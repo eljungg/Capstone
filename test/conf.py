@@ -1,0 +1,11 @@
+
+
+
+LISTBOX_MIMETYPE = "application/x-item"
+
+OP_CODE_INPUT = 1
+OP_CODE_OUTPUT = 2
+OP_CODE_ADD = 3
+OP_CODE_SUB = 4
+OP_CODE_MUL = 5
+OP_CODE_DIV = 6
