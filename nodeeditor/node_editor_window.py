@@ -14,6 +14,7 @@ class NodeEditorWindow(QMainWindow):
 
     """Class representing NodeEditor's Main Window"""
     def __init__(self):
+        print("__init__ is called in nodeeditor/node_editor_window.py")
         """
         :Instance Attributes:
 
@@ -29,6 +30,7 @@ class NodeEditorWindow(QMainWindow):
 
 
     def initUI(self):
+        print("InitUI Called in NodeEditorWindow")
         """Set up this ``QMainWindow``. Create :class:`~nodeeditor.node_editor_widget.NodeEditorWidget`, Actions and Menus"""
         self.createActions()
         self.createMenus()

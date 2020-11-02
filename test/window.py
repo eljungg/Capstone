@@ -6,12 +6,15 @@ from nodeeditor.node_editor_window import NodeEditorWindow
 from Capstone.test.drag_list_box import QDMDragListBox
 from Capstone.test.sub_window import SubWindow
 
+#Luke testing
+import inspect
 
 
 class MainWindow(NodeEditorWindow):
 
     def initUI(self):
-
+        print("caller name: ", inspect.stack()[1][3])
+        print("InitUI is called in MainWindow")
         self.name_company = 'BlenderFreak'
         self.name_product = 'NodeEditor'
 
@@ -146,6 +149,8 @@ class MainWindow(NodeEditorWindow):
             self.mdiArea.setActiveSubWindow(window)
 
     def createMdiChild(self):
+        #this command executes on ctrl - n, when you make the actually window for adding nodes.
+        print("Called createMdiChild! on ctrl-n")
         nodeeditor = SubWindow() 
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         return subwnd

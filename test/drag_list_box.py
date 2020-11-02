@@ -28,6 +28,10 @@ class QDMDragListBox(QListWidget):
         self.addItem('Subtract', 'icons/sub.png', OP_CODE_SUB)
         self.addItem('Multiply', 'icons/mul.png', OP_CODE_MUL)
         self.addItem('Divide', 'icons/divide.png', OP_CODE_DIV)
+        self.addItem('Variable', 'icons/mul.png', OP_CODE_VARIABLE)
+        self.addItem('Calculate', 'icons/mul.png', OP_CODE_CALCULATE)
+        self.addItem('Data', 'icons/mul.png', OP_CODE_DATA)
+        self.addItem('Merge', 'icons/mul.png', OP_CODE_MERGE)
 
     def addItem(self, name, icon=None, op_code=0):
         item = QListWidgetItem(name, self)

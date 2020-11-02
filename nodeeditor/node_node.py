@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 A module containing NodeEditor's class for representing `Node`.
@@ -6,6 +7,7 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_socket import *
 from nodeeditor.utils import dumpException, pp
+from ..test.model.node_data import NodeData # get our NodeData model object
 
 DEBUG = False
 
@@ -14,8 +16,9 @@ class Node(Serializable):
     """
     Class representing `Node` in the `Scene`.
     """
-    GraphicsNode_class = QDMGraphicsNode
-    NodeContent_class = QDMNodeContentWidget
+    GraphicsNode_class = QDMGraphicsNode # sets color and size etc
+    NodeContent_class = QDMNodeContentWidget # sets the nodes title / text etc
+    NodeData_class = NodeData # reference to our model/data object for a node
     Socket_class = Socket
 
     def __init__(self, scene:'Scene', title:str="Undefined Node", inputs:list=[], outputs:list=[]):
@@ -44,6 +47,7 @@ class Node(Serializable):
         # just to be sure, init these variables
         self.content = None
         self.grNode = None
+        self.data = None
 
         self.initInnerClasses()
         self.initSettings()
@@ -103,11 +107,14 @@ class Node(Serializable):
 
     def initInnerClasses(self):
         """Sets up graphics Node (PyQt) and Content Widget"""
+        node_data_class = self.getNodeDataClass()
         node_content_class = self.getNodeContentClass()
         graphics_node_class = self.getGraphicsNodeClass()
         if node_content_class is not None: self.content = node_content_class(self)
         if graphics_node_class is not None: self.grNode = graphics_node_class(self)
-
+        if node_data_class is not None: self.data = node_data_class()
+    def getNodeDataClass(self):
+        return self.__class__.NodeData_class
     def getNodeContentClass(self):
         """Returns class representing nodeeditor content"""
         return self.__class__.NodeContent_class

@@ -31,7 +31,7 @@ class QDMNodeContentWidget(QWidget, Serializable):
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.layout)
-
+        #this is where our nodes are getting there title / text input
         self.wdg_label = QLabel("Some Title")
         self.layout.addWidget(self.wdg_label)
         self.layout.addWidget(QDMTextEdit("foo"))
