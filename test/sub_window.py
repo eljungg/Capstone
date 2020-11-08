@@ -2,13 +2,14 @@ from nodeeditor.node_editor_widget import NodeEditorWidget
 from PyQt5.QtCore import *
 from Capstone.test.conf import *
 from PyQt5.QtGui import *
-from ..nodeeditor.node_node import Node # call LOCAL version of Node class
+#from ..nodeeditor.node_node import Node # call LOCAL version of Node class
+from vpl_node import VplNode # get over-ridedd node
+from nodes.variable_node import VariableNode # get our node sub classes
 
 
 class SubWindow(NodeEditorWidget):
     """This is a sub-window, the grey plot for placing nodes on """
     def __init__(self):
-        print("Dark Grey Node Plot Created!")
         super().__init__()
         self.setAttribute(Qt.WA_DeleteOnClose)
 
@@ -37,6 +38,7 @@ class SubWindow(NodeEditorWidget):
             event.setAccepted(False)
         
 
+    
     def onDrop(self, event): #Finish startDrag started in dra_list_box.py
         if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
             eventData = event.mimeData().data(LISTBOX_MIMETYPE)
@@ -51,8 +53,8 @@ class SubWindow(NodeEditorWidget):
 
             print("GOT DROP: [%d] '%s' " % (op_code, text), 'mouse: ', mouse_position, 'scene: ', scene_position)
 
-            node = Node(self.scene,  text, inputs=[1,1], outputs=[2]) # this actually creates the "nodes"
-            self.setNodeType(node=node , op_code=op_code)# Handle specific node types
+            #node = VplNode(self.scene,  text, inputs=[1,1], outputs=[2]) # this actually creates the "nodes"
+            node = self.setNodeType(text, op_code)
             
             node.setPos(scene_position.x(), scene_position.y())
             self.scene.addNode(node)
@@ -61,22 +63,28 @@ class SubWindow(NodeEditorWidget):
             event.accept()
         else:
             event.ignore()
-    def setNodeType(self , node , op_code): 
+    def setNodeType(self , text , op_code): 
+        print("Inside SetNodeType")
+        if(op_code == OP_CODE_VARIABLE):
+            print("Case custom Variable Node")
+            return VariableNode(self.scene)
+        else:
+            return VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
         #We need to get a reference to our model object in here somehow
         ###Take a newly created node object, and its opcode, inners###
-        node.data.setNodeType = op_code # set type fo any node
-        if op_code == OP_CODE_VARIABLE:
-            node.title="Variable Node"
-            node.content.wdg_label.setText("Variable")
-            node.grNode._color = QColor("#6cff51") # so this dont work
-            node.data.print()
-            #TODO, access the node.content and set color
-        if op_code == OP_CODE_CALCULATE:
-            node.title="Calculate Node"
-            node.content.wdg_label.setText("Calculate")
-        if op_code == OP_CODE_DATA:
-            node.title = "Data Node"
-            node.content.wdg_label.setText("Data")
-        if op_code == OP_CODE_MERGE:
-            node.title = "Merge Node"
-            node.content.wdg_label.setText("Merge")
+        # node.data.setNodeType = op_code # set type fo any node
+        # if op_code == OP_CODE_VARIABLE:
+        #     node.title="Variable Node"
+        #     #node.content.lbl.SetText("VARIABLE WORKS?")
+        #     node.content.wdg_label.setText("Variable")
+        #     #node.data.print()
+        #     #TODO, access the node.content and set color
+        # if op_code == OP_CODE_CALCULATE:
+        #     node.title="Calculate Node"
+        #     node.content.wdg_label.setText("Calculate")
+        # if op_code == OP_CODE_DATA:
+        #     node.title = "Data Node"
+        #     node.content.wdg_label.setText("Data")
+        # if op_code == OP_CODE_MERGE:
+        #     node.title = "Merge Node"
+        #     node.content.wdg_label.setText("Merge")

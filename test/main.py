@@ -15,7 +15,6 @@ if __name__ == '__main__':
     app.setStyle('Fusion')
 
     wnd = MainWindow() #somehow this calls initUI() in the MainWindow class
-    print("BEFORE SHOW CALL")
     wnd.show()
 
     sys.exit(app.exec_())
