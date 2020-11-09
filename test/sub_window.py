@@ -7,6 +7,9 @@ from vpl_node import VplNode # get over-ridedd node
 from nodes.variable_node import VariableNode # get our node sub classes
 from nodes.if_node import IfNode
 from nodes.join_node import JoinNode
+from nodes.data_node import DataNode
+from nodes.calculate_node import CalculateNode
+from nodes.merge_node import MergeNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -68,31 +71,29 @@ class SubWindow(NodeEditorWidget):
     def setNodeType(self , text , op_code): 
         print("Inside SetNodeType")
         if(op_code == OP_CODE_VARIABLE):
-            print("Case custom Variable Node")
-            return VariableNode(self.scene)
+            node =  VariableNode(self.scene)
+            node.title = "Variable Node"
+        elif op_code == OP_CODE_CALCULATE:
+            node = CalculateNode(self.scene)
+            node.title="Calculate Node"
+
+        elif op_code == OP_CODE_DATA:
+            node = DataNode(self.scene)
+            node.title = "Data Node"
+
+        elif op_code == OP_CODE_MERGE:
+            node = DataNode(self.scene)
+            node.title = "Merge Node"
         elif(op_code == OP_CODE_IF):
             print("adding if node.")
-            return IfNode(self.scene)
+            node = IfNode(self.scene)
+            node.title = "If Node"
         elif(op_code == OP_CODE_JOIN):
             print("adding join node.")
-            return JoinNode(self.scene)
+            node = JoinNode(self.scene)
+            node.title = "Join Node"
+            
         else:
-            return VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
-        #We need to get a reference to our model object in here somehow
-        ###Take a newly created node object, and its opcode, inners###
-        # node.data.setNodeType = op_code # set type fo any node
-        # if op_code == OP_CODE_VARIABLE:
-        #     node.title="Variable Node"
-        #     #node.content.lbl.SetText("VARIABLE WORKS?")
-        #     node.content.wdg_label.setText("Variable")
-        #     #node.data.print()
-        #     #TODO, access the node.content and set color
-        # if op_code == OP_CODE_CALCULATE:
-        #     node.title="Calculate Node"
-        #     node.content.wdg_label.setText("Calculate")
-        # if op_code == OP_CODE_DATA:
-        #     node.title = "Data Node"
-        #     node.content.wdg_label.setText("Data")
-        # if op_code == OP_CODE_MERGE:
-        #     node.title = "Merge Node"
-        #     node.content.wdg_label.setText("Merge")
+            node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
+
+        return node # give the node back
