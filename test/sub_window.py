@@ -1,10 +1,11 @@
 from nodeeditor.node_editor_widget import NodeEditorWidget
 from PyQt5.QtCore import *
-from Capstone.test.conf import *
+from conf import *
 from PyQt5.QtGui import *
 #from ..nodeeditor.node_node import Node # call LOCAL version of Node class
 from vpl_node import VplNode # get over-ridedd node
 from nodes.variable_node import VariableNode # get our node sub classes
+from nodes.if_node import IfNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -68,6 +69,9 @@ class SubWindow(NodeEditorWidget):
         if(op_code == OP_CODE_VARIABLE):
             print("Case custom Variable Node")
             return VariableNode(self.scene)
+        elif(op_code == OP_CODE_IF):
+            print("adding if node.")
+            return IfNode(self.scene)
         else:
             return VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
         #We need to get a reference to our model object in here somehow

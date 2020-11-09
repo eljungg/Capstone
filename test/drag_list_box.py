@@ -2,7 +2,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
-from Capstone.test.conf import *
+from conf import *
 from nodeeditor.utils import dumpException
 
 
@@ -32,6 +32,7 @@ class QDMDragListBox(QListWidget):
         self.addItem('Calculate', 'icons/mul.png', OP_CODE_CALCULATE)
         self.addItem('Data', 'icons/mul.png', OP_CODE_DATA)
         self.addItem('Merge', 'icons/mul.png', OP_CODE_MERGE)
+        self.addItem('If', 'icons/in.png', OP_CODE_IF)
 
     def addItem(self, name, icon=None, op_code=0):
         item = QListWidgetItem(name, self)
