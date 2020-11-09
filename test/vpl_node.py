@@ -8,7 +8,7 @@ from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 from model.node_data import NodeData
 
-
+#test
 #Over-ride the Graphics of our Node
 class VplGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
