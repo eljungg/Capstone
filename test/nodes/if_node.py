@@ -36,8 +36,8 @@ class IfNode(VplNode):
     op_title = "If"
     content_label_objname = "VplNodeIf"
 
-    def __init__(self, scene):
-        super().__init__(scene, inputs = [1], outputs = [3])
+    def __init__(self, scene, title:str="If"):
+        super().__init__(scene, title, inputs = [1], outputs = [3,3])
         self.eval()
 
     def initInnerClasses(self):

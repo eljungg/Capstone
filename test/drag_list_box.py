@@ -33,6 +33,7 @@ class QDMDragListBox(QListWidget):
         self.addItem('Data', 'icons/mul.png', OP_CODE_DATA)
         self.addItem('Merge', 'icons/mul.png', OP_CODE_MERGE)
         self.addItem('If', 'icons/in.png', OP_CODE_IF)
+        self.addItem('Join', 'icons/in.png', OP_CODE_JOIN)
 
     def addItem(self, name, icon=None, op_code=0):
         item = QListWidgetItem(name, self)

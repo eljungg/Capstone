@@ -6,6 +6,7 @@ from PyQt5.QtGui import *
 from vpl_node import VplNode # get over-ridedd node
 from nodes.variable_node import VariableNode # get our node sub classes
 from nodes.if_node import IfNode
+from nodes.join_node import JoinNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -72,6 +73,9 @@ class SubWindow(NodeEditorWidget):
         elif(op_code == OP_CODE_IF):
             print("adding if node.")
             return IfNode(self.scene)
+        elif(op_code == OP_CODE_JOIN):
+            print("adding join node.")
+            return JoinNode(self.scene)
         else:
             return VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
         #We need to get a reference to our model object in here somehow
