@@ -59,7 +59,7 @@ class QDMDragListBox(QListWidget):
 
             drag = QDrag(self)
             drag.setMimeData(mimeData)
-            drag.setPixmap(pixmap)
+            #drag.setPixmap(pixmap)
             drag.setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2))
             drag.setPixmap(pixmap)
 

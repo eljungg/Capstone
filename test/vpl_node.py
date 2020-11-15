@@ -47,9 +47,20 @@ class VplNode(Node):
     GraphicsNode_class = VplGraphicsNode
     NodeContent_class = VplContent
     data = NodeData() # hold our data model for this node
+    op_code = 0
 
     content_label = ""
     content_label_objname = "calc_node_bg"
     def __init__(self, scene:'Scene', title:str="Undefined Node", inputs:list=[], outputs:list=[]):
         super().__init__(scene , title , inputs, outputs)
         print("OVer-rided node class goes!")
+
+    def serialize(self):
+        res = super().serialize()
+        res['op_code'] = self.__class__.op_code
+        return res
+
+    def deserialize(self, data, hashmap={}, restore_id=True):
+        res = super().deserialize(data, hashmap, restore_id)
+        print("Deserialized CalcNode '%s'" % self.__class__.__name__, "res:", res)
+        return res

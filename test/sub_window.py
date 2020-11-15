@@ -62,12 +62,29 @@ class SubWindow(NodeEditorWidget):
             node = self.setNodeType(text, op_code)
             
             node.setPos(scene_position.x(), scene_position.y())
-            self.scene.addNode(node)
+            #self.scene.addNode(node)
 
             event.setDropAction(Qt.MoveAction)
             event.accept()
         else:
             event.ignore()
+
+    def doEvalOutputs(self):
+        # eval all output nodes
+        for node in self.scene.nodes:
+            if node.__class__.__name__ == "CalcNode_Output":
+                node.eval()
+
+    def onHistoryRestored(self):
+        self.doEvalOutputs()
+
+    def fileLoad(self, filename):
+        if super().fileLoad(filename):
+            self.doEvalOutputs()
+            return True
+
+        return False
+    
     def setNodeType(self , text , op_code): 
         print("Inside SetNodeType")
         if(op_code == OP_CODE_VARIABLE):

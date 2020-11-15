@@ -58,6 +58,51 @@ class MainWindow(NodeEditorWindow):
         self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu.addAction(self.aboutAct)
 
+    def getCurrentNodeEditorWidget(self):
+        """ we're returning NodeEditorWidget here... """
+        activeSubWindow = self.mdiArea.activeSubWindow()
+        if activeSubWindow:
+            return activeSubWindow.widget()
+        return None
+
+    def onFileOpen(self):
+        fnames, filter = QFileDialog.getOpenFileNames(self, 'Open graph from file', self.getFileDialogDirectory(), self.getFileDialogFilter())
+
+        try:
+            for fname in fnames:
+                if fname:
+                    existing = self.findMdiChild(fname)
+                    if existing:
+                        self.mdiArea.setActiveSubWindow(existing)
+                    else:
+                        # we need to create new subWindow and open the file
+                        nodeeditor = SubWindow()
+                        if nodeeditor.fileLoad(fname):
+                            self.statusBar().showMessage("File %s loaded" % fname, 5000)
+                            nodeeditor.setTitle()
+                            subwnd = self.createMdiChild(nodeeditor)
+                            subwnd.show()
+                        else:
+                            nodeeditor.close()
+        except Exception as e: dumpException(e)
+
+    def findMdiChild(self, filename):
+        for window in self.mdiArea.subWindowList():
+            if window.widget().filename == filename:
+                return window
+        return None
+
+    def createMdiChild(self, child_widget=None):
+        nodeeditor = child_widget if child_widget is not None else SubWindow()
+        subwnd = self.mdiArea.addSubWindow(nodeeditor)
+        #subwnd.setWindowIcon(self.empty_icon)
+        # nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)
+        # nodeeditor.scene.addItemsDeselectedListener(self.updateEditMenu)
+        nodeeditor.scene.history.addHistoryModifiedListener(self.updateEditMenu)
+        nodeeditor.addCloseEventListener(self.onSubWndClose)
+        return subwnd
+
+
     def updateWindowMenu(self):
 
         self.windowMenu.clear()
@@ -145,9 +190,9 @@ class MainWindow(NodeEditorWindow):
         if window:
             self.mdiArea.setActiveSubWindow(window)
 
-    def createMdiChild(self):
+    def createMdiChild(self, child_widget=None):
         #this command executes on ctrl - n, when you make the actually window for adding nodes.
-        nodeeditor = SubWindow() 
+        nodeeditor = child_widget if child_widget is not None else SubWindow() 
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         return subwnd
 
