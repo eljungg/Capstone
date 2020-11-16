@@ -1,5 +1,4 @@
 from PyQt5.QtCore import *
-from PyQt5.QtWidgets import QComboBox
 from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from Capstone.test.conf import * 
@@ -11,11 +10,7 @@ class CalculateContent(QDMNodeContentWidget):
         self.edit = QLineEdit("Calculate Node Class" , self)
         self.edit.setAlignment(Qt.AlignRight)
         self.layout.addWidget(self.edit)
-        # self.cBox = QComboBox(self)
-        # self.cBox.addItem('+')
-        # self.cBox.addItem('-')
-        # self.cBox.addItem('/')
-        # self.cBox.addItem('*')
+
 
 class CalculateNode(VplNode):
     def __init__(self, scene):
