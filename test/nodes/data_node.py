@@ -5,8 +5,16 @@ from Capstone.test.conf import *
 
 class DataContent(QDMNodeContentWidget):
     def initUI(self):
+        self.layout = QVBoxLayout()
+        self.setLayout(self.layout)
+
         self.edit = QLineEdit("Data Node Class" , self)
-        self.edit.setAlignment(Qt.AlignLeft)
+        self.edit.setAlignment(Qt.AlignRight)
+        self.typeLabel = QLabel("none" , self)
+        self.typeLabel.setAlignment(Qt.AlignRight)
+        self.layout.addWidget(self.edit)
+        self.layout.addWidget(self.typeLabel)
+        
 
 class DataNode(VplNode):
     def __init__(self, scene):
@@ -18,29 +26,26 @@ class DataNode(VplNode):
         #below is onTextChanged event for simple self.edit Label
         self.content.edit.textChanged.connect(self.onInputChanged)
         self.content.edit.textChanged.connect(self.determineDataType)
-    
+
     def determineDataType(self):
         ### Determine the type of data given in Text Box by user ###
         self.data.val = (self.content.edit.text())
         val = self.data.val
         if self.__isInt(val) == True:
             self.data.valType = TYPE_INT
-            return
+            self.content.typeLabel.setText("Int")
         elif self.__isFloat(val) == True:
             self.data.valType = TYPE_DOUBLE
-            return
+            self.content.typeLabel.setText("Double")
         elif self.__isBool(val) == True:
             self.data.valType = TYPE_BOOL
-            return
+            self.content.typeLabel.setText("Boolean")
         elif self.__isChar(val) == True:
             self.data.valType = TYPE_CHAR
-            return
+            self.content.typeLabel.setText("Char")
         else:
             self.data.valType = TYPE_STRING
-            return
-
-            
-
+            self.content.typeLabel.setText("String")
 
     def __isInt(self , val): #helper function for determineType
         try:

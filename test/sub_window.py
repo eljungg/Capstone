@@ -10,6 +10,7 @@ from nodes.join_node import JoinNode
 from nodes.data_node import DataNode
 from nodes.calculate_node import CalculateNode
 from nodes.merge_node import MergeNode
+from model.variables import VariablesData
 
 
 class SubWindow(NodeEditorWidget):
@@ -25,7 +26,7 @@ class SubWindow(NodeEditorWidget):
         self.scene.addDropListener(self.onDrop)
 
         self._close_event_listeners = []
-
+        self.variables = VariablesData() # each "scene" or "subwindow" has a "global" Variables data list
 
     def setTitle(self):
         self.setWindowTitle(self.getUserFriendlyFilename())
@@ -58,7 +59,6 @@ class SubWindow(NodeEditorWidget):
 
             print("GOT DROP: [%d] '%s' " % (op_code, text), 'mouse: ', mouse_position, 'scene: ', scene_position)
 
-            #node = VplNode(self.scene,  text, inputs=[1,1], outputs=[2]) # this actually creates the "nodes"
             node = self.setNodeType(text, op_code)
             
             node.setPos(scene_position.x(), scene_position.y())
@@ -86,10 +86,11 @@ class SubWindow(NodeEditorWidget):
         return False
     
     def setNodeType(self , text , op_code): 
-        print("Inside SetNodeType")
+
         if(op_code == OP_CODE_VARIABLE):
-            node =  VariableNode(self.scene)
+            node =  VariableNode(self.scene , self.variables) # Variable node gets reference to global(subWindow) variables object
             node.title = "Variable Node"
+            
         elif op_code == OP_CODE_CALCULATE:
             node = CalculateNode(self.scene)
             node.title="Calculate Node"
