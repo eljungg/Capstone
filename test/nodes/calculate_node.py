@@ -10,9 +10,26 @@ class CalculateContent(QDMNodeContentWidget):
         self.edit = QLineEdit("Calculate Node Class" , self)
         self.edit.setAlignment(Qt.AlignRight)
         self.layout.addWidget(self.edit)
+    
+    def serialize(self):
+        res = super().serialize()
+        res['value'] = self.edit.text()
+        return res 
+
+    def deserialize(self, data, hashmap={}):
+        res = super().deserialize(data, hashmap)
+        try:
+            value = data['value']
+            self.edit.setText(value)
+            return True & res
+        except Exception as e:
+            dumpException(e)
+        return res
 
 
 class CalculateNode(VplNode):
+    op_code = OP_CODE_CALCULATE
+
     def __init__(self, scene):
         super().__init__(scene, inputs=[2], outputs=[1])
 

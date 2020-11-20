@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from PyQt5.QtWidgets import QComboBox
+from conf import *
 
 class VariableContent(QDMNodeContentWidget):
     def __init__(self, parent, variablesRef):
@@ -27,7 +28,23 @@ class VariableContent(QDMNodeContentWidget):
         for var in self.vars.variables:
             self.variablesDropDown.addItem(var)
 
+    def serialize(self):
+        res = super().serialize()
+        res['value'] = self.edit.text()
+        return res
+
+    def deserialize(self, data, hashmap={}):
+        res = super().deserialize(data, hashmap)
+        try:
+            value = data['value']
+            self.edit.setText(value)
+            return True & res
+        except Exception as e:
+            dumpException(e)
+        return res
+
 class VariableNode(VplNode):
+    op_code = OP_CODE_VARIABLE
     def __init__(self, scene , variablesRef):
         self.variablesRef = variablesRef # set on construction in sub_window.py # reference to out subWindow level variables
         super().__init__(scene, inputs=[], outputs=[3])

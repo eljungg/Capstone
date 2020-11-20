@@ -14,9 +14,25 @@ class DataContent(QDMNodeContentWidget):
         self.typeLabel.setAlignment(Qt.AlignRight)
         self.layout.addWidget(self.edit)
         self.layout.addWidget(self.typeLabel)
+    
+    def serialize(self):
+        res = super().serialize()
+        res['value'] = self.edit.text()
+        return res
+
+    def deserialize(self, data, hashmap={}):
+        res = super().deserialize(data, hashmap)
+        try:
+            value = data['value']
+            self.edit.setText(value)
+            return True & res
+        except Exception as e:
+            dumpException(e)
+        return res
         
 
 class DataNode(VplNode):
+    op_code = OP_CODE_DATA
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
 

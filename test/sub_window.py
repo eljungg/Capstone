@@ -24,9 +24,26 @@ class SubWindow(NodeEditorWidget):
         self.scene.addHasBeenModifiedListener(self.setTitle)
         self.scene.addDragEnterListener(self.onDragEnter)
         self.scene.addDropListener(self.onDrop)
+        #passes the function used to determine node type into the deseriazation process
+        self.scene.setNodeClassSelector(self.getNodeClass)
 
         self._close_event_listeners = []
         self.variables = VariablesData() # each "scene" or "subwindow" has a "global" Variables data list
+
+    def getNodeClass(self, data):
+        #scan through op codes
+        #return a class based on op code
+        if 'op_code' not in data: 
+            return VplNode
+        elif data['op_code'] == 7:
+            return VariableNode
+        elif data['op_code'] == 8: return CalculateNode
+        elif data['op_code'] == 9: return DataNode
+        elif data['op_code'] == 10: return MergeNode
+        elif data['op_code'] == 11: return IfNode
+        elif data['op_code'] == 12: return JoinNode
+        
+        return VplNode
 
     def setTitle(self):
         self.setWindowTitle(self.getUserFriendlyFilename())

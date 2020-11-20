@@ -1,6 +1,7 @@
 from PyQt5.QtCore import *
 from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
+from conf import *
 
 class MergeContent(QDMNodeContentWidget):
     def initUI(self):
@@ -8,6 +9,7 @@ class MergeContent(QDMNodeContentWidget):
         self.edit.setAlignment(Qt.AlignLeft)
 
 class MergeNode(VplNode):
+    op_code = OP_CODE_MERGE
     def __init__(self, scene):
         super().__init__(scene, inputs=[4], outputs=[1])
 
