@@ -105,7 +105,8 @@ class SubWindow(NodeEditorWidget):
     def setNodeType(self , text , op_code): 
 
         if(op_code == OP_CODE_VARIABLE):
-            node =  VariableNode(self.scene , self.variables) # Variable node gets reference to global(subWindow) variables object
+            node =  VariableNode(self.scene) # Variable node gets reference to global(subWindow) variables object
+            node.setVariableData(self.variables)
             node.title = "Variable Node"
             
         elif op_code == OP_CODE_CALCULATE:
