@@ -2,6 +2,7 @@ from nodeeditor.node_editor_widget import NodeEditorWidget
 from PyQt5.QtCore import *
 from conf import *
 from PyQt5.QtGui import *
+from vpl_scene import VplScene
 #from ..nodeeditor.node_node import Node # call LOCAL version of Node class
 from vpl_node import VplNode # get over-ridedd node
 from nodes.variable_node import VariableNode # get our node sub classes
@@ -10,14 +11,15 @@ from nodes.join_node import JoinNode
 from nodes.data_node import DataNode
 from nodes.calculate_node import CalculateNode
 from nodes.merge_node import MergeNode
-from printLineNode import PrintLineNode
-from simpleDialogNode import SimpleDialogNode
+from nodes.print_line_node import PrintLineNode
+from nodes.simple_dialog_node import SimpleDialogNode
 from model.variables import VariablesData
 
 
 class SubWindow(NodeEditorWidget):
     """This is a sub-window, the grey plot for placing nodes on """
     def __init__(self):
+        self.scene = VplScene()
         super().__init__()
         self.setAttribute(Qt.WA_DeleteOnClose)
 
