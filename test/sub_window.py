@@ -10,6 +10,8 @@ from nodes.join_node import JoinNode
 from nodes.data_node import DataNode
 from nodes.calculate_node import CalculateNode
 from nodes.merge_node import MergeNode
+from printLineNode import PrintLineNode
+from simpleDialogNode import SimpleDialogNode
 from model.variables import VariablesData
 
 
@@ -42,6 +44,8 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 10: return MergeNode
         elif data['op_code'] == 11: return IfNode
         elif data['op_code'] == 12: return JoinNode
+        elif data['op_code'] == 50: return PrintLineNode
+        elif data['op_code'] == 51: return SimpleDialogNode
         
         return VplNode
 
@@ -128,6 +132,14 @@ class SubWindow(NodeEditorWidget):
             print("adding join node.")
             node = JoinNode(self.scene)
             node.title = "Join Node"
+        elif(op_code == OP_CODE_PRINT_LINE):
+            print("adding print line node.")
+            node = PrintLineNode(self.scene)
+            #node.title = "Join Node"
+        elif(op_code == OP_CODE_SIMPLE_DIALOG):
+            print("adding simple dialog node node.")
+            node = SimpleDialogNode(self.scene)
+            #node.title = "Join Node"
             
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
