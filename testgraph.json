@@ -1,0 +1,63 @@
+{
+    "id": 2108088869360,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 2316472319712,
+            "title": "Variable Node",
+            "pos_x": -547.0,
+            "pos_y": -435.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2316472324160,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 4,
+                    "socket_type": 3
+                }
+            ],
+            "content": {
+                "value": "thread"
+            },
+            "op_code": 7
+        },
+        {
+            "id": 2316472189328,
+            "title": "Calculate Node",
+            "pos_x": -88.0,
+            "pos_y": -381.0,
+            "inputs": [
+                {
+                    "id": 2316472324736,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 3,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2316472324784,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 4,
+                    "socket_type": 1
+                }
+            ],
+            "content": {
+                "value": "Calculate Node Class"
+            },
+            "op_code": 8
+        }
+    ],
+    "edges": [
+        {
+            "id": 2316472324880,
+            "edge_type": 2,
+            "start": 2316472324160,
+            "end": 2316472324736
+        }
+    ]
+}

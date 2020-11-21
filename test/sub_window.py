@@ -1,4 +1,5 @@
-from nodeeditor.node_editor_widget import NodeEditorWidget
+#from nodeeditor.node_editor_widget import NodeEditorWidget
+from Capstone.test.widget import NodeEditorWidget
 from PyQt5.QtCore import *
 from conf import *
 from PyQt5.QtGui import *
