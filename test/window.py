@@ -5,8 +5,15 @@ from nodeeditor.utils import dumpException
 from nodeeditor.node_editor_window import NodeEditorWindow
 from Capstone.test.drag_list_box import QDMDragListBox
 from Capstone.test.sub_window import SubWindow
+import threading
+import pathlib
+import os
+import json
 
-
+#threadLock = threading.Lock()
+start_threads = []
+threads = []
+windowContent = []
 
 
 class MainWindow(NodeEditorWindow):
@@ -58,6 +65,11 @@ class MainWindow(NodeEditorWindow):
         self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu.addAction(self.aboutAct)
 
+        self.menuBar().addSeparator()
+
+        self.runMenu = self.menuBar().addMenu("&Run")
+        self.runMenu.addAction(self.runAct)
+
     def getCurrentNodeEditorWidget(self):
         """ we're returning NodeEditorWidget here... """
         activeSubWindow = self.mdiArea.activeSubWindow()
@@ -91,6 +103,73 @@ class MainWindow(NodeEditorWindow):
             if window.widget().filename == filename:
                 return window
         return None
+
+    def runProgram(self):
+        windows = self.mdiArea.subWindowList()
+        self.separatorAct.setVisible(len(windows) != 0)
+
+        edges = []
+
+        for i, window in enumerate(windows):
+            child = window.widget()
+
+            nameOfFile = child.getUserFriendlyFilename()
+
+            pathName = pathlib.Path(__file__).parent.absolute()
+            print(pathName)
+            fullpath = os.path.join(pathName, nameOfFile)
+            print(fullpath)
+            
+            with open(nameOfFile) as f:
+                data = json.load(f)
+
+            for j in data['edges']:
+                edges.append(j)
+            
+            for k in edges:
+                for m in data['nodes']:
+                    if len(m['outputs']) != 0:
+                        if k['start'] == m['outputs'][0]['id']:
+                            node1Type = m['op_code']
+                            contentToTransfer = m['content']['value']
+                    if len(m['inputs']) != 0:
+                        if k['end'] == m['inputs'][0]['id']:
+                            node2Type = m['op_code']
+
+                edgeThread = nodeThread(node1Type, node2Type, contentToTransfer)
+                start_threads.append(edgeThread)
+
+            for n in start_threads:
+                n.start()
+
+            for p in start_threads:
+                threads.append(p)
+
+            for t in threads:
+                t.join()
+
+            if(node2Type == 1):
+                pass
+            elif(node2Type == 2):
+                pass
+            elif(node2Type == 3):
+                pass
+            elif(node2Type == 4):
+                pass
+            elif(node2Type == 5):
+                pass
+            elif(node2Type == 6):
+                pass
+            elif(node2Type == 8):
+                print("Opening sub window")
+                self.window = printWindow()
+                self.window.show()
+
+            print("Showing result of printThread")
+            
+            start_threads.clear()
+            threads.clear()
+            windowContent.clear()
 
     def createMdiChild(self, child_widget=None):
         nodeeditor = child_widget if child_widget is not None else SubWindow()
@@ -155,6 +234,8 @@ class MainWindow(NodeEditorWindow):
         self.separatorAct = QAction(self)
         self.separatorAct.setSeparator(True)
         self.aboutAct = QAction("&About", self, statusTip="Show the application's About box", triggered=self.about)
+        self.runAct = QAction("&Run Program", self, statusTip="Run the program", triggered=self.runProgram)
+
 
     def onWindowNodesToolbar(self):
         if self.nodesDock.isVisible():
@@ -202,5 +283,53 @@ class MainWindow(NodeEditorWindow):
             return activeSubWindow.widget()
         return None
 
+class nodeThread(threading.Thread):
+    def __init__(self, node1, node2, node1Content):
+        threading.Thread.__init__(self)
+        self.node1 = node1
+        self.node2 = node2
+        self.node1Content = node1Content
 
+    def run(self):
+        #threadLock.acquire()
+
+        if(self.node2 == 1):
+            pass
+        elif(self.node2 == 2):
+            pass
+        elif(self.node2 == 3):
+            pass
+        elif(self.node2 == 4):
+            pass
+        elif(self.node2 == 5):
+            pass
+        elif(self.node2 == 6):
+            pass
+        elif(self.node2 == 8):
+            printThread(self.node1Content)
+
+        #threadLock.release()
+
+def printThread(node1Content):
+    windowContent.append(node1Content)
+
+class printWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        layout = QVBoxLayout()
+        for i in windowContent:
+            self.l = QLabel(i)
+            layout.addWidget(self.l)
+
+        b = QPushButton("Stop")
+        b.pressed.connect(self.on_click)
+        b.pressed.connect(self.close)
+
+        layout.addWidget(b)
+
+        self.setLayout(layout)
+
+    def on_click(self):
+        print('PyQt5 button click')
 
