@@ -1,4 +1,5 @@
 from nodeeditor.node_scene import Scene
+import json
 
 class VplScene(Scene):
 
@@ -10,7 +11,7 @@ class VplScene(Scene):
         :type filename: ``str``
         :raises: :class:`~nodeeditor.node_scene.InvalidFile` if there was an error decoding JSON file
         """
-
+        print("using vplScene loading")
         with open(filename, "r") as file:
             raw_data = file.read()
             try:

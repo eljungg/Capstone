@@ -17,9 +17,10 @@ from model.variables import VariablesData
 
 
 class SubWindow(NodeEditorWidget):
+    Scene_class = VplScene
     """This is a sub-window, the grey plot for placing nodes on """
     def __init__(self):
-        self.scene = VplScene()
+        
         super().__init__()
         self.setAttribute(Qt.WA_DeleteOnClose)
 
