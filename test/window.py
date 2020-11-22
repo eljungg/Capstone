@@ -1,19 +1,29 @@
+import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from nodeeditor.utils import loadStylesheets
 from nodeeditor.utils import dumpException
 from nodeeditor.node_editor_window import NodeEditorWindow
 from Capstone.test.drag_list_box import QDMDragListBox
 from Capstone.test.sub_window import SubWindow
 
+import Capstone.test.qss.nodeeditor_dark_resources
 
 
 
 class MainWindow(NodeEditorWindow):
 
     def initUI(self):
-        self.name_company = 'BlenderFreak'
-        self.name_product = 'NodeEditor'
+        self.name_company = 'ASU'
+        self.name_product = 'ASU VPL'
+
+        self.stylesheet_filename = os.path.join(os.path.dirname(__file__), "qss/nodeeditor.qss")
+        loadStylesheets(
+            os.path.join(os.path.dirname(__file__), "qss/nodeeditor-dark.qss"),
+            self.stylesheet_filename
+        )
+
 
         self.mdiArea = QMdiArea()
         self.mdiArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
