@@ -89,3 +89,7 @@ class DataNode(VplNode):
             return True
         else:
             return False
+
+    def doEval(self, input=None):
+        return self.content.edit.text()
+        

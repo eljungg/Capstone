@@ -35,6 +35,8 @@ class TerminalPrintNode(VplNode):
         string = ""
         if(input == None):
             string = "ERROR, no value passed to node"
+            print(string)
         else:
             string = input
-        return string
+            print(string)
+        return None
