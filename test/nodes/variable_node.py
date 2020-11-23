@@ -9,16 +9,14 @@ from Capstone.test.variable_menu import VariableMenu
 
 class VariableContent(QDMNodeContentWidget):
     def __init__(self, parent, variablesRef):
-        self.vars = variablesRef
+        self.vars = variablesRef #reference to 'global' variables list
         super().__init__(parent)
         
-
     def initUI(self):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
         #self.edit = QLineEdit("Variable Node Class" , self) # Removed, unsused
         #self.edit.setAlignment(Qt.AlignRight) # removed, breaks seriealized
-        ###We are going to need some globla (subWindow) level variable holder
         self.variablesDropDown = QComboBox(self)
         for var in self.vars.variables:
             self.variablesDropDown.addItem(var)
