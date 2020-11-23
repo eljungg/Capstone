@@ -93,3 +93,6 @@ class CalculateNode(VplNode):
             return True
         else:
             return False
+
+    def doEval(self, input=None):
+        return str(eval(self.data.val, {}, {}))
