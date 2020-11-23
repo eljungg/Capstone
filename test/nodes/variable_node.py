@@ -2,8 +2,10 @@ from PyQt5.QtCore import *
 from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from PyQt5.QtWidgets import QComboBox
+from PyQt5.QtWidgets import QPushButton
 from conf import *
 from model.variables import VariablesData
+from Capstone.test.variable_menu import VariableMenu
 
 class VariableContent(QDMNodeContentWidget):
     def __init__(self, parent, variablesRef):
@@ -20,9 +22,12 @@ class VariableContent(QDMNodeContentWidget):
         self.variablesDropDown = QComboBox(self)
         for var in self.vars.variables:
             self.variablesDropDown.addItem(var)
-            print("I go :" + var)
+        
+        self.variableMenuBtn = QPushButton("more");
+
         self.layout.addWidget(self.edit)
         self.layout.addWidget(self.variablesDropDown)
+        self.layout.addWidget(self.variableMenuBtn);
         
     def reDrawVariablesDropDown(self): # function displays new variables in dropdown. (GUI REFRESH)
         self.variablesDropDown.clear()
@@ -46,6 +51,9 @@ class VariableContent(QDMNodeContentWidget):
         except Exception as e:
             dumpException(e)
         return res
+    def showVariableMenu(self): #maybe better in content class?
+        menuDialog = VariableMenu(self, self.vars)
+        menuDialog.exec_()
 
 class VariableNode(VplNode):
     op_code = OP_CODE_VARIABLE
@@ -61,7 +69,7 @@ class VariableNode(VplNode):
         #self.content.edit.textChanged.connect(self.onInputChanged)
         self.content.edit.textChanged.connect(self.__printVariables) # DEBUG TESTING
         self.content.edit.textChanged.connect(self.content.reDrawVariablesDropDown) # redraw content of dropdown
-    
+        self.content.variableMenuBtn.clicked.connect(self.content.showVariableMenu) # do modal popup
     def __printVariables(self): ## DEBUG TESTING ONLY
         self.variablesRef.variables.append("another")
         for variable in self.variablesRef.variables:
@@ -70,3 +78,5 @@ class VariableNode(VplNode):
     def setVariableData(self, variables):
         self.variablesRef = variables
         self.content.setContentVariables(self.variablesRef)
+
+
