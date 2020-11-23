@@ -5,16 +5,21 @@ from conf import *
 
 class MergeContent(QDMNodeContentWidget):
     def initUI(self):
-        self.edit = QLineEdit("Merge Node Class" , self)
-        self.edit.setAlignment(Qt.AlignLeft)
+        pass
 
 class MergeNode(VplNode):
+    icon = 'icons\merge.png'
     op_code = OP_CODE_MERGE
+    op_title = 'Merge'
+    content_label_objname = 'VplMergeNode'
+
     def __init__(self, scene):
-        super().__init__(scene, inputs=[4], outputs=[1])
+        super().__init__(scene, inputs=[1], outputs=[1])
 
     def initInnerClasses(self):
-        self.content = MergeContent(self)
-        self.grNode = VplGraphicsNode(self)
-        #below is onTextChanged event for simple self.edit Label
-        self.content.edit.textChanged.connect(self.onInputChanged)
+        self.content = VPLMergeContent(self)
+        self.grNode = VPLGraphicsNode(self)
+        self.grNode.edge_roundness = 22
+        self.grNode.width = 60
+        self.grNode.height = 60
+        self.grNode.title_vertical_padding = 5

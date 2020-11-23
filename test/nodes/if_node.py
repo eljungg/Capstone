@@ -4,6 +4,11 @@ from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 
+DEBUG = True
+ADDITIONAL_IFS = 2
+INITIAL_OUTPUTS = 2
+
+
 class IfNodeContent(QDMNodeContentWidget):
     def initUI(self):
         # Setup of all the widgets needed
@@ -26,29 +31,30 @@ class IfNodeContent(QDMNodeContentWidget):
     #I hope these are correct
     def serialize(self):
         res = super().serialize()
-        res['value'] = self.conditional1.text()
+        res['value'] = self.edit.text()
         return res
 
     def deserialize(self, data, hashmap={}):
         res = super().deserialize(data, hashmap)
         try:
             value = data['value']
-            self.conditional1.setText(value)
+            self.edit.setText(value)
             return True & res
+
         except Exception as e:
             dumpException(e)
+
         return res
 
 
 class IfNode(VplNode):
-    icons = "icons/in.png"
+    icons = "Capstone/icons/in.png"
     op_code = OP_CODE_IF
     op_title = "If"
     content_label_objname = "VplNodeIf"
 
     def __init__(self, scene, title:str="If"):
-        super().__init__(scene, title, inputs = [1], outputs = [1,2])
-        self.eval()
+        super().__init__(scene, title, inputs = [1], outputs = [1,INITIAL_OUTPUTS])
 
     def initInnerClasses(self):
         self.content = IfNodeContent(self)
@@ -59,71 +65,62 @@ class IfNode(VplNode):
          
         self.registerButtons()
     
-    #def evalImplementation
-    #May use in the future for syntax checking. Not needed for compilation
-
-
 
     def registerButtons(self):
         self.content.subBtn.clicked.connect(self.decreaseWidgetSize)
         self.content.addBtn.clicked.connect(self.increaseWidgetSize)
 
     def increaseWidgetSize(self):
-        try:
-            # will have to change this to account for multiple if nodes
-            # maybe make a local copy
-            global ADDITIONAL_IFS
-            self.grNode.height = self.grNode.height + 20
-            if DEBUG:
-                print('Add button clicked!')
+        # will have to change this to account for multiple if nodes
+        # maybe make a local copy
+        global ADDITIONAL_IFS
+        self.grNode.height = self.grNode.height + 24
+        if DEBUG:
+            print('Add button clicked!')
 
-            # increment global variable ADDITIONAL IFS
-            ADDITIONAL_IFS = ADDITIONAL_IFS + 1
+        # increment global variable ADDITIONAL IFS
+        ADDITIONAL_IFS = ADDITIONAL_IFS + 1
 
-            # remove current bottom row (buttons + else label)
-            if DEBUG:
-                print('REMOVING BOTTOM ROW')
-            self.content.layout.removeWidget(self.content.subBtn)
-            self.content.subBtn.setParent(None)
-            self.content.layout.removeWidget(self.content.elseLbl)
-            self.content.elseLbl.setParent(None)
-            self.content.layout.removeWidget(self.content.addBtn)
-            self.content.addBtn.setParent(None)
+        # remove current bottom row (buttons + else label)
+        if DEBUG:
+            print('REMOVING BOTTOM ROW')
+        self.content.layout.removeWidget(self.content.subBtn)
+        self.content.subBtn.setParent(None)
+        self.content.layout.removeWidget(self.content.elseLbl)
+        self.content.elseLbl.setParent(None)
+        self.content.layout.removeWidget(self.content.addBtn)
+        self.content.addBtn.setParent(None)
 
-            # for some reason, must redefine widgets
-            if DEBUG:
-                print('REDEFINING WIDGETS')        
-            self.content.edit = QLineEdit('' , self.content)
-            self.content.edit.setAlignment(Qt.AlignCenter)
-            self.content.subBtn = QPushButton('-', self.content)
-            self.content.addBtn = QPushButton('+', self.content)
-            self.content.elseLbl = QLabel('Else', self.content)
-            self.content.elseLbl.setAlignment(Qt.AlignCenter)
+        # for some reason, must redefine widgets
+        if DEBUG:
+            print('REDEFINING WIDGETS')        
+        self.content.edit = QLineEdit('' , self.content)
+        self.content.edit.setAlignment(Qt.AlignCenter)
+        self.content.subBtn = QPushButton('-', self.content)
+        self.content.addBtn = QPushButton('+', self.content)
+        self.content.elseLbl = QLabel('Else', self.content)
+        self.content.elseLbl.setAlignment(Qt.AlignCenter)
 
-            # add redefined widgets back into the layout
-            if DEBUG:
-                print('ADDING WIDGETS BACK INTO LAYOUT')
-            numIfs = ADDITIONAL_IFS - 1
-            self.content.layout.addWidget(self.content.edit, numIfs, 1, 1, 3)
-            self.content.layout.addWidget(self.content.subBtn, ADDITIONAL_IFS, 1)
-            self.content.layout.addWidget(self.content.elseLbl, ADDITIONAL_IFS, 2)
-            self.content.layout.addWidget(self.content.addBtn, ADDITIONAL_IFS, 3)
+        # add redefined widgets back into the layout
+        if DEBUG:
+            print('ADDING WIDGETS BACK INTO LAYOUT')
+        numIfs = ADDITIONAL_IFS - 1
+        self.content.layout.addWidget(self.content.edit, numIfs, 1, 1, 3)
+        self.content.layout.addWidget(self.content.subBtn, ADDITIONAL_IFS, 1)
+        self.content.layout.addWidget(self.content.elseLbl, ADDITIONAL_IFS, 2)
+        self.content.layout.addWidget(self.content.addBtn, ADDITIONAL_IFS, 3)
 
-            # must reregister buttons because they are new
-            if DEBUG:
-                print('REGISTERING BUTTONS')  
-            self.registerButtons()
+        # must reregister buttons because they are new
+        if DEBUG:
+            print('REGISTERING BUTTONS')  
+        self.registerButtons()
 
-        except Exception as e:
-            dumpException(e)
-
-    # i commented this section out to focus on the strange program crashes from the add button
     def decreaseWidgetSize(self):
         print('Sub button clicked!')
         if (self.grNode.height > 100):
-            '''
+            
             global ADDITIONAL_IFS
-            self.grNode.height = self.grNode.height - 20
+            self.grNode.height = self.grNode.height - 24
             if DEBUG:
                 print('Add button clicked!')
 
@@ -143,16 +140,17 @@ class IfNode(VplNode):
             if DEBUG:
                 print('REMOVING BOTTOM IF STATEMENT')
             
+            
             # Remove row at ADDITIONAL_IFS
-            
-            
+            toRemove = self.content.layout.itemAtPosition(ADDITIONAL_IFS, 1)
+            remove = toRemove.widget()
+            self.content.layout.removeWidget(remove)
+            remove.setParent(None)
             
             
             # for some reason, must redefine widgets
             if DEBUG:
                 print('REDEFINING WIDGETS')        
-            self.content.edit = QLineEdit('' , self.content)
-            self.content.edit.setAlignment(Qt.AlignCenter)
             self.content.subBtn = QPushButton('-', self.content)
             self.content.addBtn = QPushButton('+', self.content)
             self.content.elseLbl = QLabel('Else', self.content)
@@ -160,53 +158,14 @@ class IfNode(VplNode):
 
             if DEBUG:
                 print('ADDING WIDGETS BACK INTO LAYOUT')
-            numIfs = ADDITIONAL_IFS - 1
-            self.content.layout.addWidget(self.content.edit, numIfs, 1, 1, 3)
             self.content.layout.addWidget(self.content.subBtn, ADDITIONAL_IFS, 1)
             self.content.layout.addWidget(self.content.elseLbl, ADDITIONAL_IFS, 2)
             self.content.layout.addWidget(self.content.addBtn, ADDITIONAL_IFS, 3)      
-            '''
+            
             if DEBUG:
                 print('REGISTERING BUTTONS')  
 
-            #self.registerButtons()
+            self.registerButtons()
+
         else:
             print('Must have at least one if statement!')
-        
-        self.registerButtons()
-        '''
-    def subClicked(self):
-        pass
-  
-    def addClicked(self):
-        global ADDITIONAL_IFS
-        if DEBUG:
-            print('Add button clicked!')
-        
-        # increment global variable ADDITIONAL IFS
-        ADDITIONAL_IFS = ADDITIONAL_IFS + 1
-
-        # remove current bottom row
-        if DEBUG:
-            print('REMOVING BOTTOM ROW')
-        self.layout.removeWidget(self.subBtn)
-        self.subBtn.setParent(None)
-        self.layout.removeWidget(self.elseLbl)
-        self.elseLbl.setParent(None)
-        self.layout.removeWidget(self.addBtn)
-        self.addBtn.setParent(None)
-
-        # for some reason, must redefine widgets
-        self.edit = QLineEdit('' , self)
-        self.edit.setAlignment(Qt.AlignCenter)
-        self.subBtn = QPushButton('-', self)
-        self.addBtn = QPushButton('+', self)
-        self.elseLbl = QLabel('Else', self)
-        self.elseLbl.setAlignment(Qt.AlignCenter)
-
-        numIfs = ADDITIONAL_IFS - 1
-        self.layout.addWidget(self.edit, numIfs, 1, 1, 3)
-        self.layout.addWidget(self.subBtn, ADDITIONAL_IFS, 1)
-        self.layout.addWidget(self.elseLbl, ADDITIONAL_IFS, 2)
-        self.layout.addWidget(self.addBtn, ADDITIONAL_IFS, 3)        
-        '''

@@ -53,7 +53,7 @@ class VplNode(Node):
     content_label_objname = "calc_node_bg"
     def __init__(self, scene:'Scene', title:str="Undefined Node", inputs:list=[], outputs:list=[]):
         super().__init__(scene , title , inputs, outputs)
-        print("OVer-rided node class goes!")
+        print("Over-rided node class goes!")
 
     def serialize(self):
         res = super().serialize()
@@ -62,5 +62,5 @@ class VplNode(Node):
 
     def deserialize(self, data, hashmap={}, restore_id=True):
         res = super().deserialize(data, hashmap, restore_id)
-        print("Deserialized CalcNode '%s'" % self.__class__.__name__, "res:", res)
+        print("Deserialized VplCNode '%s'" % self.__class__.__name__, "res:", res)
         return res
