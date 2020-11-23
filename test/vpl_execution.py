@@ -7,53 +7,16 @@ from nodeeditor.node_node import Node
 from nodeeditor.node_edge import Edge
 from nodeeditor.node_socket import *
 from conf import *
+from execution_window import ExecutionWindow
 
 from collections import deque
+import threading
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 
-class _DialogWindow(QWidget):
-    def __init__(self, simpleDialog=True):
-        super().__init__()
-        self.windowString = ""
-        self.setFixedWidth(600)
-        self.setFixedHeight(600)
-        self.layout = QVBoxLayout()
+threads = []
 
-        self.textArea = QLabel()
-        self.textArea.setText(self.windowString)
-        self.textArea.setFixedWidth(580)
-        self.textArea.setFixedHeight(500)
-        self.layout.addWidget(self.textArea)
-
-        self.button = QPushButton()
-        self.button.setFixedWidth(120)
-        self.button.setFixedHeight(50)
-        if simpleDialog:
-            self.button.setText("Ok")
-        else:
-            self.button.setText("Stop")
-        self.layout.addWidget(self.button)
-        #self.button.clicked.connect(self.buttonClicked())
-
-        self.setLayout(self.layout)
-
-        self.show()
-
-    def buttonClicked(self):
-        self.close()
-
-    
-    def appendLabel(self, string):
-        self.windowString += string
-        self.textArea.setText(self.windowString)
-
-    #def close(self):
-
-
-
-    
 
 class VplExecution():
 
@@ -63,7 +26,7 @@ class VplExecution():
         self._startNodes = []
         self._nodeQueue = deque()
         self._findStartNodes()
-        self._window = _DialogWindow(False)
+        self._window = ExecutionWindow(False)
         self.dialogOpen = False
         self.str = "Program started.\n"
 
@@ -73,6 +36,7 @@ class VplExecution():
                 self._startNodes.append(node)
 
     def startExecution(self):
+        self._window.show()
         for node in self._startNodes:
             self._nodeQueue.append(node)
             self._executeNodes()
@@ -84,26 +48,29 @@ class VplExecution():
         while self._nodeQueue: #continues until nodeQueue is empty
             nodeEx = self._nodeQueue.popleft()
             if(nodeEx.op_code == OP_CODE_SIMPLE_DIALOG):
-                self._dialogOpen = True
-                if(nextValue == None):
-                    line = "ERROR, no value passed to simple dialog\n"
-                else:
-                    line = nextValue + '\n'
-                newWindow = _DialogWindow()
-                newWindow.appendLabel(line)
-                #while self._dialogOpen
+                self._simpleDialogEx(nextValue)
                 
             elif(nodeEx.op_code == OP_CODE_TERMINAL_PRINT):
                 if(nextValue == None):
                     print("ERROR, no value passed to simple dialog\n")
                 else:
                     print(nextValue)
+            elif(nodeEx.op_code == OP_CODE_PRINT_LINE):
+                self._window.appendText(nextValue + '\n')
 
             nextValue = nodeEx.doEval(nextValue)
-            #execute the node node.implementation()
-            #nodevalue = nodeEx.evalImplemantation(nodeValue)
-            #save its value
-            #execute
+
             for node in nodeEx.getChildrenNodes():
                 self._nodeQueue.append(node)
-            
+        
+    def _simpleDialogEx(self, nextValue):
+        print("entered simple dialog")
+        self._dialogOpen = True
+        if(nextValue == None):
+            line = "ERROR, no value passed to simple dialog\n"
+        else:
+            line = nextValue + '\n'
+        newWindow = ExecutionWindow(True)
+        newWindow.appendText(line) 
+        newWindow.show()
+
