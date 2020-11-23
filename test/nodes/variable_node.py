@@ -16,8 +16,8 @@ class VariableContent(QDMNodeContentWidget):
     def initUI(self):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
-        self.edit = QLineEdit("Variable Node Class" , self)
-        self.edit.setAlignment(Qt.AlignRight)
+        #self.edit = QLineEdit("Variable Node Class" , self) # Removed, unsused
+        #self.edit.setAlignment(Qt.AlignRight) # removed, breaks seriealized
         ###We are going to need some globla (subWindow) level variable holder
         self.variablesDropDown = QComboBox(self)
         for var in self.vars.variables:
@@ -25,7 +25,7 @@ class VariableContent(QDMNodeContentWidget):
         
         self.variableMenuBtn = QPushButton("more");
 
-        self.layout.addWidget(self.edit)
+        #self.layout.addWidget(self.edit)
         self.layout.addWidget(self.variablesDropDown)
         self.layout.addWidget(self.variableMenuBtn);
         
@@ -39,7 +39,8 @@ class VariableContent(QDMNodeContentWidget):
 
     def serialize(self):
         res = super().serialize()
-        res['value'] = self.edit.text()
+        #res['value'] = self.edit.text()
+        res['value'] = "NOTHING" # Dummy value for now, broken
         return res
 
     def deserialize(self, data, hashmap={}):
@@ -66,14 +67,7 @@ class VariableNode(VplNode):
     def initInnerClasses(self):
         self.content = VariableContent(self , self.variablesRef)
         self.grNode = VplGraphicsNode(self)
-        #self.content.edit.textChanged.connect(self.onInputChanged)
-        self.content.edit.textChanged.connect(self.__printVariables) # DEBUG TESTING
-        self.content.edit.textChanged.connect(self.content.reDrawVariablesDropDown) # redraw content of dropdown
         self.content.variableMenuBtn.clicked.connect(self.content.showVariableMenu) # do modal popup
-    def __printVariables(self): ## DEBUG TESTING ONLY
-        self.variablesRef.variables.append("another")
-        for variable in self.variablesRef.variables:
-            print("Variable found! : " + variable)
 
     def setVariableData(self, variables):
         self.variablesRef = variables
