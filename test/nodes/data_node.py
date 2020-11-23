@@ -34,7 +34,7 @@ class DataContent(QDMNodeContentWidget):
 class DataNode(VplNode):
     op_code = OP_CODE_DATA
     def __init__(self, scene):
-        super().__init__(scene, inputs=[], outputs=[3])
+        super().__init__(scene, inputs=[1], outputs=[3])
 
     def initInnerClasses(self):
         self.content = DataContent(self)
@@ -62,6 +62,9 @@ class DataNode(VplNode):
         else:
             self.data.valType = TYPE_STRING
             self.content.typeLabel.setText("String")
+
+    def doEval(self, input=None):
+        return self.content.edit.text()
 
     def __isInt(self , val): #helper function for determineType
         try:

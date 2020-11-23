@@ -2,6 +2,7 @@ from nodeeditor.node_editor_widget import NodeEditorWidget
 from PyQt5.QtCore import *
 from conf import *
 from PyQt5.QtGui import *
+from vpl_scene import VplScene
 #from ..nodeeditor.node_node import Node # call LOCAL version of Node class
 from vpl_node import VplNode # get over-ridedd node
 from nodes.variable_node import VariableNode # get our node sub classes
@@ -10,12 +11,17 @@ from nodes.join_node import JoinNode
 from nodes.data_node import DataNode
 from nodes.calculate_node import CalculateNode
 from nodes.merge_node import MergeNode
+from nodes.print_line_node import PrintLineNode
+from nodes.simple_dialog_node import SimpleDialogNode
+from nodes.terminal_print_node import TerminalPrintNode
 from model.variables import VariablesData
 
 
 class SubWindow(NodeEditorWidget):
+    Scene_class = VplScene
     """This is a sub-window, the grey plot for placing nodes on """
     def __init__(self):
+        
         super().__init__()
         self.setAttribute(Qt.WA_DeleteOnClose)
 
@@ -42,6 +48,8 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 10: return MergeNode
         elif data['op_code'] == 11: return IfNode
         elif data['op_code'] == 12: return JoinNode
+        elif data['op_code'] == 50: return PrintLineNode
+        elif data['op_code'] == 51: return SimpleDialogNode
         
         return VplNode
 
@@ -128,7 +136,17 @@ class SubWindow(NodeEditorWidget):
             print("adding join node.")
             node = JoinNode(self.scene)
             node.title = "Join Node"
-            
+        elif(op_code == OP_CODE_PRINT_LINE):
+            print("adding print line node.")
+            node = PrintLineNode(self.scene)
+            #node.title = "Join Node"
+        elif(op_code == OP_CODE_SIMPLE_DIALOG):
+            print("adding simple dialog node node.")
+            node = SimpleDialogNode(self.scene)
+            #node.title = "Join Node"
+        elif(op_code == OP_CODE_TERMINAL_PRINT):
+            print("adding terminal print node.")
+            node = TerminalPrintNode(self.scene)
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 

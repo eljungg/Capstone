@@ -55,6 +55,11 @@ class VplNode(Node):
         super().__init__(scene , title , inputs, outputs)
         print("Over-rided node class goes!")
 
+    #eval statment for our execution engine
+    def doEval(self, input=None):
+        """Evaluation statement for our execution engine. May replace later with normal eval provided by `nodeeditor`."""
+        return None
+
     def serialize(self):
         res = super().serialize()
         res['op_code'] = self.__class__.op_code

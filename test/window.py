@@ -7,6 +7,7 @@ from nodeeditor.utils import dumpException
 from nodeeditor.node_editor_window import NodeEditorWindow
 from Capstone.test.drag_list_box import QDMDragListBox
 from Capstone.test.sub_window import SubWindow
+from vpl_execution import VplExecution
 
 import Capstone.test.qss.nodeeditor_dark_resources
 
@@ -132,6 +133,7 @@ class MainWindow(NodeEditorWindow):
         self.windowMenu.addAction(self.nextAct)
         self.windowMenu.addAction(self.previousAct)
         self.windowMenu.addAction(self.separatorAct)
+        self.windowMenu.addAction(self.actRun)
 
         windows = self.mdiArea.subWindowList()
         self.separatorAct.setVisible(len(windows) != 0)
@@ -165,6 +167,8 @@ class MainWindow(NodeEditorWindow):
         self.separatorAct = QAction(self)
         self.separatorAct.setSeparator(True)
         self.aboutAct = QAction("&About", self, statusTip="Show the application's About box", triggered=self.about)
+        self.actRun = QAction('&Run', self, shortcut='Ctrl+R', statusTip="Run the program.", triggered=self.executeProgram)
+
 
     def onWindowNodesToolbar(self):
         if self.nodesDock.isVisible():
@@ -211,6 +215,13 @@ class MainWindow(NodeEditorWindow):
         if activeSubWindow:
             return activeSubWindow.widget()
         return None
+
+    def executeProgram(self):
+        currentScene = self.getCurrentNodeEditorWidget().scene
+        execution = VplExecution(currentScene.nodes, currentScene.edges)
+        execution.startExecution()
+        #execution.setDialogWindow(window)
+        #execution.executeProgram()
 
 
 
