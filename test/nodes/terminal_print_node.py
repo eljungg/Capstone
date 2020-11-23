@@ -4,9 +4,9 @@ from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 
-class SimpleDialogNodeContent(VplContent):
+class TerminalPrintContent(VplContent):
     def initUI(self):
-        self.label = QLabel("Simple Dialog", self)
+        self.label = QLabel("Print Line", self)
     
     #I hope these are correct
     def serialize(self):
@@ -18,20 +18,23 @@ class SimpleDialogNodeContent(VplContent):
         return res
 
 
-class SimpleDialogNode(VplNode):
-    op_code = OP_CODE_PRINT_LINE
-    op_title = "Simple Dialog"
-    content_label_objname = "VplNodeDialog"
+class TerminalPrintNode(VplNode):
+    op_code = OP_CODE_TERMINAL_PRINT
+    op_title = "Terminal Print"
+    content_label_objname = "VplNodePrint"
 
-    def __init__(self, scene, title:str="Simple Dialog"):
+    def __init__(self, scene, title:str="Terminal Print"):
         super().__init__(scene, title, inputs = [1], outputs = [1])
         self.eval()
 
     def initInnerClasses(self):
-        self.content = SimpleDialogNodeContent(self)
+        self.content = TerminalPrintContent(self)
         self.grNode = VplGraphicsNode(self)
 
     def doEval(self, input=None):
+        string = ""
         if(input == None):
-            print("ERROR, no value given to simple dialog")
-        return None
+            string = "ERROR, no value passed to node"
+        else:
+            string = input
+        return string

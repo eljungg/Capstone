@@ -30,3 +30,4 @@ class PrintLineNode(VplNode):
     def initInnerClasses(self):
         self.content = PrintLineNodeContent(self)
         self.grNode = VplGraphicsNode(self)
+    
