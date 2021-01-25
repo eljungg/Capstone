@@ -42,7 +42,7 @@ class VplExecution():
         moreChildren = True
         nextNodes = []
         while moreChildren:
-            print("start while\n")
+            #print("start while\n")
             if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
                 self._simpleDialogEx(nextValue)
                 
@@ -59,24 +59,24 @@ class VplExecution():
             nextNodes = currentNode.getChildrenNodes()
             if nextNodes != []:
                 currentNode = nextNodes[0]
-                print("continuing thread\n")
+                #print("continuing thread\n")
                 if len(nextNodes) > 1:
                     for node in nextNodes:
-                        print("new thread from child\n")
+                        #print("new thread from child\n")
                         t = threading.Thread(target=self.threadExecute, args=(node, nextValue), daemon=True)
                         threads.append(t)
                         t.start()
 
             else:
                 moreChildren = False
-                print("Ending a thread\n")
+                #print("Ending a thread\n")
 
     def startExecution(self):
         self._window.show()
         for node in self._startNodes:
             t = threading.Thread(target=self.threadExecute, args=(node,), daemon=True)
             threads.append(t)
-            print("Starting a thread\n")
+            #print("Starting a thread\n")
             t.start()
             #self._nodeQueue.append(node)
             #self._executeNodes()
