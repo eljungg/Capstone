@@ -2,10 +2,10 @@ import os
 import sys
 from PyQt5.QtWidgets import *
 
-sys.path.insert(0, os.path.join( os.path.dirname(__file__), "..", ".." ))
+#sys.path.insert(0, os.path.join( os.path.dirname(__file__), "..", ".." ))
 
 
-from Capstone.test.window import MainWindow
+from window import MainWindow
 
 
 if __name__ == '__main__':
@@ -18,3 +18,4 @@ if __name__ == '__main__':
     wnd.show()
 
     sys.exit(app.exec_())
+ 
