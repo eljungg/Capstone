@@ -7,6 +7,7 @@ from nodeeditor.node_node import Node
 from nodeeditor.node_edge import Edge
 from nodeeditor.node_socket import *
 from conf import *
+from execution_window import ExecutionWindow
 
 from collections import deque
 
@@ -16,6 +17,9 @@ from PyQt5.QtCore import *
 start_threads = []
 threads = []
 windowContent = []
+
+array = []
+queue = []
 
 class _DialogWindow(QWidget):
     def __init__(self, simpleDialog=True):
@@ -67,24 +71,29 @@ class VplExecution():
         self._startNodes = []
         self._nodeQueue = deque()
         self._findStartNodes()
-        self._window = _DialogWindow(False)
+        self._window = _ExecutionWindow(False)
         self.dialogOpen = False
         self.str = "Program started.\n"
 
     def _findStartNodes(self):
         for node in self._nodes:
             if(node.getInput() == None):
-                self._startNodes.append(node)
+                queue.append(node)
+                array.append(queue)
+                #self._startNodes.append(node)
 
     def startExecution(self):
-        for node in self._startNodes:
-            self._nodeQueue.append(node)
+        #for node in self._startNodes:
+        for start in queue:
+            array.append(start)
+
+            #self._nodeQueue.append(node)
             self._executeNodes()
             print("end of thread.")
 
         windowContent.append("Test")
         #print("Opening sub window")
-        window = printWindow(windowContent)
+        window = ExecutionWindow(True)
         window.show()
              
     def _executeNodes(self):
@@ -101,20 +110,6 @@ class VplExecution():
                 newWindow = _DialogWindow()
                 newWindow.appendLabel(line)
                 #while self._dialogOpen
-
-            """
-            elif(nodeEx.op_code == OP_CODE_TERMINAL_PRINT):
-                if(nextValue == None):
-                    print("ERROR, no value passed to simple dialog\n")
-                else:
-                    print(nextValue)
-
-            elif(nodeEx.op_code == OP_CODE_DATA):
-                nextValue = nodeEx.doEval()
-
-            elif(nodeEx.op_code == OP_CODE_CALCULATE):
-                nextValue = nodeEx.content.edit.text()
-            """
 
             edgeThread = nodeThread(target=nodeEx.doEval, args=(nextValue,))
             start_threads.append(edgeThread)
@@ -141,26 +136,4 @@ class nodeThread(threading.Thread):
     def join(self, *args):
         threading.Thread.join(self, *args)
         return self._return
-
-class printWindow(QWidget):
-    def __init__(self, windowContent):
-        super().__init__()
-        self.windowContent = windowContent
-
-        layout = QVBoxLayout()
-        for i in windowContent:
-            self.l = QLabel(i)
-            layout.addWidget(self.l)
-
-        b = QPushButton("Stop")
-        b.pressed.connect(self.on_click)
-        b.pressed.connect(self.close)
-
-        layout.addWidget(b)
-
-        self.setLayout(layout)
-
-    def on_click(self):
-        for n in start_threads:
-            if n.is_alive():
-                n.join()
+        
