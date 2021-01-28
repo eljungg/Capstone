@@ -30,4 +30,9 @@ class PrintLineNode(VplNode):
     def initInnerClasses(self):
         self.content = PrintLineNodeContent(self)
         self.grNode = VplGraphicsNode(self)
+    def doActivity(self): #Print Line Node Do Activity!
+        print("\n*****Im a Print Line Node, doing my Activity!")
+        print("You can access all my attributes through thisnode.data!")
+        print("I Dont have any data! Oops! We need to get that data from my PARENT node. How do we do that?")
+        print("This function returns nothing! but it could do whatever you wanted!*****\n")
     

@@ -28,8 +28,8 @@ class VplExecution():
         self._findStartNodes()
         self._window = ExecutionWindow(False)
         self.dialogOpen = False
-        self.str = "Program XXstarted.\n"
-        self._threads = list()
+        self.str = "Program XXstarted.\n" # this is nothing??
+        self._threads = list() # is this even the list you access calling threads? no _threads? # is this list used???
 
     def _findStartNodes(self):
         for node in self._nodes:
@@ -37,77 +37,51 @@ class VplExecution():
                 self._startNodes.append(node)
                 
 
-    def threadExecute(self, startNode, nextVal=None):
-        nextValue = nextVal
+    def threadExecute(self, startNode):
+        ##Big Picture:
+        ##Spin a thread for each start node
+        ##Run that nodes activity.
+        ## all data we need is accessed via node.data object
+        ##TODO## Handle getting info from parent nodes?
         currentNode = startNode
-        moreChildren = True
-        nextNodes = []
-        print("threadExecute, Im a nodeopcode== " + str(currentNode.op_code))
-        print("nextVal = " +str(nextVal))
-        print("nextValue = " +str(nextValue))
-        while moreChildren:
-            #print("start while\n")
-            if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
-                self._simpleDialogEx(nextValue)
-                
-            elif(currentNode.op_code == OP_CODE_TERMINAL_PRINT):
-                if(nextValue == None):
-                    print("ERROR, no value passed to simple dialog\n")
-                else:
-                    print(nextValue)
-            elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                print("WHAT IS nextValue here??" + str(nextValue))
-                self._window.appendText(nextValue + '\n')
-            
-            nextValue = currentNode.doEval(nextValue)
+        parentNodes = currentNode.getInputs() #this doesnt work, returns empty list
 
-            nextNodes = currentNode.getChildrenNodes()
-            if nextNodes != []:
-                currentNode = nextNodes[0]
-                #print("continuing thread\n")
-                if len(nextNodes) > 1:
-                    for node in nextNodes:
-                        #print("new thread from child\n")
-                        t = threading.Thread(target=self.threadExecute, args=(node, nextValue), daemon=True)
+        nextNodes = []
+        moreChildren = True #flag for controlling this thread continueing to more nodes or not
+        self._window.appendText("One Thread Spawned!" + '\n')
+        while moreChildren:
+            self._window.appendText("One Node Processed!" + '\n')
+            nextNodes = currentNode.getChildrenNodes() #function returns IMMEDIATE children only
+            #Regardless of how we handle the children, current node must be dealt with also
+            currentNode.doActivity() #calls base class in VplNode, over-write in your specific node class
+
+            if(len(nextNodes) == 0):
+                #CASE 0, no children.
+                moreChildren = False
+            if(len(nextNodes) > 0): # there are more nodes, dont kill thread
+                #CASE # 1a, have some children
+                print("CASE 1a")
+                print(str(type(currentNode)) + "and the next " +str(type(nextNodes[0])))
+                currentNode = nextNodes[0] # move forward like a linked list
+                if(len(nextNodes) > 1):
+                    #CASE #1b , have more than one children, do we spawn a new thread???
+                    print("CASE 1b")
+                    for node in nextNodes[1:]: # syntax to skip the first node, which will be run on this thread
+                        print("spawn a 1b child node!\n")
+                        t = threading.Thread(target=self.threadExecute, args=(node,), daemon=True)
                         threads.append(t)
                         t.start()
 
-            else:
-                moreChildren = False
-                #print("Ending a thread\n")
+     
+        print("Thread dies") # end of thread, no more children and this thread executed
 
     def startExecution(self):
         self._window.show()
         for node in self._startNodes:
             t = threading.Thread(target=self.threadExecute, args=(node,), daemon=True)
             threads.append(t)
-            #print("Starting a thread\n")
             t.start()
-            #self._nodeQueue.append(node)
-            #self._executeNodes()
-            #print("end of thread.")
 
-    #Old non-threaded function. Not currently in use.         
-    def _executeNodes(self):
-        #this should be changed to multithreaded implementation
-        nextValue = None
-        while self._nodeQueue: #continues until nodeQueue is empty
-            nodeEx = self._nodeQueue.popleft()
-            if(nodeEx.op_code == OP_CODE_SIMPLE_DIALOG):
-                self._simpleDialogEx(nextValue)
-                
-            elif(nodeEx.op_code == OP_CODE_TERMINAL_PRINT):
-                if(nextValue == None):
-                    print("ERROR, no value passed to simple dialog\n")
-                else:
-                    print(nextValue)
-            elif(nodeEx.op_code == OP_CODE_PRINT_LINE):
-                self._window.appendText(nextValue + '\n')
-
-            nextValue = nodeEx.doEval(nextValue)
-
-            for node in nodeEx.getChildrenNodes():
-                self._nodeQueue.append(node)
         
     def _simpleDialogEx(self, nextValue):
         print("entered simple dialog")

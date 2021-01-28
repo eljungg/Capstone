@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from Capstone.test.conf import *
+from model.node_data import NodeData
 
 class DataContent(QDMNodeContentWidget):
     def initUI(self):
@@ -42,6 +43,7 @@ class DataNode(VplNode):
         #below is onTextChanged event for simple self.edit Label
         self.content.edit.textChanged.connect(self.onInputChanged)
         self.content.edit.textChanged.connect(self.determineDataType)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE, NOT APPLIED TO ANY OTHER NODES
 
     def determineDataType(self):
         ### Determine the type of data given in Text Box by user ###
@@ -89,3 +91,9 @@ class DataNode(VplNode):
             return True
         else:
             return False
+    def doActivity(self): #Data Node Do Activity!
+        print("\n*****Im a data Node, doing my Activity!")
+        print("You can access all my attributes through thisnode.data!")
+        print("data.val ==> " +str(self.data.val))
+        print("data.valType (its a opcode) ==> "+str(self.data.valType))
+        print("This function returns nothing! but it could do whatever you wanted!*****\n")

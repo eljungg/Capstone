@@ -15,8 +15,10 @@ class ExecutionWindow(QWidget):
         self.layout = QVBoxLayout()
 
         self.textBox = QLabel()
+        self.title = QLabel("This is the Execution Window") #just to show us what we are looking at
         self.textBox.setFixedSize(580, 500)
         self.textBox.setText(self.text)
+        self.layout.addWidget(self.title)
         self.layout.addWidget(self.textBox)
 
         self.button = QPushButton()

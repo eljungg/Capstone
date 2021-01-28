@@ -59,6 +59,8 @@ class VplNode(Node):
     def doEval(self, input=None):
         """Evaluation statement for our execution engine. May replace later with normal eval provided by `nodeeditor`."""
         return None
+    def doActivity(self): #rough base activity function.
+        print("\n***This is the base activity function, I do nothing!\n Over-write me in your nodeclass!***\n\n")
 
     def serialize(self):
         res = super().serialize()

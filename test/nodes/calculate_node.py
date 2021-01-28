@@ -93,3 +93,9 @@ class CalculateNode(VplNode):
             return True
         else:
             return False
+    def doActivity(self): #Calculate Node Do Activity!
+        print("\n*****Im a Calculate Node, doing my Activity!")
+        print("You can access all my attributes through thisnode.data!")
+        print("data.val ==> " +str(self.data.val))
+        print("data.valType (its a opcode) ==> "+str(self.data.valType))
+        print("This function returns nothing! but it could do whatever you wanted!*****\n")

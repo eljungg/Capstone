@@ -82,7 +82,7 @@ class SubWindow(NodeEditorWidget):
             mouse_position = event.pos()
             scene_position = self.scene.grScene.views()[0].mapToScene(mouse_position)
 
-            print("GOT DROP: [%d] '%s' " % (op_code, text), 'mouse: ', mouse_position, 'scene: ', scene_position)
+            #DEBUG#print("GOT DROP: [%d] '%s' " % (op_code, text), 'mouse: ', mouse_position, 'scene: ', scene_position)
 
             node = self.setNodeType(text, op_code)
             
