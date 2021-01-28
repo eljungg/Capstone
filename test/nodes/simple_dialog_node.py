@@ -3,6 +3,7 @@ from vpl_node import *
 from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
+from model.node_data import NodeData
 
 class SimpleDialogNodeContent(VplContent):
     def initUI(self):
@@ -30,6 +31,7 @@ class SimpleDialogNode(VplNode):
     def initInnerClasses(self):
         self.content = SimpleDialogNodeContent(self)
         self.grNode = VplGraphicsNode(self)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE, 
 
     def doEval(self, input=None):
         if(input == None):

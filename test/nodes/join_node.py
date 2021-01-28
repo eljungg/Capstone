@@ -4,6 +4,7 @@ from vpl_node import *
 from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
+from model.node_data import NodeData
 
 class JoinNodeContent(VplContent):
     def initUI(self):
@@ -59,6 +60,7 @@ class JoinNode(VplNode):
         self.grNode = VplGraphicsNode(self)
         self.content.conditional1.textChanged.connect(self.onInputChanged)
         self.content.conditional2.textChanged.connect(self.onInputChanged)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE
     
     #def evalImplementation():
     #May use in the future for syntax checking. Not needed for compilation

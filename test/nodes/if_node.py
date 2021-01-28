@@ -3,6 +3,7 @@ from vpl_node import *
 from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
+from model.node_data import NodeData
 
 DEBUG = True
 ADDITIONAL_IFS = 2
@@ -59,6 +60,7 @@ class IfNode(VplNode):
     def initInnerClasses(self):
         self.content = IfNodeContent(self)
         self.grNode = VplGraphicsNode(self)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE
 
         self.grNode.height = 100
         self.grNode.width = 210

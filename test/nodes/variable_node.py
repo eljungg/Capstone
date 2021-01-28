@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QPushButton
 from conf import *
 from model.variables import VariablesData
 from Capstone.test.variable_menu import VariableMenu
+from model.node_data import NodeData
 
 class VariableContent(QDMNodeContentWidget):
     def __init__(self, parent, variablesRef):
@@ -66,6 +67,7 @@ class VariableNode(VplNode):
     def initInnerClasses(self):
         self.content = VariableContent(self , self.variablesRef)
         self.grNode = VplGraphicsNode(self)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE, 
         #self.content.edit.textChanged.connect(self.onInputChanged)
         self.content.edit.textChanged.connect(self.__printVariables) # DEBUG TESTING
         self.content.edit.textChanged.connect(self.content.reDrawVariablesDropDown) # redraw content of dropdown

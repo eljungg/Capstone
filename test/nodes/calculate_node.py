@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from Capstone.test.conf import * 
+from model.node_data import NodeData
 
 class CalculateContent(QDMNodeContentWidget):
     def initUI(self):
@@ -39,6 +40,7 @@ class CalculateNode(VplNode):
         #below is onTextChanged event for simple self.edit Label
         self.content.edit.textChanged.connect(self.onInputChanged)
         self.content.edit.textChanged.connect(self.doCalculations)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE
     
     def doCalculations(self): ## just gonna run python eval
         ### This doesnt handle any variables or anything like that###

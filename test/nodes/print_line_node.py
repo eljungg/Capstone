@@ -3,6 +3,7 @@ from vpl_node import *
 from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
+from model.node_data import NodeData
 
 class PrintLineNodeContent(VplContent):
     def initUI(self):
@@ -30,6 +31,7 @@ class PrintLineNode(VplNode):
     def initInnerClasses(self):
         self.content = PrintLineNodeContent(self)
         self.grNode = VplGraphicsNode(self)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE, 
     def doActivity(self): #Print Line Node Do Activity!
         print("\n*****Im a Print Line Node, doing my Activity!")
         print("You can access all my attributes through thisnode.data!")
