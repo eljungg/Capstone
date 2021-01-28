@@ -28,19 +28,23 @@ class VplExecution():
         self._findStartNodes()
         self._window = ExecutionWindow(False)
         self.dialogOpen = False
-        self.str = "Program started.\n"
+        self.str = "Program XXstarted.\n"
         self._threads = list()
 
     def _findStartNodes(self):
         for node in self._nodes:
             if(node.getInput() == None):
                 self._startNodes.append(node)
+                
 
     def threadExecute(self, startNode, nextVal=None):
         nextValue = nextVal
         currentNode = startNode
         moreChildren = True
         nextNodes = []
+        print("threadExecute, Im a nodeopcode== " + str(currentNode.op_code))
+        print("nextVal = " +str(nextVal))
+        print("nextValue = " +str(nextValue))
         while moreChildren:
             #print("start while\n")
             if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
@@ -52,6 +56,7 @@ class VplExecution():
                 else:
                     print(nextValue)
             elif(currentNode.op_code == OP_CODE_PRINT_LINE):
+                print("WHAT IS nextValue here??" + str(nextValue))
                 self._window.appendText(nextValue + '\n')
             
             nextValue = currentNode.doEval(nextValue)
