@@ -46,11 +46,6 @@ class VplExecution():
             if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
                 self._simpleDialogEx(nextValue)
                 
-            elif(currentNode.op_code == OP_CODE_TERMINAL_PRINT):
-                if(nextValue == None):
-                    print("ERROR, no value passed to simple dialog\n")
-                else:
-                    print(nextValue)
             elif(currentNode.op_code == OP_CODE_PRINT_LINE):
                 self._window.appendText(nextValue + '\n')
             
