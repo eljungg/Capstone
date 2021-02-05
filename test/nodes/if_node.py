@@ -3,11 +3,9 @@ from vpl_node import *
 from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
-
 DEBUG = True
 ADDITIONAL_IFS = 2
 INITIAL_OUTPUTS = 2
-
 
 class IfNodeContent(QDMNodeContentWidget):
     def initUI(self):

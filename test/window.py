@@ -2,14 +2,13 @@ import os
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from nodeeditor.utils import loadStylesheets
-from nodeeditor.utils import dumpException
+from nodeeditor.utils import loadStylesheets, dumpException
 from nodeeditor.node_editor_window import NodeEditorWindow
-from Capstone.test.drag_list_box import QDMDragListBox
-from Capstone.test.sub_window import SubWindow
+from drag_list_box import QDMDragListBox
+from sub_window import SubWindow
 from vpl_execution import VplExecution
 
-import Capstone.test.qss.nodeeditor_dark_resources
+import nodeeditor_dark_resources
 
 
 
@@ -18,13 +17,13 @@ class MainWindow(NodeEditorWindow):
     def initUI(self):
         self.name_company = 'ASU'
         self.name_product = 'ASU VPL'
-
-        self.stylesheet_filename = os.path.join(os.path.dirname(__file__), "qss/nodeeditor.qss")
+        '''
+        self.stylesheet_filename = os.path.join(os.path.dirname(__file__), "qss")
         loadStylesheets(
-            os.path.join(os.path.dirname(__file__), "qss/nodeeditor-dark.qss"),
+            os.path.join(os.path.dirname(__file__), "nodeeditor-dark.qss"),
             self.stylesheet_filename
         )
-
+        '''
 
         self.mdiArea = QMdiArea()
         self.mdiArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -102,7 +101,7 @@ class MainWindow(NodeEditorWindow):
             if window.widget().filename == filename:
                 return window
         return None
-
+    '''
     def createMdiChild(self, child_widget=None):
         nodeeditor = child_widget if child_widget is not None else SubWindow()
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
@@ -112,7 +111,7 @@ class MainWindow(NodeEditorWindow):
         nodeeditor.scene.history.addHistoryModifiedListener(self.updateEditMenu)
         nodeeditor.addCloseEventListener(self.onSubWndClose)
         return subwnd
-
+    '''
 
     def updateWindowMenu(self):
 
