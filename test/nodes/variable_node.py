@@ -4,7 +4,7 @@ from vpl_node import * # get our custom node base
 from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QPushButton
 from conf import *
-from variables import VariablesData
+from model.variables import VariablesData
 from variable_menu import VariableMenu
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 

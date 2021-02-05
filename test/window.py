@@ -8,7 +8,7 @@ from drag_list_box import QDMDragListBox
 from sub_window import SubWindow
 from vpl_execution import VplExecution
 
-import nodeeditor_dark_resources
+import qss.nodeeditor_dark_resources
 
 
 
