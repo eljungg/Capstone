@@ -19,7 +19,7 @@ class SimpleDialogNodeContent(VplContent):
 
 
 class SimpleDialogNode(VplNode):
-    op_code = OP_CODE_PRINT_LINE
+    op_code = OP_CODE_SIMPLE_DIALOG
     op_title = "Simple Dialog"
     content_label_objname = "VplNodeDialog"
 
