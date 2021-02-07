@@ -39,4 +39,4 @@ class TerminalPrintNode(VplNode):
         else:
             string = input
             print(string)
-        return None
+        return string

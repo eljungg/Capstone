@@ -48,6 +48,7 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 10: return MergeNode
         elif data['op_code'] == 11: return IfNode
         elif data['op_code'] == 12: return JoinNode
+        elif data['op_code'] == 49: return TerminalPrintNode
         elif data['op_code'] == 50: return PrintLineNode
         elif data['op_code'] == 51: return SimpleDialogNode
         
