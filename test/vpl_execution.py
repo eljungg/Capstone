@@ -11,6 +11,7 @@ from execution_window import ExecutionWindow
 
 from collections import deque
 import threading
+import time
 
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
@@ -54,7 +55,7 @@ class _DialogWindow(QWidget):
     def appendLabel(self, string):
         self.windowString += string
         self.textArea.setText(self.windowString)
-threads = []
+
 
 
 class VplExecution():
@@ -81,6 +82,7 @@ class VplExecution():
         moreChildren = True
         nextNodes = []
         while moreChildren:
+            time.sleep(0.5)
             #print("start while\n")
             if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
                 self._simpleDialogEx(nextValue)
@@ -95,7 +97,7 @@ class VplExecution():
                 currentNode = nextNodes[0]
                 #print("continuing thread\n")
                 if len(nextNodes) > 1:
-                    for node in nextNodes:
+                    for node in nextNodes[1:]:
                         #print("new thread from child\n")
                         t = threading.Thread(target=self.threadExecute, args=(node, nextValue), daemon=True)
                         threads.append(t)
