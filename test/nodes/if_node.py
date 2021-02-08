@@ -61,6 +61,7 @@ class IfNode(VplNode):
         self.grNode.height = 100
         self.grNode.width = 210
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        self.data.nodeType = self.op_code
          
         self.registerButtons()
     

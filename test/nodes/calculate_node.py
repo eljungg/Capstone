@@ -40,6 +40,7 @@ class CalculateNode(VplNode):
         self.content.edit.textChanged.connect(self.onInputChanged)
         self.content.edit.textChanged.connect(self.doCalculations)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        self.data.nodeType = self.op_code
     
     def doCalculations(self): ## just gonna run python eval
         ### This doesnt handle any variables or anything like that###
@@ -53,7 +54,7 @@ class CalculateNode(VplNode):
         
         self.data.val = result
         self.determineDataType() # set type
-        print("Saved Value from Calcualte : "+ self.data.val) ##DEBUG
+        #print("Saved Value from Calcualte : "+ self.data.val) ##DEBUG
 
 
     ##Borrowed from data_node for easy type check of eval
@@ -95,5 +96,13 @@ class CalculateNode(VplNode):
         else:
             return False
 
-    def doEval(self, input=None):
-        return str(eval(self.data.val, {}, {}))
+    def doEval(self, input=None) : #input is the NodeData() object of the parent/input node
+        ##Strictly Debug printing###
+        if(input != None): # case has parent input
+            print("TESTING, DOES CALCULATE RECIEVE DATA NODE?")
+            input.print() # print parent classes data
+            print("END TESTING")
+        if(input == None):
+            print("Data node has no parent")
+        
+        #return str(eval(self.data.val, {}, {}))

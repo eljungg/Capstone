@@ -9,22 +9,9 @@ class NodeData:
         self.nodeType = None # will contain opcode that defines type
         self.val = None # Simpler than .vals List, Didnt want to delete vals[] if anyone was using it.mro
         self.valType = None #Simpler than .valsType List, didnt want to delete ValsType[] if anyoe was using it
-        self.vals = [] # list, can handle multiple data vals
-        self.valsTypes = [] # matching list to vals, holds type infor for each val. e.g TYPE_STRING, TYPE_INT
-        self.name = "Name me"
-        self.operations = [] # list for storing operations E.G OPERATION_IF OPERATION_ELSE
-        # as of right now, none of this is private and there are no setters etc.
     
 
     def print(self): # Debug utility
         print(f"nodeType = {self.nodeType}")
-        print("vals = ")
-        for x in self.vals:
-            print(x)
-        print("valsTypes = ")
-        for y in self.valsTypes:
-            print(y)
-        print("name = " , self.name)
-        print("operations =")
-        for z in self.operations:
-            print(z)
+        print(f"val = {self.val}")
+        print(f"valType = {self.valType}" )

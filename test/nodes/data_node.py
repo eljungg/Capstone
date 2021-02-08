@@ -43,6 +43,7 @@ class DataNode(VplNode):
         self.content.edit.textChanged.connect(self.onInputChanged)
         self.content.edit.textChanged.connect(self.determineDataType)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        self.data.nodeType = self.op_code
 
     def determineDataType(self):
         ### Determine the type of data given in Text Box by user ###
@@ -92,5 +93,6 @@ class DataNode(VplNode):
             return False
 
     def doEval(self, input=None):
-        return self.content.edit.text()
+        return
+        #return self.content.edit.text()
         
