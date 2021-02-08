@@ -71,6 +71,7 @@ class VariableNode(VplNode):
         self.content = VariableContent(self , self.variablesRef)
         self.grNode = VplGraphicsNode(self)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        self.data.nodeType = self.op_code
 
         self.grNode.height = 120
         self.grNode.width = 160

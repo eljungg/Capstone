@@ -31,4 +31,5 @@ class PrintLineNode(VplNode):
         self.content = PrintLineNodeContent(self)
         self.grNode = VplGraphicsNode(self)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        self.data.nodeType = self.op_code
     

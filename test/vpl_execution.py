@@ -82,15 +82,17 @@ class VplExecution():
         moreChildren = True
         nextNodes = []
         while moreChildren:
-            time.sleep(0.5)
+            time.sleep(0.5) #why we sleep here? -luke
             #print("start while\n")
             if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
-                self._simpleDialogEx(nextValue)
+                self._simpleDialogEx(nextValue) #broken? -luke
                 
             elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                self._window.appendText(nextValue + '\n')
+                self._window.appendText(nextValue.val + '\n') #prints val from parents NodeData object
             
-            nextValue = currentNode.doEval(nextValue)
+            ##I think this would make more sense if nextValue was named something like parentData instead personally --Luke
+            currentNode.doEval(nextValue); #evaluate the current node, nextValue is the data object from parent node if applicable
+            nextValue = currentNode.data # save data object for passing to child node
 
             nextNodes = currentNode.getChildrenNodes()
             if nextNodes != []:
@@ -118,52 +120,6 @@ class VplExecution():
             #self._executeNodes()
             #print("end of thread.")
 
-    #Old non-threaded function. Not currently in use.         
-    def _executeNodes(self):
-        #this should be changed to multithreaded implementation
-        nextValue = None
-        while self._nodeQueue: #continues until nodeQueue is empty
-            nodeEx = self._nodeQueue.popleft()
-            if(nodeEx.op_code == OP_CODE_SIMPLE_DIALOG):
-                self._dialogOpen = True
-                if(nextValue == None):
-                    line = "ERROR, no value passed to simple dialog\n"
-                else:
-                    line = nextValue + '\n'
-                newWindow = _DialogWindow()
-                newWindow.appendLabel(line)
-                #while self._dialogOpen
-
-            """
-                self._simpleDialogEx(nextValue)
-                
-            elif(nodeEx.op_code == OP_CODE_TERMINAL_PRINT):
-                if(nextValue == None):
-                    print("ERROR, no value passed to simple dialog\n")
-                else:
-                    print(nextValue)
-            elif(nodeEx.op_code == OP_CODE_PRINT_LINE):
-                self._window.appendText(nextValue + '\n')
-
-            elif(nodeEx.op_code == OP_CODE_DATA):
-                nextValue = nodeEx.doEval()
-
-            elif(nodeEx.op_code == OP_CODE_CALCULATE):
-                nextValue = nodeEx.content.edit.text()
-            """
-
-            edgeThread = nodeThread(target=nodeEx.doEval, args=(nextValue,))
-            start_threads.append(edgeThread)
-
-            edgeThread.start()
-            nextValue = edgeThread.join()
-            
-            #execute the node node.implementation()
-            #nodevalue = nodeEx.evalImplemantation(nodeValue)
-            #save its value
-            #execute
-            for node in nodeEx.getChildrenNodes():
-                self._nodeQueue.append(node)
         
 class nodeThread(threading.Thread):
     def __init__(self, group=None, target=None, name=None, args=(), kwargs={}, Verbose=None):
@@ -211,7 +167,7 @@ class printWindow(QWidget):
         if(nextValue == None):
             line = "ERROR, no value passed to simple dialog\n"
         else:
-            line = nextValue + '\n'
+            line = nextValue.val + '\n'
         newWindow = ExecutionWindow(True)
         newWindow.appendText(line) 
         newWindow.show()
