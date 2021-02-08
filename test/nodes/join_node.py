@@ -59,6 +59,7 @@ class JoinNode(VplNode):
         self.grNode = VplGraphicsNode(self)
         self.content.conditional1.textChanged.connect(self.onInputChanged)
         self.content.conditional2.textChanged.connect(self.onInputChanged)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE,
     
     #def evalImplementation():
     #May use in the future for syntax checking. Not needed for compilation

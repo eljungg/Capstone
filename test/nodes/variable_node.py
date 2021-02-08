@@ -70,6 +70,7 @@ class VariableNode(VplNode):
     def initInnerClasses(self):
         self.content = VariableContent(self , self.variablesRef)
         self.grNode = VplGraphicsNode(self)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE,
 
         self.grNode.height = 120
         self.grNode.width = 160
