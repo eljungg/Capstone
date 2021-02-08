@@ -19,6 +19,7 @@ class MergeNode(VplNode):
     def initInnerClasses(self):
         self.content = VPLMergeContent(self)
         self.grNode = VPLGraphicsNode(self)
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.grNode.edge_roundness = 22
         self.grNode.width = 60
         self.grNode.height = 60
