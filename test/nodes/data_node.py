@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from Capstone.test.conf import *
+from model.node_data import NodeData
 
 class DataContent(QDMNodeContentWidget):
     def initUI(self):
@@ -66,7 +67,7 @@ class DataNode(VplNode):
             self.content.typeLabel.setText("String")
 
     def doEval(self, input=None):
-        return self.content.edit.text()
+        return #self.content.edit.text()    determinedatatype sets the values for NodeData() nothing needs to be done here.
 
     def __isInt(self , val): #helper function for determineType
         try:
@@ -92,7 +93,4 @@ class DataNode(VplNode):
         else:
             return False
 
-    def doEval(self, input=None):
-        return
-        #return self.content.edit.text()
-        
+

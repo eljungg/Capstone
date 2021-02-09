@@ -39,6 +39,5 @@ class TerminalPrintNode(VplNode):
             string = "ERROR, no value passed to node"
             print(string)
         else:
-            string = input
+            string = input.val
             print(string)
-        return string

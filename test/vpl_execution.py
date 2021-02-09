@@ -76,23 +76,23 @@ class VplExecution():
             if(node.getInput() == None):
                 self._startNodes.append(node)
 
-    def threadExecute(self, startNode, nextVal=None):
-        nextValue = nextVal
+    def threadExecute(self, startNode, pData=None):
+        parentData = pData
         currentNode = startNode
         moreChildren = True
         nextNodes = []
         while moreChildren:
-            time.sleep(0.5) #why we sleep here? -luke
+            #time.sleep(0.5) multithreading confirmation
             #print("start while\n")
             if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
-                self._simpleDialogEx(nextValue) #broken? -luke
+                self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
                 
             elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                self._window.appendText(nextValue.val + '\n') #prints val from parents NodeData object
+                self._window.appendText(parentData.val + '\n') #prints val from parents NodeData object
             
-            ##I think this would make more sense if nextValue was named something like parentData instead personally --Luke
-            currentNode.doEval(nextValue); #evaluate the current node, nextValue is the data object from parent node if applicable
-            nextValue = currentNode.data # save data object for passing to child node
+            ##I think this would make more sense if parentData was named something like parentData instead personally --Luke
+            currentNode.doEval(parentData) #evaluate the current node, nextValue is the data object from parent node if applicable
+            parentData = currentNode.data # save data object for passing to child node
 
             nextNodes = currentNode.getChildrenNodes()
             if nextNodes != []:
@@ -101,7 +101,7 @@ class VplExecution():
                 if len(nextNodes) > 1:
                     for node in nextNodes[1:]:
                         #print("new thread from child\n")
-                        t = threading.Thread(target=self.threadExecute, args=(node, nextValue), daemon=True)
+                        t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
                         threads.append(t)
                         t.start()
 
@@ -156,18 +156,18 @@ class printWindow(QWidget):
         for n in start_threads:
             if n.is_alive():
                 n.join()
-            nextValue = nodeEx.doEval(nextValue)
+            parentData = nodeEx.doEval(parentData)
 
             for node in nodeEx.getChildrenNodes():
                 self._nodeQueue.append(node)
         
-    def _simpleDialogEx(self, nextValue):
+    def _simpleDialogEx(self, parentData):
         print("entered simple dialog")
         self._dialogOpen = True
-        if(nextValue == None):
+        if(parentData == None):
             line = "ERROR, no value passed to simple dialog\n"
         else:
-            line = nextValue.val + '\n'
+            line = parentData.val + '\n'
         newWindow = ExecutionWindow(True)
         newWindow.appendText(line) 
         newWindow.show()
