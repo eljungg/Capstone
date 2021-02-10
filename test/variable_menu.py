@@ -28,7 +28,6 @@ class VariableMenu(QDialog):
         self.variableListBox = QListWidget() # list for storing our vars
         self.variableVBox.addWidget(self.variableListBox)
         for variable in self.variablesListRef.variables:
-            #self._drawVarLineEdit(variable.name) # OLD GUI ITEM
             self._drawListBoxEntry(variable.name)
 
         self.addBtn = QPushButton("Add")
@@ -57,7 +56,6 @@ class VariableMenu(QDialog):
         self.outterVBox.addWidget(self.buttonBox)
 
         #wire up buttons
-        #self.variableListBox.itemSelectionChanged.connect(self._variableSelectionChanged) # whenever highlighted listbox item changes
         self.addBtn.clicked.connect(self._addVar) # add variable to varList
         self.addBtn.clicked.connect(parent.reDrawVariablesDropDown) # refresh current nodes dropdown when item added
         
@@ -71,14 +69,11 @@ class VariableMenu(QDialog):
         varType = self._typeStringToOpCode(varTypeStr) # get type as int/enum
         varVal = None # value of variable is not assigned at creation
         newVar = Variable(varName , varVal , varType) # create Variable Object
-
         self.variablesListRef._addVariable(newVar) # add Variable object to "global" variables list
-        #self._drawVarLineEdit(varName) # add a line for new variable in GUI #OLD GUI
         self._drawListBoxEntry(varName) # add item to listbox
 
     def _deleteVar(self):
         selectedVarList = self.variableListBox.selectedItems() # returns list of selected items
-        print("length of selecteVarList == " + str(len(selectedVarList)))
         for selected in selectedVarList: # plan on only deleting one at a time, but its set to handle multiple selected it needed
             varName = selected.text()
             variable = self.variablesListRef._findVarByName(varName);
@@ -87,8 +82,6 @@ class VariableMenu(QDialog):
             else: # variable found, delete
                 self.variablesListRef._deleteVariable(variable)
         self._reDrawListBoxEntries()
-        
-
 
     def _typeStringToOpCode(self , typeStr): # just sort out the text from comboBox to actual type enum style
         if(typeStr == "String"):

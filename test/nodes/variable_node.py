@@ -30,14 +30,11 @@ class VariableContent(QDMNodeContentWidget):
         self.layout.addWidget(self.variableMenuBtn)
 
         self.setLayout(self.layout)
-        print("debug size of self.vars ==>" + str(len(self.vars.variables)))
         self.reDrawVariablesDropDown() # on node creation, show current variables in dropdown
         
     def reDrawVariablesDropDown(self): # function displays new variables in dropdown. (GUI REFRESH)
         self.variablesDropDown.clear()
-        print("size of self.vars.variables ==>" + str(len(self.vars.variables)))
         for var in self.vars.variables:
-            # var._printVar() #debug
             self.variablesDropDown.addItem(var.name)
 
     def setContentVariables(self, variables):
@@ -66,7 +63,7 @@ class VariableNode(VplNode):
     def __init__(self, scene):
         #VariablesData() called to create a dummy value for compatibility with library loading function
         self.variablesRef = VariablesData() # set on construction in sub_window.py # reference to out subWindow level variables
-        super().__init__(scene, inputs=[], outputs=[3])
+        super().__init__(scene, inputs=[1], outputs=[3]) #added single input
         
 
     def initInnerClasses(self):
