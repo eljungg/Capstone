@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
+from model.variables import Variable
+from conf import *
 
 class VariableMenu(QDialog):
     def __init__(self, parent, variablesListRef):
@@ -23,11 +25,12 @@ class VariableMenu(QDialog):
         self.varLbl.setAlignment(Qt.AlignLeft)
         self.varInput = QLineEdit("variableName" , self)
         self.variableVBox = QVBoxLayout() ## we will add line edits for each item in variables array?
+        self.variableListBox = QListWidget() # list for storing our vars
+        self.variableVBox.addWidget(self.variableListBox)
         for variable in self.variablesListRef.variables:
-            le = QLineEdit(variable) #We need something selectable, Im not sure this is proper widget....
-            le.setAlignment(Qt.AlignLeft)
-            le.setReadOnly(True)
-            self.variableVBox.addWidget(le)
+            #self._drawVarLineEdit(variable.name) # OLD GUI ITEM
+            self._drawListBoxEntry(variable.name)
+
         self.addBtn = QPushButton("Add")
         self.deleteBtn = QPushButton("Delete")
         self.typeLbl = QLabel("Type:")
@@ -53,4 +56,64 @@ class VariableMenu(QDialog):
         self.outterVBox.addWidget(self.typeDropDown)
         self.outterVBox.addWidget(self.buttonBox)
 
+        #wire up buttons
+        #self.variableListBox.itemSelectionChanged.connect(self._variableSelectionChanged) # whenever highlighted listbox item changes
+        self.addBtn.clicked.connect(self._addVar) # add variable to varList
+        self.addBtn.clicked.connect(parent.reDrawVariablesDropDown) # refresh current nodes dropdown when item added
+        
+        self.deleteBtn.clicked.connect(self._deleteVar) # Delete selected variables
+        self.deleteBtn.clicked.connect(parent.reDrawVariablesDropDown) # refresh current nodes dropdown when item deleted
+ 
 
+    def _addVar(self):
+        varName = self.varInput.text()
+        varTypeStr = self.typeDropDown.currentText() #get type as text from comboBox
+        varType = self._typeStringToOpCode(varTypeStr) # get type as int/enum
+        varVal = None # value of variable is not assigned at creation
+        newVar = Variable(varName , varVal , varType) # create Variable Object
+
+        self.variablesListRef._addVariable(newVar) # add Variable object to "global" variables list
+        #self._drawVarLineEdit(varName) # add a line for new variable in GUI #OLD GUI
+        self._drawListBoxEntry(varName) # add item to listbox
+
+    def _deleteVar(self):
+        selectedVarList = self.variableListBox.selectedItems() # returns list of selected items
+        print("length of selecteVarList == " + str(len(selectedVarList)))
+        for selected in selectedVarList: # plan on only deleting one at a time, but its set to handle multiple selected it needed
+            varName = selected.text()
+            variable = self.variablesListRef._findVarByName(varName);
+            if(variable == None): #basic error handling, no variable found from name
+                print("Variable not found to delete")
+            else: # variable found, delete
+                self.variablesListRef._deleteVariable(variable)
+        self._reDrawListBoxEntries()
+        
+
+
+    def _typeStringToOpCode(self , typeStr): # just sort out the text from comboBox to actual type enum style
+        if(typeStr == "String"):
+            return TYPE_STRING
+        if(typeStr == "Integer"):
+            return TYPE_INT
+        if(typeStr == "Double"):
+            return TYPE_DOUBLE
+        if(typeStr == "Boolean"):
+            return TYPE_BOOL;
+        if(typeStr == "Char"):
+            return TYPE_CHAR
+
+    def _drawVarLineEdit(self , variable): #where variable == string of varName
+        le = QLineEdit(variable) #We need something selectable, Im not sure this is proper widget....
+        le.setAlignment(Qt.AlignLeft)
+        le.setReadOnly(True)
+        self.variableVBox.addWidget(le)
+
+    def _drawListBoxEntry(self , variableName):
+        listBoxItem = QListWidgetItem(variableName)
+        self.variableListBox.addItem(listBoxItem)
+        
+    def _reDrawListBoxEntries(self):
+        self.variableListBox.clear() # clear old
+        for variable in self.variablesListRef.variables: # re-draw based on current variables
+            self._drawListBoxEntry(variable.name)
+    

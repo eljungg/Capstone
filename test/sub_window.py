@@ -116,6 +116,7 @@ class SubWindow(NodeEditorWidget):
         if(op_code == OP_CODE_VARIABLE):
             node =  VariableNode(self.scene) # Variable node gets reference to global(subWindow) variables object
             node.setVariableData(self.variables)
+            node.content.reDrawVariablesDropDown() #dropdown of variables has to be drawn after .setVariableData above, other wise would do this inside of node
             node.title = "Variable Node"
             
         elif op_code == OP_CODE_CALCULATE:
