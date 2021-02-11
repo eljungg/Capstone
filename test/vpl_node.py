@@ -60,6 +60,12 @@ class VplNode(Node):
         """Evaluation statement for our execution engine. May replace later with normal eval provided by `nodeeditor`."""
         return None
 
+    def getChildSocket(self, outSocket):
+        """Allows a node to get a reference to the specific socket it's edges connect to. Used on nodes that connect to join or any multiple input nodes."""
+        childInSockets = []
+        for i in outSocket.edges:
+            childInSockets.append(outSocket.edges[i].end_socket())
+
     def serialize(self):
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
