@@ -97,12 +97,4 @@ class CalculateNode(VplNode):
             return False
 
     def doEval(self, input=None) : #input is the NodeData() object of the parent/input node
-        ##Strictly Debug printing###
-        if(input != None): # case has parent input
-            print("TESTING, DOES CALCULATE RECIEVE DATA NODE?")
-            input.print() # print parent classes data
-            print("END TESTING")
-        if(input == None):
-            print("Data node has no parent")
-        
-        #return str(eval(self.data.val, {}, {}))
+        return
