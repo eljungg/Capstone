@@ -61,7 +61,6 @@ class VariableContent(QDMNodeContentWidget):
 class VariableNode(VplNode):
     op_code = OP_CODE_VARIABLE
     def __init__(self, scene):
-        #VariablesData() called to create a dummy value for compatibility with library loading function
         self.variablesRef = VariablesData() # set on construction in sub_window.py # reference to out subWindow level variables
         super().__init__(scene, inputs=[1], outputs=[3]) #added single input
         
@@ -75,7 +74,35 @@ class VariableNode(VplNode):
         self.grNode.height = 120
         self.grNode.width = 160
         self.content.variableMenuBtn.clicked.connect(self.content.showVariableMenu) # do modal popup
+    def doEval(self, parentData=None):
+        selectedVariable = self._getSelectedVariable()#we need a handle on selected variable
+        if(selectedVariable == None): # case we have no variables yet, but data comes into variable node
+            print("This is an error message! You can have data coming in with no defined variables!") # TODO build some type of popup alert like in VIPLE for this
+            self.__clearNodeData()
+            return
+        if(parentData == None): #case its the first node in thread 
+            #selected variable != None here, so we are a first node, but our variable is set
+            self.data.val = selectedVariable.val
+            self.data.valType = selectedVariable.valType
+            return
+
+        self.__setVariableVal(selectedVariable , parentData.val) # set that variable with the new data
+        self.__setVariableType(selectedVariable , parentData.valType)
+        #now we need to set this nodes NodeData() to have its val, and type. So that we pass these one to children
+        self.data.val = parentData.val
+        self.data.valType = parentData.valType
     
+    def _getSelectedVariable(self): # get variable object which is selected on node-face
+        varName = self.content.variablesDropDown.currentText() # get varname as string
+        variable = self.variablesRef._findVarByName(varName)
+        return variable;
+    
+    def __setVariableVal(self , variable , inpVal):
+        variable.val = inpVal;
+
+    def __setVariableType(self , variable, inpType): #im not sure if we need this #should type be determined by incoming datanode or by what user selected in variable menu???
+        variable.valType = inpType 
+
     def __printVariables(self): ## DEBUG TESTING ONLY
         for variable in self.variablesRef.variables:
             print("Variable found! : " + variable.name)
@@ -83,3 +110,8 @@ class VariableNode(VplNode):
     def setVariableData(self, variables): # wires up stuff, see subWindow.py
         self.variablesRef = variables
         self.content.setContentVariables(self.variablesRef)
+    
+    def __clearNodeData(self): # for a weird case where the variable inside a node has been deleted and not replaced / empty
+        #could wire this to onDropDown changed event might be smart honestly
+        self.data.val = None
+        self.valType = None
