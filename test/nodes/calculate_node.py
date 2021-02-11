@@ -76,8 +76,7 @@ class CalculateNode(VplNode):
         self.content.setContentVariables(self.variablesRef)
 
     def doEval(self, input=None):
-        
-<<<<<<< HEAD
+
         statement = self.content.edit.text()
         print(statement)
 
@@ -103,59 +102,3 @@ class CalculateNode(VplNode):
         self.final = eval(statement)
         self.data.val = self.final
         self.data.valType = type(self.final)
-        
-
-        
-        
-
-
-        
-        
-=======
-        self.data.val = result
-        self.determineDataType() # set type
-        #print("Saved Value from Calcualte : "+ self.data.val) ##DEBUG
-
-
-    ##Borrowed from data_node for easy type check of eval
-    def determineDataType(self):
-        ### Determine the type of data given in Text Box by user ###
-        val = self.data.val
-        if self.__isInt(val) == True:
-            self.data.valType = TYPE_INT
-        elif self.__isFloat(val) == True:
-            self.data.valType = TYPE_DOUBLE
-        elif self.__isBool(val) == True:
-            self.data.valType = TYPE_BOOL
-        elif self.__isChar(val) == True:
-            self.data.valType = TYPE_CHAR
-        else:
-            self.data.valType = TYPE_STRING
-
-    def __isInt(self , val): #helper function for determineType
-        try:
-            int(val)
-            return True
-        except ValueError:
-            return False
-    def __isFloat(self, val):
-        try:
-            float(val)
-            return True
-        except ValueError:
-            return False
-    def __isBool(self, val):
-        lcVal = val.lower()
-        if lcVal == "false" or lcVal == "true":
-            return True
-        else:
-            return False
-    def __isChar(self, val): #Python doesnt do Char, but VIPLE does so we just emulate?
-        if len(val) == 1:
-            return True
-        else:
-            return False
-
-    def doEval(self, input=None) : #input is the NodeData() object of the parent/input node
-        return
->>>>>>> 29a77f660fe1a503c9743a2f1bc7fe211cf81e27
