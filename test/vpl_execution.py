@@ -81,6 +81,8 @@ class VplExecution():
         currentNode = startNode
         moreChildren = True
         nextNodes = []
+        ifValue = False
+        switchValue = False
         while moreChildren:
             #time.sleep(0.5) multithreading confirmation
             #print("start while\n")
@@ -89,6 +91,12 @@ class VplExecution():
                 
             elif(currentNode.op_code == OP_CODE_PRINT_LINE):
                 self._window.appendText(parentData.val + '\n') #prints val from parents NodeData object
+
+            elif(currentNode.op_code == OP_CODE_IF):
+                ifValue = True
+
+            elif(currentNode.op_code == OP_CODE_SWITCH):
+                switchValue = True
             
             ##I think this would make more sense if parentData was named something like parentData instead personally --Luke
             currentNode.doEval(parentData) #evaluate the current node, nextValue is the data object from parent node if applicable
@@ -96,14 +104,27 @@ class VplExecution():
 
             nextNodes = currentNode.getChildrenNodes()
             if nextNodes != []:
-                currentNode = nextNodes[0]
-                #print("continuing thread\n")
-                if len(nextNodes) > 1:
-                    for node in nextNodes[1:]:
-                        #print("new thread from child\n")
-                        t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
-                        threads.append(t)
-                        t.start()
+                if(ifValue and parentData.val):
+                    currentNode = nextNodes[0]
+                    ifValue = False
+                elif(ifValue and not parentData.val):
+                    currentNode = nextNodes[1]
+                    ifValue = False
+                elif(switchValue and parentData.val):
+                    currentNode = nextNodes[0]
+                    switchValue = False
+                elif(switchValue and not parentData.val):
+                    currentNode = nextNodes[1]
+                    switchValue = False
+                else:
+                    currentNode = nextNodes[0]
+                    #print("continuing thread\n")
+                    if len(nextNodes) > 1:
+                        for node in nextNodes[1:]:
+                            #print("new thread from child\n")
+                            t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
+                            threads.append(t)
+                            t.start()
 
             else:
                 moreChildren = False
@@ -119,56 +140,3 @@ class VplExecution():
             #self._nodeQueue.append(node)
             #self._executeNodes()
             #print("end of thread.")
-
-        
-class nodeThread(threading.Thread):
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs={}, Verbose=None):
-        threading.Thread.__init__(self, group, target, name, args, kwargs)
-        self._return = None
-
-    def run(self):
-        if self._target is not None:
-            self._return = self._target(*self._args, **self._kwargs)
-
-    def join(self, *args):
-        threading.Thread.join(self, *args)
-        return self._return
-
-class printWindow(QWidget):
-    def __init__(self, windowContent):
-        super().__init__()
-        self.windowContent = windowContent
-
-        layout = QVBoxLayout()
-        for i in windowContent:
-            self.l = QLabel(i)
-            layout.addWidget(self.l)
-
-        b = QPushButton("Stop")
-        b.pressed.connect(self.on_click)
-        b.pressed.connect(self.close)
-
-        layout.addWidget(b)
-
-        self.setLayout(layout)
-
-    def on_click(self):
-        for n in start_threads:
-            if n.is_alive():
-                n.join()
-            parentData = nodeEx.doEval(parentData)
-
-            for node in nodeEx.getChildrenNodes():
-                self._nodeQueue.append(node)
-        
-    def _simpleDialogEx(self, parentData):
-        print("entered simple dialog")
-        self._dialogOpen = True
-        if(parentData == None):
-            line = "ERROR, no value passed to simple dialog\n"
-        else:
-            line = parentData.val + '\n'
-        newWindow = ExecutionWindow(True)
-        newWindow.appendText(line) 
-        newWindow.show()
-

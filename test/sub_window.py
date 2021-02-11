@@ -14,6 +14,7 @@ from nodes.merge_node import MergeNode
 from nodes.print_line_node import PrintLineNode
 from nodes.simple_dialog_node import SimpleDialogNode
 from nodes.terminal_print_node import TerminalPrintNode
+from nodes.switch_node import SwitchNode
 from model.variables import VariablesData
 
 
@@ -148,6 +149,9 @@ class SubWindow(NodeEditorWidget):
         elif(op_code == OP_CODE_TERMINAL_PRINT):
             print("adding terminal print node.")
             node = TerminalPrintNode(self.scene)
+        elif(op_code == OP_CODE_SWITCH):
+            print("adding switch node")
+            node = SwitchNode(self.scene)
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 
