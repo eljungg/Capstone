@@ -61,6 +61,8 @@ class JoinNode(VplNode):
         self.content.conditional2.textChanged.connect(self.onInputChanged)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
+        self.size = 2
+    
     
     #def evalImplementation():
     #May use in the future for syntax checking. Not needed for compilation

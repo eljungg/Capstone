@@ -56,6 +56,29 @@ class _DialogWindow(QWidget):
         self.windowString += string
         self.textArea.setText(self.windowString)
 
+class _joinData():
+    def __init__(self, nodeId, size):
+        self.nodeId = nodeId
+        self.size = size
+        self.queueList = []
+
+        for i in range(size):
+            self.queueList.append(deque())
+
+    def addEntry(self, position, entry):
+        returnList = []
+        if(position < 0 or position >= self.size):
+            print("Error: position is out of range")
+        else:
+            self.queueList[position].append(entry)
+            full = True
+            for i in self.queueList:
+                if not self.queueList[i]:
+                    full = False
+            if full:
+                for i in self.queueList:
+                    returnList.append(self.queueList[i].popleft())
+        return returnList
 
 
 class VplExecution():
@@ -70,11 +93,25 @@ class VplExecution():
         self.dialogOpen = False
         self.str = "Program started.\n"
         self._threads = list()
+        self._joinNodeList = []
 
+    def _registerJoinNode(self, node):
+        self._joinNodeList.append(_joinData(node.size, node.id))
+
+    def _addEntrytoJoinNode(self, nodeId, position, entry):
+        returnList = []
+        for n in self._joinNodeList:
+            if(self._joinNodeList[n].nodeId == nodeId):
+                #semaphore blocking here
+                returnList = self._joinNodeList[n].addEntry(position, entry)
+                #semaphore release here
+    
     def _findStartNodes(self):
         for node in self._nodes:
             if(node.getInput() == None):
                 self._startNodes.append(node)
+            if(node.op_code == OP_CODE_JOIN):
+                self._registerJoinNode(node)
 
     def threadExecute(self, startNode, pData=None):
         parentData = pData
@@ -89,6 +126,9 @@ class VplExecution():
                 
             elif(currentNode.op_code == OP_CODE_PRINT_LINE):
                 self._window.appendText(parentData.val + '\n') #prints val from parents NodeData object
+
+            #if(currentNode.op_code == OP_CODE_JOIN):
+                #self._addEntrytoJoinNode(currentNode.id, )
             
             ##I think this would make more sense if parentData was named something like parentData instead personally --Luke
             currentNode.doEval(parentData) #evaluate the current node, nextValue is the data object from parent node if applicable
