@@ -1,15 +1,45 @@
 from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from Capstone.test.conf import * 
+from model.variables import VariablesData
+from model.node_data import NodeData
+from nodeeditor.node_node import *
 
 class CalculateContent(QDMNodeContentWidget):
+
+    def __init__(self, parent, variablesRef):
+        self.vars = variablesRef
+        super().__init__(parent)
+
     def initUI(self):
         self.layout = QVBoxLayout()
+
+        self.comboBox = QComboBox(self)
+        self.initialList = ['true', 'false']
+
+        for var in self.vars.variables:
+            self.initialList.append(var)
+        self.initialList.append('value')
+        self.comboBox.addItems(self.initialList)
+
+        self.edit = QLineEdit('', self)
+        self.comboBox.setLineEdit(self.edit)
+
+        self.layout.addWidget(self.comboBox)
         self.setLayout(self.layout)
-        self.edit = QLineEdit("Calculate Node Class" , self)
-        self.edit.setAlignment(Qt.AlignRight)
-        self.layout.addWidget(self.edit)
+        self.redrawComboBox()
+
+    def redrawComboBox(self): # function displays new variables in dropdown. (GUI REFRESH)
+        self.comboBox.clear()
+        self.comboBox.addItems(['true', 'false'])
+        for var in self.vars.variables:
+            self.comboBox.addItem(var.name)
+        self.comboBox.addItem('value')
+
+    def setContentVariables(self, variables):
+        self.vars = variables
     
     def serialize(self):
         res = super().serialize()
@@ -31,78 +61,52 @@ class CalculateNode(VplNode):
     op_code = OP_CODE_CALCULATE
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[2], outputs=[1])
+        self.variablesRef = VariablesData()
+        super().__init__(scene, inputs=[1], outputs=[1])
 
     def initInnerClasses(self):
-        self.content = CalculateContent(self)
+        self.content = CalculateContent(self, self.variablesRef)
         self.grNode = VplGraphicsNode(self)
-        #below is onTextChanged event for simple self.edit Label
-        self.content.edit.textChanged.connect(self.onInputChanged)
-        self.content.edit.textChanged.connect(self.doCalculations)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
-    
-    def doCalculations(self): ## just gonna run python eval
-        ### This doesnt handle any variables or anything like that###
-        result =""
-        try:
-            #Danger Warning #Hackable
-            result = str(eval(self.content.edit.text() , {}, {}))
-            #this is super unsafe. We already imported OS, can do syscalls or spawn a shell or something
-        except Exception:
-            result = "error"
+
+
+    def setVariableData(self, variables): # wires up stuff, see subWindow.py
+        self.variablesRef = variables
+        self.content.setContentVariables(self.variablesRef)
+
+    def doEval(self, input=None):
         
-        self.data.val = result
-        self.determineDataType() # set type
-        #print("Saved Value from Calcualte : "+ self.data.val) ##DEBUG
+        statement = self.content.edit.text()
+        print(statement)
 
+        if statement == 'true':
+            self.data.val = True
+            self.data.valType = bool
+            return
 
-    ##Borrowed from data_node for easy type check of eval
-    def determineDataType(self):
-        ### Determine the type of data given in Text Box by user ###
-        val = self.data.val
-        if self.__isInt(val) == True:
-            self.data.valType = TYPE_INT
-        elif self.__isFloat(val) == True:
-            self.data.valType = TYPE_DOUBLE
-        elif self.__isBool(val) == True:
-            self.data.valType = TYPE_BOOL
-        elif self.__isChar(val) == True:
-            self.data.valType = TYPE_CHAR
-        else:
-            self.data.valType = TYPE_STRING
+        if statement == 'false':
+            self.data.val = False
+            self.data.valType = bool
+            return
 
-    def __isInt(self , val): #helper function for determineType
-        try:
-            int(val)
-            return True
-        except ValueError:
-            return False
-    def __isFloat(self, val):
-        try:
-            float(val)
-            return True
-        except ValueError:
-            return False
-    def __isBool(self, val):
-        lcVal = val.lower()
-        if lcVal == "false" or lcVal == "true":
-            return True
-        else:
-            return False
-    def __isChar(self, val): #Python doesnt do Char, but VIPLE does so we just emulate?
-        if len(val) == 1:
-            return True
-        else:
-            return False
+        if 'value' in statement:
+            self.inp = input.val
+            statement = statement.replace('value', str(self.inp))
 
-    def doEval(self, input=None) : #input is the NodeData() object of the parent/input node
-        ##Strictly Debug printing###
-        if(input != None): # case has parent input
-            print("TESTING, DOES CALCULATE RECIEVE DATA NODE?")
-            input.print() # print parent classes data
-            print("END TESTING")
-        if(input == None):
-            print("Data node has no parent")
+        for var in self.content.vars.variables:
+            if var.name in statement:
+                print('variable detected')
+                statement = statement.replace(var.name, str(var.val))
         
-        #return str(eval(self.data.val, {}, {}))
+        self.final = eval(statement)
+        self.data.val = self.final
+        self.data.valType = type(self.final)
+        
+
+        
+        
+
+
+        
+        

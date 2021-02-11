@@ -121,6 +121,8 @@ class SubWindow(NodeEditorWidget):
             
         elif op_code == OP_CODE_CALCULATE:
             node = CalculateNode(self.scene)
+            node.setVariableData(self.variables)
+            node.content.redrawComboBox()
             node.title="Calculate Node"
 
         elif op_code == OP_CODE_DATA:

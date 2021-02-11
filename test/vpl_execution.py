@@ -88,7 +88,7 @@ class VplExecution():
                 self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
                 
             elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                self._window.appendText(parentData.val + '\n') #prints val from parents NodeData object
+                self._window.appendText(str(parentData.val) + '\n') #prints val from parents NodeData object
             
             ##I think this would make more sense if parentData was named something like parentData instead personally --Luke
             currentNode.doEval(parentData) #evaluate the current node, nextValue is the data object from parent node if applicable
