@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QComboBox
 from PyQt5.QtWidgets import QPushButton
 from conf import *
 from model.variables import VariablesData
-from variable_menu import VariableMenu
+from variable_menu import *
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 
 class VariableContent(QDMNodeContentWidget):
@@ -18,8 +18,6 @@ class VariableContent(QDMNodeContentWidget):
     def initUI(self):
         self.layout = QVBoxLayout()
         
-        self.edit = QLineEdit("Variable Node Class" , self)
-        self.edit.setAlignment(Qt.AlignRight)
         ###We are going to need some globla (subWindow) level variable holder
         self.variablesDropDown = QComboBox(self)
         for var in self.vars.variables:
@@ -27,30 +25,31 @@ class VariableContent(QDMNodeContentWidget):
         
         self.variableMenuBtn = QPushButton("more")
 
-        self.layout.addWidget(self.edit)
+        #self.layout.addWidget(self.edit) #hiding the O.G. edit line, not needed
         self.layout.addWidget(self.variablesDropDown)
         self.layout.addWidget(self.variableMenuBtn)
 
         self.setLayout(self.layout)
+        self.reDrawVariablesDropDown() # on node creation, show current variables in dropdown
         
     def reDrawVariablesDropDown(self): # function displays new variables in dropdown. (GUI REFRESH)
         self.variablesDropDown.clear()
         for var in self.vars.variables:
-            self.variablesDropDown.addItem(var)
+            self.variablesDropDown.addItem(var.name)
 
     def setContentVariables(self, variables):
         self.vars = variables
 
     def serialize(self):
         res = super().serialize()
-        res['value'] = self.edit.text()
+        #res['value'] = self.edit.text() #TODO this QT widget has been deleted, saving needs work 
         return res
 
     def deserialize(self, data, hashmap={}):
         res = super().deserialize(data, hashmap)
         try:
             value = data['value']
-            self.edit.setText(value)
+            #self.edit.setText(value) #TODO this QT widget has been deleted, saving needs work 
             return True & res
         except Exception as e:
             dumpException(e)
@@ -64,7 +63,7 @@ class VariableNode(VplNode):
     def __init__(self, scene):
         #VariablesData() called to create a dummy value for compatibility with library loading function
         self.variablesRef = VariablesData() # set on construction in sub_window.py # reference to out subWindow level variables
-        super().__init__(scene, inputs=[], outputs=[3])
+        super().__init__(scene, inputs=[1], outputs=[3]) #added single input
         
 
     def initInnerClasses(self):
@@ -75,16 +74,12 @@ class VariableNode(VplNode):
 
         self.grNode.height = 120
         self.grNode.width = 160
-        #self.content.edit.textChanged.connect(self.onInputChanged)
-        self.content.edit.textChanged.connect(self.__printVariables) # DEBUG TESTING
-        self.content.edit.textChanged.connect(self.content.reDrawVariablesDropDown) # redraw content of dropdown
         self.content.variableMenuBtn.clicked.connect(self.content.showVariableMenu) # do modal popup
     
     def __printVariables(self): ## DEBUG TESTING ONLY
-        self.variablesRef.variables.append("another")
         for variable in self.variablesRef.variables:
-            print("Variable found! : " + variable)
+            print("Variable found! : " + variable.name)
 
-    def setVariableData(self, variables):
+    def setVariableData(self, variables): # wires up stuff, see subWindow.py
         self.variablesRef = variables
         self.content.setContentVariables(self.variablesRef)
