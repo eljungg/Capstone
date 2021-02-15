@@ -7,6 +7,8 @@ from model.variables import VariablesData
 from model.node_data import NodeData
 from nodeeditor.node_node import *
 
+import re
+
 class CalculateContent(QDMNodeContentWidget):
 
     def __init__(self, parent, variablesRef):
@@ -70,7 +72,6 @@ class CalculateNode(VplNode):
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
 
-
     def setVariableData(self, variables): # wires up stuff, see subWindow.py
         self.variablesRef = variables
         self.content.setContentVariables(self.variablesRef)
@@ -82,12 +83,12 @@ class CalculateNode(VplNode):
 
         if statement == 'true':
             self.data.val = True
-            self.data.valType = bool
+            self.data.valType = TYPE_BOOL
             return
 
         if statement == 'false':
             self.data.val = False
-            self.data.valType = bool
+            self.data.valType = TYPE_BOOL
             return
 
         if 'value' in statement:
@@ -95,10 +96,15 @@ class CalculateNode(VplNode):
             statement = statement.replace('value', str(self.inp))
 
         for var in self.content.vars.variables:
-            if var.name in statement:
-                print('variable detected')
-                statement = statement.replace(var.name, str(var.val))
+            statement = re.sub(fr'\b{var.name}\b', str(var.val), statement)
         
+        # issue with multiple variables sharing parts of the same name
+
         self.final = eval(statement)
         self.data.val = self.final
+        if type(self.final) is int:
+            self.data.valType = TYPE_INT
+        elif type(self.final) is float:
+            self.data.valType = TYPE_DOUBLE
+        
         self.data.valType = type(self.final)
