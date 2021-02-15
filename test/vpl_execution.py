@@ -90,7 +90,7 @@ class VplExecution():
                 self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
                 
             elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                self._window.appendText(parentData.val + '\n') #prints val from parents NodeData object
+                self._window.appendText(str(parentData.val) + '\n') #prints val from parents NodeData object
 
             elif(currentNode.op_code == OP_CODE_IF):
                 ifValue = True
