@@ -52,6 +52,7 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 49: return TerminalPrintNode
         elif data['op_code'] == 50: return PrintLineNode
         elif data['op_code'] == 51: return SimpleDialogNode
+        elif data['op_code'] == 14: return CommentNode
         
         return VplNode
 
@@ -155,6 +156,9 @@ class SubWindow(NodeEditorWidget):
         elif(op_code == OP_CODE_SWITCH):
             print("adding switch node")
             node = SwitchNode(self.scene)
+        elif (op_code == OP_CODE_COMMENT):
+            print("adding comment node.")
+            node = CommentNode(self.scene)
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 

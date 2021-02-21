@@ -32,6 +32,7 @@ class QDMDragListBox(QListWidget):
         self.addItem('Simple Dialog', 'icons/in.png', OP_CODE_SIMPLE_DIALOG)
         self.addItem('Terminal Print', 'icons/in.png', OP_CODE_TERMINAL_PRINT)
         self.addItem('Switch', 'icons/in.png', OP_CODE_SWITCH)
+        self.addItem('Comment', 'icons/in.png', OP_CODE_COMMENT)
 
 
     def addItem(self, name, icon=None, op_code=0):
