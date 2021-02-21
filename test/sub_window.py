@@ -133,7 +133,7 @@ class SubWindow(NodeEditorWidget):
             node.title = "Data Node"
 
         elif op_code == OP_CODE_MERGE:
-            node = DataNode(self.scene)
+            node = MergeNode(self.scene)
             node.title = "Merge Node"
         elif(op_code == OP_CODE_IF):
             print("adding if node.")
