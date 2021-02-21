@@ -96,6 +96,9 @@ class VplExecution():
                 elif(currentNode.op_code == OP_CODE_PRINT_LINE):
                     self._window.appendText(str(parentData.val) + '\n') #prints val from parents NodeData object
 
+                elif (currentNode.op_code == OP_CODE_TIMMER):
+                    time.sleep(int(parentData.val)/1000)
+
                 elif(currentNode.op_code == OP_CODE_IF):
                     ifValue = True
 
