@@ -16,6 +16,7 @@ from nodes.simple_dialog_node import SimpleDialogNode
 from nodes.terminal_print_node import TerminalPrintNode
 from nodes.switch_node import SwitchNode
 from model.variables import VariablesData
+from model.comment_node import CommentNode
 
 
 class SubWindow(NodeEditorWidget):
