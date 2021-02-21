@@ -83,52 +83,56 @@ class VplExecution():
         nextNodes = []
         ifValue = False
         switchValue = False
-        while moreChildren:
-            #time.sleep(0.5) multithreading confirmation
-            #print("start while\n")
-            if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
-                self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
-                
-            elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                self._window.appendText(str(parentData.val) + '\n') #prints val from parents NodeData object
 
-            elif(currentNode.op_code == OP_CODE_IF):
-                ifValue = True
+        if (startNode.op_code == OP_CODE_MERGE or startNode.op_code == OP_CODE_JOIN):
+            self._window.appendText("Error, you cannot have a Merge or Join activity as Start-Node!" + '\n')
+        else:
+            while moreChildren:
+                #time.sleep(0.5) multithreading confirmation
+                #print("start while\n")
+                if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
+                    self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
 
-            elif(currentNode.op_code == OP_CODE_SWITCH):
-                switchValue = True
-            
-            ##I think this would make more sense if parentData was named something like parentData instead personally --Luke
-            currentNode.doEval(parentData) #evaluate the current node, nextValue is the data object from parent node if applicable
-            parentData = currentNode.data # save data object for passing to child node
+                elif(currentNode.op_code == OP_CODE_PRINT_LINE):
+                    self._window.appendText(str(parentData.val) + '\n') #prints val from parents NodeData object
 
-            nextNodes = currentNode.getChildrenNodes()
-            if nextNodes != []:
-                if(ifValue and parentData.val):
-                    currentNode = nextNodes[0]
-                    ifValue = False
-                elif(ifValue and not parentData.val):
-                    currentNode = nextNodes[1]
-                    ifValue = False
-                elif(switchValue and parentData.val):
-                    currentNode = nextNodes[0]
-                    switchValue = False
-                elif(switchValue and not parentData.val):
-                    currentNode = nextNodes[1]
-                    switchValue = False
+                elif(currentNode.op_code == OP_CODE_IF):
+                    ifValue = True
+
+                elif(currentNode.op_code == OP_CODE_SWITCH):
+                    switchValue = True
+
+                ##I think this would make more sense if parentData was named something like parentData instead personally --Luke
+                currentNode.doEval(parentData) #evaluate the current node, nextValue is the data object from parent node if applicable
+                parentData = currentNode.data # save data object for passing to child node
+
+                nextNodes = currentNode.getChildrenNodes()
+                if nextNodes != []:
+                    if(ifValue and parentData.val):
+                        currentNode = nextNodes[0]
+                        ifValue = False
+                    elif(ifValue and not parentData.val):
+                        currentNode = nextNodes[1]
+                        ifValue = False
+                    elif(switchValue and parentData.val):
+                        currentNode = nextNodes[0]
+                        switchValue = False
+                    elif(switchValue and not parentData.val):
+                        currentNode = nextNodes[1]
+                        switchValue = False
+                    else:
+                        currentNode = nextNodes[0]
+                        #print("continuing thread\n")
+                        if len(nextNodes) > 1:
+                            for node in nextNodes[1:]:
+                                #print("new thread from child\n")
+                                t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
+                                threads.append(t)
+                                t.start()
+
                 else:
-                    currentNode = nextNodes[0]
-                    #print("continuing thread\n")
-                    if len(nextNodes) > 1:
-                        for node in nextNodes[1:]:
-                            #print("new thread from child\n")
-                            t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
-                            threads.append(t)
-                            t.start()
-
-            else:
-                moreChildren = False
-                #print("Ending a thread\n")
+                    moreChildren = False
+                    #print("Ending a thread\n")
 
     def startExecution(self):
         self._window.show()
