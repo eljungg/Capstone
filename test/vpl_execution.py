@@ -88,16 +88,12 @@ class VplExecution():
             self._window.appendText("Error, you cannot have a Merge or Join activity as Start-Node!" + '\n')
         else:
             while moreChildren:
-                #time.sleep(0.5) multithreading confirmation
-                #print("start while\n")
+
                 if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
                     self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
 
                 elif(currentNode.op_code == OP_CODE_PRINT_LINE):
                     self._window.appendText(str(parentData.val) + '\n') #prints val from parents NodeData object
-
-                elif (currentNode.op_code == OP_CODE_TIMMER):
-                    time.sleep(int(parentData.val)/1000)
 
                 elif(currentNode.op_code == OP_CODE_IF):
                     ifValue = True
@@ -105,8 +101,7 @@ class VplExecution():
                 elif(currentNode.op_code == OP_CODE_SWITCH):
                     switchValue = True
 
-                ##I think this would make more sense if parentData was named something like parentData instead personally --Luke
-                currentNode.doEval(parentData) #evaluate the current node, nextValue is the data object from parent node if applicable
+                currentNode.doEval(parentData) #evaluate the current node, parentData is the data object from parent node if applicable
                 parentData = currentNode.data # save data object for passing to child node
 
                 nextNodes = currentNode.getChildrenNodes()

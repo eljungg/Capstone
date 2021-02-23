@@ -17,7 +17,7 @@ from nodes.terminal_print_node import TerminalPrintNode
 from nodes.switch_node import SwitchNode
 from model.variables import VariablesData
 from nodes.comment_node import CommentNode
-from nodes.timmer_node import TimmerNode
+from nodes.timer_node import timerNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -55,7 +55,7 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 50: return PrintLineNode
         elif data['op_code'] == 51: return SimpleDialogNode
         elif data['op_code'] == 14: return CommentNode
-        elif data['op_code'] == 15: return TimmerNode
+        elif data['op_code'] == 15: return timerNode
         
         return VplNode
 
@@ -162,9 +162,9 @@ class SubWindow(NodeEditorWidget):
         elif (op_code == OP_CODE_COMMENT):
             print("adding comment node.")
             node = CommentNode(self.scene)
-        elif (op_code == OP_CODE_TIMMER):
-            print("adding timmer node.")
-            node = TimmerNode(self.scene)
+        elif (op_code == OP_CODE_timer):
+            print("adding timer node.")
+            node = timerNode(self.scene)
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 
