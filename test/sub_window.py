@@ -14,7 +14,10 @@ from nodes.merge_node import MergeNode
 from nodes.print_line_node import PrintLineNode
 from nodes.simple_dialog_node import SimpleDialogNode
 from nodes.terminal_print_node import TerminalPrintNode
+from nodes.switch_node import SwitchNode
 from model.variables import VariablesData
+from nodes.comment_node import CommentNode
+from nodes.timer_node import timerNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -51,6 +54,8 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 49: return TerminalPrintNode
         elif data['op_code'] == 50: return PrintLineNode
         elif data['op_code'] == 51: return SimpleDialogNode
+        elif data['op_code'] == 14: return CommentNode
+        elif data['op_code'] == 15: return timerNode
         
         return VplNode
 
@@ -116,10 +121,13 @@ class SubWindow(NodeEditorWidget):
         if(op_code == OP_CODE_VARIABLE):
             node =  VariableNode(self.scene) # Variable node gets reference to global(subWindow) variables object
             node.setVariableData(self.variables)
+            node.content.reDrawVariablesDropDown() #dropdown of variables has to be drawn after .setVariableData above, other wise would do this inside of node
             node.title = "Variable Node"
             
         elif op_code == OP_CODE_CALCULATE:
             node = CalculateNode(self.scene)
+            node.setVariableData(self.variables)
+            node.content.redrawComboBox()
             node.title="Calculate Node"
 
         elif op_code == OP_CODE_DATA:
@@ -127,7 +135,7 @@ class SubWindow(NodeEditorWidget):
             node.title = "Data Node"
 
         elif op_code == OP_CODE_MERGE:
-            node = DataNode(self.scene)
+            node = MergeNode(self.scene)
             node.title = "Merge Node"
         elif(op_code == OP_CODE_IF):
             print("adding if node.")
@@ -148,6 +156,15 @@ class SubWindow(NodeEditorWidget):
         elif(op_code == OP_CODE_TERMINAL_PRINT):
             print("adding terminal print node.")
             node = TerminalPrintNode(self.scene)
+        elif(op_code == OP_CODE_SWITCH):
+            print("adding switch node")
+            node = SwitchNode(self.scene)
+        elif (op_code == OP_CODE_COMMENT):
+            print("adding comment node.")
+            node = CommentNode(self.scene)
+        elif (op_code == OP_CODE_timer):
+            print("adding timer node.")
+            node = timerNode(self.scene)
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 

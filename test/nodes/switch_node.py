@@ -4,18 +4,18 @@ from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 DEBUG = True
-ADDITIONAL_IFS = 2
+ADDITIONAL_SWITCHES = 2
 INITIAL_OUTPUTS = 5
 outputList = [1,1]
 
-class IfNodeContent(QDMNodeContentWidget):
+class SwitchNodeContent(QDMNodeContentWidget):
     def initUI(self):
         # Setup of all the widgets needed
         self.edit = QLineEdit('' , self)
         self.edit.setAlignment(Qt.AlignCenter)
         self.subBtn = QPushButton('-', self)
         self.addBtn = QPushButton('+', self)
-        self.elseLbl = QLabel('Else', self)
+        self.elseLbl = QLabel('Default', self)
         self.elseLbl.setAlignment(Qt.AlignCenter)
 
         # Set up layout
@@ -46,73 +46,43 @@ class IfNodeContent(QDMNodeContentWidget):
         return res
 
 
-class IfNode(VplNode):
+class SwitchNode(VplNode):
     icons = "Capstone/icons/in.png"
-    op_code = OP_CODE_IF
-    op_title = "If"
-    content_label_objname = "VplNodeIf"
+    op_code = OP_CODE_SWITCH
+    op_title = "Switch"
+    content_label_objname = "VplNodeSwitch"
 
-    def __init__(self, scene, title:str="If"):
+    def __init__(self, scene, title:str="Switch"):
         super().__init__(scene, title, inputs = [1], outputs = [1,2])
 
     def initInnerClasses(self):
-        self.content = IfNodeContent(self)
+        self.content = SwitchNodeContent(self)
         self.grNode = VplGraphicsNode(self)
 
         self.grNode.height = 100
         self.grNode.width = 210
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
-        self.data.id = self.id
          
         self.registerButtons()
 
     
     def doEval(self, input=None):
         statement = self.content.edit.text()
-        broken = statement.split(" ")
 
         givenValue = ""
 
-        if(len(broken) == 3):
-            if(broken[2][0] == "\"" and broken[2][-1] == "\""):
-                givenValue = broken[2][1:-1]
-            else:
-                givenValue = broken[2]
+        if(statement[0] == "\"" and statement[-1] == "\""):
+            givenValue = statement[1:-1]
+        else:
+            givenValue = statement
 
-            if(broken[0] == "value"):
-                if(broken[1] == "=="):
-                    if(input.val == givenValue):
-                        self.data.val = True
-                    else:
-                        self.data.val = False
-                elif(broken[1] == ">="):
-                    if(input.val >= givenValue):
-                        self.data.val = True
-                    else:
-                        self.data.val = False
-                elif(broken[1] == "<="):
-                    if(input.val <= givenValue):
-                        self.data.val = True
-                    else:
-                        self.data.val = False
-                elif(broken[1] == ">"):
-                    if(input.val > givenValue):
-                        self.data.val = True
-                    else:
-                        self.data.val = False
-                elif(broken[1] == "<"):
-                    if(input.val < givenValue):
-                        self.data.val = True
-                    else:
-                        self.data.val = False
-                elif(broken[1] == "!="):
-                    if(input.val != givenValue):
-                        self.data.val = True
-                    else:
-                        self.data.val = False
-                else:
-                    print("There is an error in the logic.")
+
+        if(input.val == givenValue):
+            self.data.val = True
+        else:
+            self.data.val = False
+            
         return
     
 
@@ -123,13 +93,13 @@ class IfNode(VplNode):
     def increaseWidgetSize(self):
         # will have to change this to account for multiple if nodes
         # maybe make a local copy
-        global ADDITIONAL_IFS
+        global ADDITIONAL_SWITCHES
         self.grNode.height = self.grNode.height + 24
         if DEBUG:
             print('Add button clicked!')
 
-        # increment global variable ADDITIONAL IFS
-        ADDITIONAL_IFS = ADDITIONAL_IFS + 1
+        # increment global variable ADDITIONAL_SWITCHES
+        ADDITIONAL_SWITCHES = ADDITIONAL_SWITCHES + 1
         outputList.append(1)
 
         # remove current bottom row (buttons + else label)
@@ -155,11 +125,11 @@ class IfNode(VplNode):
         # add redefined widgets back into the layout
         if DEBUG:
             print('ADDING WIDGETS BACK INTO LAYOUT')
-        numIfs = ADDITIONAL_IFS - 1
+        numIfs = ADDITIONAL_SWITCHES - 1
         self.content.layout.addWidget(self.content.edit, numIfs, 1, 1, 3)
-        self.content.layout.addWidget(self.content.subBtn, ADDITIONAL_IFS, 1)
-        self.content.layout.addWidget(self.content.elseLbl, ADDITIONAL_IFS, 2)
-        self.content.layout.addWidget(self.content.addBtn, ADDITIONAL_IFS, 3)
+        self.content.layout.addWidget(self.content.subBtn, ADDITIONAL_SWITCHES, 1)
+        self.content.layout.addWidget(self.content.elseLbl, ADDITIONAL_SWITCHES, 2)
+        self.content.layout.addWidget(self.content.addBtn, ADDITIONAL_SWITCHES, 3)
 
         # must reregister buttons because they are new
         if DEBUG:
@@ -170,13 +140,13 @@ class IfNode(VplNode):
         print('Sub button clicked!')
         if (self.grNode.height > 100):
             
-            global ADDITIONAL_IFS
+            global ADDITIONAL_SWITCHES
             self.grNode.height = self.grNode.height - 24
             if DEBUG:
                 print('Add button clicked!')
 
-            # increment global variable ADDITIONAL IFS
-            ADDITIONAL_IFS = ADDITIONAL_IFS - 1
+            # increment global variable ADDITIONAL_SWITCHES
+            ADDITIONAL_SWITCHES = ADDITIONAL_SWITCHES - 1
 
             # remove current bottom row
             if DEBUG:
@@ -193,7 +163,7 @@ class IfNode(VplNode):
             
             
             # Remove row at ADDITIONAL_IFS
-            toRemove = self.content.layout.itemAtPosition(ADDITIONAL_IFS, 1)
+            toRemove = self.content.layout.itemAtPosition(ADDITIONAL_SWITCHES, 1)
             remove = toRemove.widget()
             self.content.layout.removeWidget(remove)
             remove.setParent(None)
@@ -204,14 +174,14 @@ class IfNode(VplNode):
                 print('REDEFINING WIDGETS')        
             self.content.subBtn = QPushButton('-', self.content)
             self.content.addBtn = QPushButton('+', self.content)
-            self.content.elseLbl = QLabel('Else', self.content)
+            self.content.elseLbl = QLabel('Default', self.content)
             self.content.elseLbl.setAlignment(Qt.AlignCenter)
 
             if DEBUG:
                 print('ADDING WIDGETS BACK INTO LAYOUT')
-            self.content.layout.addWidget(self.content.subBtn, ADDITIONAL_IFS, 1)
-            self.content.layout.addWidget(self.content.elseLbl, ADDITIONAL_IFS, 2)
-            self.content.layout.addWidget(self.content.addBtn, ADDITIONAL_IFS, 3)      
+            self.content.layout.addWidget(self.content.subBtn, ADDITIONAL_SWITCHES, 1)
+            self.content.layout.addWidget(self.content.elseLbl, ADDITIONAL_SWITCHES, 2)
+            self.content.layout.addWidget(self.content.addBtn, ADDITIONAL_SWITCHES, 3)      
             
             if DEBUG:
                 print('REGISTERING BUTTONS')  
@@ -219,4 +189,4 @@ class IfNode(VplNode):
             self.registerButtons()
 
         else:
-            print('Must have at least one if statement!')
+            print('Must have at least one switch statement!')

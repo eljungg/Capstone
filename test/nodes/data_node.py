@@ -67,8 +67,10 @@ class DataNode(VplNode):
             self.data.valType = TYPE_STRING
             self.content.typeLabel.setText("String")
 
-    def doEval(self, input=None):
-        return #self.content.edit.text()    determinedatatype sets the values for NodeData() nothing needs to be done here.
+    def doEval(self, parentData=None): 
+        #does literally nothing. 
+        #as of now, getting the type and data are handled in determineDataType() # saved to self.data
+        return
 
     def __isInt(self , val): #helper function for determineType
         try:
