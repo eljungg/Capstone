@@ -32,6 +32,7 @@ class TerminalPrintNode(VplNode):
         self.grNode = VplGraphicsNode(self)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
+        self.data.id = self.id
 
     def doEval(self, input=None):
         string = ""

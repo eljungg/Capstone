@@ -60,11 +60,15 @@ class VplNode(Node):
         """Evaluation statement for our execution engine. May replace later with normal eval provided by `nodeeditor`."""
         return None
 
-    def getChildSocket(self, outSocket):
-        """Allows a node to get a reference to the specific socket it's edges connect to. Used on nodes that connect to join or any multiple input nodes."""
-        childInSockets = []
-        for i in outSocket.edges:
-            childInSockets.append(outSocket.edges[i].end_socket())
+    def findParentFromSocket(self, pid):
+        """Allows a node to determine which socket the parent is connected to based on id in NodeData. Used for join"""
+        i = 0
+        for socket in self.inputs: #loop through inputs of the node
+            e = socket.edge[0] #only merge should take multiple inputs on a socket, get the only edge connected to the input
+            parent = e.getOtherSocket(socket).node
+            if(parent.id == pid):
+                return i #returns the socket's postition in the list
+            i = i + 1
 
     def serialize(self):
         res = super().serialize()

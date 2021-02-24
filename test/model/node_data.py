@@ -9,6 +9,7 @@ class NodeData:
         self.nodeType = None # will contain opcode that defines type
         self.val = None # Simpler than .vals List, Didnt want to delete vals[] if anyone was using it.mro
         self.valType = None #Simpler than .valsType List, didnt want to delete ValsType[] if anyoe was using it
+        self.id = None #The node's id in case look back is needed (join)
     
 
     def print(self): # Debug utility

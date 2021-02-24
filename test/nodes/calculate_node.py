@@ -41,6 +41,7 @@ class CalculateNode(VplNode):
         self.content.edit.textChanged.connect(self.doCalculations)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
+        self.data.id = self.id
     
     def doCalculations(self): ## just gonna run python eval
         ### This doesnt handle any variables or anything like that###

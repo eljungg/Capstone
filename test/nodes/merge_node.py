@@ -21,6 +21,7 @@ class MergeNode(VplNode):
         self.grNode = VPLGraphicsNode(self)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
+        self.data.id = self.id
         self.grNode.edge_roundness = 22
         self.grNode.width = 60
         self.grNode.height = 60
