@@ -105,7 +105,7 @@ class VariableMenu(QDialog):
         else:
             return True #is duplicate
 
-    def _lockTypeBox(self):
+    def _lockTypeBox(self): # this is breaking variables stored type info
         self.typeDropDown.setCurrentIndex(-1)
         self.typeDropDown.setEnabled(False) # disable
 
@@ -116,7 +116,6 @@ class VariableMenu(QDialog):
     def _updateVariableTypeDropdown(self , item):
         self.currentlySelectedVariable = item;
         if(item == None):
-            print("returning none on _updateVariableTypeDropDown")
             return
         varName = self.currentlySelectedVariable.text() # get name of variable
         variable = self.variablesListRef._findVarByName(varName)
@@ -126,7 +125,7 @@ class VariableMenu(QDialog):
         self.typeDropDown.setEnabled(True)
 
     def _setVarTypeFromDropDown(self): #on indexChanged of typeDropDown
-        if(self.currentlySelectedVariable == None):
+        if(self.currentlySelectedVariable == None or self.typeDropDown.currentIndex() == -1): # ignore case when dropdown is cleared on inputFocus event or no vars yet
             return #somethings wrong
         varName = self.currentlySelectedVariable.text()
         variable = self.variablesListRef._findVarByName(varName)
@@ -147,6 +146,7 @@ class VariableMenu(QDialog):
         self.variablesListRef._addVariable(newVar) # add Variable object to "global" variables list
         self._drawListBoxEntry(varName) # add item to listbox
         self._determineTypeDropDownLockStatus()
+        self.s1.varListChanged.emit()
 
     def showDuplicateErrorDialog(self): #simple popup for warning user attempting to add duplicate variable
         self.errorString = "ERROR: Variable already exists.\n Cannot add duplicate."
@@ -172,6 +172,7 @@ class VariableMenu(QDialog):
         self._reDrawListBoxEntries()
         self.currentlySelectedVariable = None # reset this because if selected was deleted it breaks
         self._determineTypeDropDownLockStatus()
+        self.s1.varListChanged.emit()
 
     def _drawVarLineEdit(self , variable): #where variable == string of varName
         le = QLineEdit(variable) #We need something selectable, Im not sure this is proper widget....
