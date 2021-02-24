@@ -10,6 +10,9 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 from util import valTypeToString
 from util import stringToValType
 
+class customSignals(QObject): #custom signals
+    typeChange = pyqtSignal()
+s1 = customSignals() # need a "global" ref to pass custom signal into our variable menu
 class VariableContent(QDMNodeContentWidget):
     
     def __init__(self, parent, variablesRef):
@@ -57,7 +60,7 @@ class VariableContent(QDMNodeContentWidget):
             dumpException(e)
         return res
     def showVariableMenu(self): #maybe better in content class?
-        menuDialog = VariableMenu(self, self.vars)
+        menuDialog = VariableMenu(self, self.vars ,s1)
         menuDialog.exec_()
 
 class VariableNode(VplNode):
@@ -79,6 +82,7 @@ class VariableNode(VplNode):
     def _connectView(self): #wire up controllers
         self.content.variableMenuBtn.clicked.connect(self.content.showVariableMenu) # do modal popup
         self.content.variablesDropDown.currentIndexChanged.connect(self._setTypeLbl)
+        s1.typeChange.connect(self._setTypeLbl)
 
     def _setTypeLbl(self):
         varType = self._getSelectedVariableType() # get the variable type

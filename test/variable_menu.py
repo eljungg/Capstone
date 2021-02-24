@@ -26,10 +26,10 @@ class varLineEdit(QLineEdit): # we have to sub-class this to get event handlers 
         #we will catch these emits inside our variableMenu
 
 class VariableMenu(QDialog):
-    def __init__(self, parent, variablesListRef):
+    def __init__(self, parent, variablesListRef , s1):
         super().__init__(parent=parent) ## might need kwargs nonsense
         self.setWindowTitle("Variable Selection")
-
+        self.s1 =s1
         self.variablesListRef = variablesListRef
         dialogButtons = QDialogButtonBox.Ok
 
@@ -133,6 +133,7 @@ class VariableMenu(QDialog):
         chosenTypeStr = self.typeDropDown.currentText()
         chosenType = stringToValType(chosenTypeStr)
         variable.valType = chosenType
+        self.s1.typeChange.emit() # emit cusom event to change the typeLabel on variable node itself real-time
 
     def _addVar(self):
         varName = self.varInput.text()
