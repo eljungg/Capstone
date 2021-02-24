@@ -106,17 +106,11 @@ class VplExecution():
 
                 nextNodes = currentNode.getChildrenNodes()
                 if nextNodes != []:
-                    if(ifValue and parentData.val):
-                        currentNode = nextNodes[0]
+                    if(ifValue):
+                        currentNode = nextNodes[parentData.val]
                         ifValue = False
-                    elif(ifValue and not parentData.val):
-                        currentNode = nextNodes[1]
-                        ifValue = False
-                    elif(switchValue and parentData.val):
-                        currentNode = nextNodes[0]
-                        switchValue = False
-                    elif(switchValue and not parentData.val):
-                        currentNode = nextNodes[1]
+                    elif(switchValue):
+                        currentNode = nextNodes[parentData.val]
                         switchValue = False
                     else:
                         currentNode = nextNodes[0]
