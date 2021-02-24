@@ -7,6 +7,8 @@ from conf import *
 from model.variables import VariablesData
 from variable_menu import *
 from nodeeditor.node_graphics_node import QDMGraphicsNode
+from util import valTypeToString
+from util import stringToValType
 
 class VariableContent(QDMNodeContentWidget):
     
@@ -17,18 +19,18 @@ class VariableContent(QDMNodeContentWidget):
 
     def initUI(self):
         self.layout = QVBoxLayout()
-        
+        self.innerHbox = QHBoxLayout() # for holding side by side typeLabel and variableMenuBtn
+        self.typeLabel = QLabel("No Value") # label for holding type info of selected variable
         ###We are going to need some globla (subWindow) level variable holder
         self.variablesDropDown = QComboBox(self)
         for var in self.vars.variables:
             self.variablesDropDown.addItem(var)
         
         self.variableMenuBtn = QPushButton("more")
-
-        #self.layout.addWidget(self.edit) #hiding the O.G. edit line, not needed
         self.layout.addWidget(self.variablesDropDown)
-        self.layout.addWidget(self.variableMenuBtn)
-
+        self.innerHbox.addWidget(self.typeLabel)
+        self.innerHbox.addWidget(self.variableMenuBtn)
+        self.layout.addLayout(self.innerHbox)
         self.setLayout(self.layout)
         self.reDrawVariablesDropDown() # on node creation, show current variables in dropdown
         
@@ -64,16 +66,25 @@ class VariableNode(VplNode):
         self.variablesRef = VariablesData() # set on construction in sub_window.py # reference to out subWindow level variables
         super().__init__(scene, inputs=[1], outputs=[3]) #added single input
         
-
     def initInnerClasses(self):
         self.content = VariableContent(self , self.variablesRef)
         self.grNode = VplGraphicsNode(self)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
 
-        self.grNode.height = 120
+        self.grNode.height = 98
         self.grNode.width = 160
+        self._connectView() # set the controllers
+
+    def _connectView(self): #wire up controllers
         self.content.variableMenuBtn.clicked.connect(self.content.showVariableMenu) # do modal popup
+        self.content.variablesDropDown.currentIndexChanged.connect(self._setTypeLbl)
+
+    def _setTypeLbl(self):
+        varType = self._getSelectedVariableType() # get the variable type
+        varTypeStr = valTypeToString(varType) # convert from TYPE to string
+        self.content.typeLabel.setText(varTypeStr)
+
     def doEval(self, parentData=None):
         selectedVariable = self._getSelectedVariable()#we need a handle on selected variable
         if(selectedVariable == None): # case we have no variables yet, but data comes into variable node
@@ -96,7 +107,12 @@ class VariableNode(VplNode):
         varName = self.content.variablesDropDown.currentText() # get varname as string
         variable = self.variablesRef._findVarByName(varName)
         return variable;
-    
+    def _getSelectedVariableType(self):
+        varName = self.content.variablesDropDown.currentText() # get varname as string
+        variable = self.variablesRef._findVarByName(varName)
+        if(variable != None):
+            return variable.valType;
+            #this call fails sometimes (and this catches it), I think its because we redraw the variableMenu and it calls on changeIndex of text == ""
     def __setVariableVal(self , variable , inpVal):
         variable.val = inpVal;
 
