@@ -110,8 +110,8 @@ class VplExecution():
         for node in self._nodes:
             if(node.getInput() == None):
                 self._startNodes.append(node)
-            if(node.op_code == OP_CODE_JOIN):
-                self._registerJoinNode(node)
+            #if(node.op_code == OP_CODE_JOIN):
+                #self._registerJoinNode(node)
 
     def threadExecute(self, startNode, pData=None):
         parentData = pData
@@ -130,7 +130,7 @@ class VplExecution():
                     self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
 
                 elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                    self._window.appendText(str(parentData.val) + '\n') #prints val from parents NodeData object
+                    self._window.appendText(currentNode.nodeDataValtoString(parentData.val) + '\n') #prints val from parents NodeData object
 
                 elif(currentNode.op_code == OP_CODE_IF):
                     ifValue = True
@@ -142,6 +142,7 @@ class VplExecution():
                 parentData = currentNode.data # save data object for passing to child node
 
                 nextNodes = currentNode.getChildrenNodes()
+
                 if nextNodes != []:
                     if(ifValue and parentData.val):
                         currentNode = nextNodes[0]
@@ -155,6 +156,9 @@ class VplExecution():
                     elif(switchValue and not parentData.val):
                         currentNode = nextNodes[1]
                         switchValue = False
+                    elif(currentNode.op_code == OP_CODE_JOIN and not parentData.val):
+                        moreChildren = False
+                        #join node returned empty list, not ready, let thread die. Non-empty list will pass through and execute normally.
                     else:
                         currentNode = nextNodes[0]
                         #print("continuing thread\n")

@@ -61,11 +61,16 @@ class VplNode(Node):
         return None
 
     def findParentFromSocket(self, pid):
-        """Allows a node to determine which socket the parent is connected to based on id in NodeData. Used for join"""
+        """Allows a node to determine which socket the parent is connected to based on id in NodeData. id of parent node as argument. Used for join"""
+        print(len(self.inputs))
         i = 0
         for socket in self.inputs: #loop through inputs of the node
-            e = socket.edge[0] #only merge should take multiple inputs on a socket, get the only edge connected to the input
+            print("entering for")
+            e = socket.edges[0] #only merge should take multiple inputs on a socket, get the only edge connected to the input
             parent = e.getOtherSocket(socket).node
+            print(parent.id)
+            print(pid)
+            print(i)
             if(parent.id == pid):
                 return i #returns the socket's postition in the list
             i = i + 1
