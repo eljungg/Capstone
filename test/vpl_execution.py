@@ -56,6 +56,29 @@ class _DialogWindow(QWidget):
         self.windowString += string
         self.textArea.setText(self.windowString)
 
+class _joinData():
+    def __init__(self, nodeId, size):
+        self.nodeId = nodeId
+        self.size = size
+        self.queueList = []
+
+        for i in range(size):
+            self.queueList.append(deque())
+
+    def addEntry(self, position, entry):
+        returnList = []
+        if(position < 0 or position >= self.size):
+            print("Error: position is out of range")
+        else:
+            self.queueList[position].append(entry)
+            full = True
+            for i in self.queueList:
+                if not self.queueList[i]:
+                    full = False
+            if full:
+                for i in self.queueList:
+                    returnList.append(self.queueList[i].popleft())
+        return returnList
 
 
 class VplExecution():
@@ -70,11 +93,25 @@ class VplExecution():
         self.dialogOpen = False
         self.str = "Program started.\n"
         self._threads = list()
+        self._joinNodeList = []
 
+    def _registerJoinNode(self, node):
+        self._joinNodeList.append(_joinData(node.size, node.id))
+
+    def _addEntrytoJoinNode(self, nodeId, position, entry):
+        returnList = []
+        for n in self._joinNodeList:
+            if(self._joinNodeList[n].nodeId == nodeId):
+                #semaphore blocking here
+                returnList = self._joinNodeList[n].addEntry(position, entry)
+                #semaphore release here
+    
     def _findStartNodes(self):
         for node in self._nodes:
             if(node.getInput() == None):
                 self._startNodes.append(node)
+            #if(node.op_code == OP_CODE_JOIN):
+                #self._registerJoinNode(node)
 
     def threadExecute(self, startNode, pData=None):
         parentData = pData
@@ -93,7 +130,7 @@ class VplExecution():
                     self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
 
                 elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                    self._window.appendText(str(parentData.val) + '\n') #prints val from parents NodeData object
+                    self._window.appendText(currentNode.nodeDataValtoString(parentData.val) + '\n') #prints val from parents NodeData object
 
                 elif(currentNode.op_code == OP_CODE_IF):
                     ifValue = True
@@ -105,6 +142,7 @@ class VplExecution():
                 parentData = currentNode.data # save data object for passing to child node
 
                 nextNodes = currentNode.getChildrenNodes()
+
                 if nextNodes != []:
                     if(ifValue and parentData.val):
                         currentNode = nextNodes[0]
@@ -118,6 +156,9 @@ class VplExecution():
                     elif(switchValue and not parentData.val):
                         currentNode = nextNodes[1]
                         switchValue = False
+                    elif(currentNode.op_code == OP_CODE_JOIN and not parentData.val):
+                        moreChildren = False
+                        #join node returned empty list, not ready, let thread die. Non-empty list will pass through and execute normally.
                     else:
                         currentNode = nextNodes[0]
                         #print("continuing thread\n")

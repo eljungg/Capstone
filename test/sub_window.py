@@ -8,6 +8,7 @@ from vpl_node import VplNode # get over-ridedd node
 from nodes.variable_node import VariableNode # get our node sub classes
 from nodes.if_node import IfNode
 from nodes.join_node import JoinNode
+from nodes.join3_node import Join3Node
 from nodes.data_node import DataNode
 from nodes.calculate_node import CalculateNode
 from nodes.merge_node import MergeNode
@@ -165,6 +166,10 @@ class SubWindow(NodeEditorWidget):
         elif (op_code == OP_CODE_timer):
             print("adding timer node.")
             node = timerNode(self.scene)
+        elif(op_code == OP_CODE_JOIN3):
+            print("adding join node.")
+            node = Join3Node(self.scene)
+            node.title = "Join Node"
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 

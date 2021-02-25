@@ -71,6 +71,7 @@ class CalculateNode(VplNode):
         self.grNode = VplGraphicsNode(self)
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
+        self.data.id = self.id
 
     def setVariableData(self, variables): # wires up stuff, see subWindow.py
         self.variablesRef = variables
