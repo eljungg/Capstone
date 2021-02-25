@@ -84,16 +84,16 @@ class JoinNode(VplNode):
             if full:
                 for i in self.queueList:
                     returnList.append(i.popleft())
-                print("returning a full join node")
+                #print("returning a full join node")
                 returnList.reverse() #nodeeditor has the bottom socket as 0 so the entries are backwards from what one would expect.
-            else:
-                print("join is not full")
+            #else:
+                #print("join is not full")
         return returnList
 
     def doEval(self, input=None):
         if (input != None):
             inputpos = self.findParentFromSocket(input.id)
-            print(inputpos)
+            #print(inputpos)
             self.data.val = self.addEntry(inputpos, input.val)
         else:
             print("ERROR, join recieved a null input")
