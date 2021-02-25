@@ -1,8 +1,10 @@
 from PyQt5.QtCore import *
+from PyQt5.QtWidgets import *
 from vpl_node import *
 from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
+from nodeeditor.node_content_widget import QDMNodeContentWidget
 DEBUG = True
 ADDITIONAL_IFS = 2
 INITIAL_OUTPUTS = 5
@@ -60,7 +62,7 @@ class IfNode(VplNode):
         self.grNode = VplGraphicsNode(self)
 
         self.grNode.height = 100
-        self.grNode.width = 210
+        self.grNode.width = 215
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
         self.data.id = self.id

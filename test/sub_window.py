@@ -1,4 +1,6 @@
 from nodeeditor.node_editor_widget import NodeEditorWidget
+from nodeeditor.node_graphics_scene import QDMGraphicsScene
+from nodeeditor.node_graphics_view import QDMGraphicsView
 from PyQt5.QtCore import *
 from conf import *
 from PyQt5.QtGui import *
@@ -23,6 +25,7 @@ from nodes.timer_node import timerNode
 
 class SubWindow(NodeEditorWidget):
     Scene_class = VplScene
+    GraphicsView_class = QDMGraphicsView
     """This is a sub-window, the grey plot for placing nodes on """
     def __init__(self):
         
@@ -39,6 +42,8 @@ class SubWindow(NodeEditorWidget):
 
         self._close_event_listeners = []
         self.variables = VariablesData() # each "scene" or "subwindow" has a "global" Variables data list
+
+        
 
     def getNodeClass(self, data):
         #scan through op codes
