@@ -160,6 +160,8 @@ class VariableMenu(QDialog):
 
     def _deleteVar(self):
         selectedVarList = self.variableListBox.selectedItems() # returns list of selected items
+        if(len(selectedVarList )== 0): # nothing to delete, ignore user click
+            return
         for selected in selectedVarList: # plan on only deleting one at a time, but its set to handle multiple selected it needed
             varName = selected.text()
             variable = self.variablesListRef._findVarByName(varName);
