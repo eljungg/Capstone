@@ -43,7 +43,7 @@ class DataNode(VplNode):
         #below is onTextChanged event for simple self.edit Label
         self.content.edit.textChanged.connect(self.onInputChanged)
         self.content.edit.textChanged.connect(self.determineDataType)
-        self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
         self.data.id = self.id
 

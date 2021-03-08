@@ -60,7 +60,7 @@ class JoinNode(VplNode):
         self.grNode = VplGraphicsNode(self)
         self.content.conditional1.textChanged.connect(self.onInputChanged)
         self.content.conditional2.textChanged.connect(self.onInputChanged)
-        self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
         self.data.id = self.id
         self.size = 2

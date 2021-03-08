@@ -30,7 +30,7 @@ class SimpleDialogNode(VplNode):
     def initInnerClasses(self):
         self.content = SimpleDialogNodeContent(self)
         self.grNode = VplGraphicsNode(self)
-        self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
         self.data.id = self.id
 
