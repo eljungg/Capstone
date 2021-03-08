@@ -92,9 +92,6 @@ class VplExecution():
                 if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
                     self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
 
-                elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                    self._window.appendText(currentNode.nodeDataValtoString(parentData.val) + '\n') #prints val from parents NodeData object
-
                 elif(currentNode.op_code == OP_CODE_IF):
                     ifValue = True
 
@@ -103,6 +100,7 @@ class VplExecution():
 
                 currentNode.doEval(parentData) #evaluate the current node, parentData is the data object from parent node if applicable
                 parentData = currentNode.data # save data object for passing to child node
+                self.printNodeMessages(parentData) # print any messages resulting from our doEval() function.
 
                 nextNodes = currentNode.getChildrenNodes()
 
@@ -146,3 +144,10 @@ class VplExecution():
             #self._nodeQueue.append(node)
             #self._executeNodes()
             #print("end of thread.")
+    def printNodeMessages(self, dataObject): # prints all a nodes messages, and then clears them
+        for msg in dataObject.messages: # iterate any messages
+            if(type(msg) == str): #verify type
+                self._window.appendText(msg + '\n') # any given msg string to the print_line execution window
+            else:
+                print("printNodeMessages passed non-string type error") #Debug
+        dataObject.clearMessages() # clear all messages after printing
