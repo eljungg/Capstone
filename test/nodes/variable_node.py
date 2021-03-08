@@ -12,7 +12,8 @@ from util import stringToValType
 
 class customSignals(QObject): #custom signals
     typeChange = pyqtSignal()
-    varListChanged = pyqtSignal()
+    varAdded = pyqtSignal(str) # str will be varName
+    varDeleted = pyqtSignal(str)
 s1 = customSignals() # need a "global" ref to pass custom signal into our variable menu
 class VariableContent(QDMNodeContentWidget):
     
@@ -20,7 +21,6 @@ class VariableContent(QDMNodeContentWidget):
         self.vars = variablesRef
         super().__init__(parent)
     
-
     def initUI(self):
         self.layout = QVBoxLayout()
         self.innerHbox = QHBoxLayout() # for holding side by side typeLabel and variableMenuBtn
@@ -69,6 +69,7 @@ class VariableNode(VplNode):
     def __init__(self, scene):
         self.variablesRef = VariablesData() # set on construction in sub_window.py # reference to out subWindow level variables
         super().__init__(scene, inputs=[1], outputs=[3]) #added single input
+        self.currentVariableName = ""
         
     def initInnerClasses(self):
         self.content = VariableContent(self , self.variablesRef)
@@ -85,7 +86,20 @@ class VariableNode(VplNode):
         self.content.variableMenuBtn.clicked.connect(self.content.showVariableMenu) # do modal popup
         self.content.variablesDropDown.currentIndexChanged.connect(self._setTypeLbl)
         s1.typeChange.connect(self._setTypeLbl)
-        s1.varListChanged.connect(self.content.reDrawVariablesDropDown) # redraw variables dropdown on every node when varlist changes
+        s1.varAdded.connect(self._addVarItemByName) # add variable to this nodes dropdown
+        s1.varDeleted.connect(self._deleteVarItemByName) # remove variable from this nodes dropdown
+
+    def _deleteVarItemByName(self, varName):
+        idx = self.content.variablesDropDown.findText(varName) # returns index
+        if(idx == -1): # handle variable not found error
+            print("_deleteVarItemByName in variable_node tried to delete no existing item: ERROR")
+            return
+        if(idx == self.content.variablesDropDown.currentIndex()): # case deleting selected variable.
+            self.content.variablesDropDown.setCurrentIndex(-1) # set to blank
+        self.content.variablesDropDown.removeItem(idx) # delete the item from comboBox dropdown
+
+    def _addVarItemByName(self, varName):
+        self.content.variablesDropDown.addItem(varName)
 
     def _setTypeLbl(self):
         varType = self._getSelectedVariableType() # get the variable type
