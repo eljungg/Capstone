@@ -46,3 +46,7 @@ class PrintLineNode(VplNode):
                 rString = str(input)
         return rString
     
+    def doEval(self, parentData=None):
+        msg = self.nodeDataValtoString(parentData.val)
+        self.data.messages.append(msg)
+
