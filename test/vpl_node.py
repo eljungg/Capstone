@@ -46,14 +46,19 @@ class VplContent(QDMNodeContentWidget):
 class VplNode(Node):
     GraphicsNode_class = VplGraphicsNode
     NodeContent_class = VplContent
-    data = NodeData() # hold our data model for this node
+    #data = NodeData() # hold our data model for this node
     op_code = 0
 
     content_label = ""
     content_label_objname = "calc_node_bg"
     def __init__(self, scene:'Scene', title:str="Undefined Node", inputs:list=[], outputs:list=[]):
+        self.data = NodeData()
         super().__init__(scene , title , inputs, outputs)
+        
         print("Over-rided node class goes!")
+
+    def onDeserialized(self, data=None):
+        self.data.id = self.id
 
     #eval statment for our execution engine
     def doEval(self, input=None):

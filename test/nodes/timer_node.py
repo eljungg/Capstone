@@ -36,7 +36,7 @@ class timerNode(VplNode):
     def initInnerClasses(self):
         self.content = timerNodeContent(self)
         self.grNode = VplGraphicsNode(self)
-        self.data = NodeData()
+        #self.data = NodeData()
         self.data.nodeType = self.op_code
 
     def doEval(self, input=None):
