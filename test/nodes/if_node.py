@@ -17,12 +17,7 @@ class IfNodeContent(QDMNodeContentWidget):
         super().__init__(parent)
 
     def initUI(self):
-        self.layout = QGridLayout()
-        self.backup = QGridLayout()
-
-        self.layout.setRowStretch(1, 3)
-        self.layout.setRowStretch(2, 3)
-        
+        self.layout = QVBoxLayout()       
 
         self.comboBox = []
         self.comboBox.append(QComboBox(self))
@@ -44,12 +39,23 @@ class IfNodeContent(QDMNodeContentWidget):
         self.elseLbl = QLabel('Else', self)
         self.elseLbl.setAlignment(Qt.AlignCenter)
 
-        self.layout.addWidget(self.comboBox[0], 1, 1, 1, 3)
-        self.layout.addWidget(self.subBtn, 2, 2)
-        self.layout.addWidget(self.elseLbl, 2, 3)
-        self.layout.addWidget(self.addBtn, 2, 1)
-        self.setLayout(self.layout)
+        self.layout.addWidget(self.comboBox[0])
+
+        self.groupBox = QGroupBox()
+        self.layout.addWidget(self.groupBox)
+
+        self.innerHbox = QHBoxLayout() 
+        self.groupBox.setLayout(self.innerHbox)
+
+        self.innerHbox.addWidget(self.addBtn)
+        self.innerHbox.addWidget(self.subBtn)
+        self.innerHbox.addWidget(self.elseLbl)
+
+        self.layout.setStretch(0, 1)
+        self.layout.setStretch(1, 1)
+        
         self.redrawComboBox()
+        self.setLayout(self.layout)
 
     def redrawComboBox(self): # function displays new variables in dropdown. (GUI REFRESH)
         self.comboBox[self.TotalIfs - 1].clear()
@@ -66,14 +72,21 @@ class IfNodeContent(QDMNodeContentWidget):
     #I hope these are correct
     def serialize(self):
         res = super().serialize()
-        res['value'] = self.edit[0].text()
+        values = []
+        for i in range(len(self.edit)):
+            values.append(self.edit[i].text())
+
+        res['value'] = values
         return res
 
     def deserialize(self, data, hashmap={}):
         res = super().deserialize(data, hashmap)
         try:
             value = data['value']
-            self.edit[0].setText(value)
+
+            for i in range(len(value)):
+                self.edit[i].setText(value[i])
+
             return True & res
         except Exception as e:
             dumpException(e)
@@ -96,8 +109,8 @@ class IfNode(VplNode):
         self.TotalIfs = self.content.TotalIfs
         self.grNode = VplGraphicsNode(self)
 
-        self.grNode.height = 160
-        self.grNode.width = 260
+        self.grNode.height = 225
+        self.grNode.width = 298
         self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
 
@@ -151,16 +164,19 @@ class IfNode(VplNode):
         
         self.TotalIfs = self.TotalIfs + 1
 
-        self.content.layout.removeWidget(self.content.subBtn)
+        self.content.innerHbox.removeWidget(self.content.subBtn)
         self.content.subBtn.deleteLater()
         self.content.subBtn = None
-        self.content.layout.removeWidget(self.content.elseLbl)
+        self.content.innerHbox.removeWidget(self.content.elseLbl)
         self.content.elseLbl.deleteLater()
         self.content.elseLbl = None
-        self.content.layout.removeWidget(self.content.addBtn)
+        self.content.innerHbox.removeWidget(self.content.addBtn)
         self.content.addBtn.deleteLater()
-        self.content.addBtn = None      
-
+        self.content.addBtn = None
+        self.content.layout.removeWidget(self.content.groupBox)
+        self.content.groupBox.deleteLater()
+        self.content.groupBox = None
+    
         self.content.comboBox.append(QComboBox(self.content))
         self.content.comboBox[self.TotalIfs - 1].addItems(self.content.initialList)
 
@@ -172,16 +188,23 @@ class IfNode(VplNode):
         self.content.subBtn = QPushButton('-', self.content)
         self.content.addBtn = QPushButton('+', self.content)
         self.content.elseLbl = QLabel('Else', self.content)
-        self.content.elseLbl.setAlignment(Qt.AlignCenter)
+        
+        self.content.layout.addWidget(self.content.comboBox[self.TotalIfs - 1])
 
-        self.content.layout.setRowStretch(self.TotalIfs, 3)
-        self.content.layout.setRowStretch(self.TotalIfs + 1, 3)
-        
-        self.content.layout.addWidget(self.content.comboBox[self.TotalIfs - 1], self.TotalIfs, 1, 1, 3)        
-        
-        self.content.layout.addWidget(self.content.subBtn, self.TotalIfs + 1, 2)
-        self.content.layout.addWidget(self.content.elseLbl, self.TotalIfs + 1, 3)
-        self.content.layout.addWidget(self.content.addBtn, self.TotalIfs + 1, 1)
+        self.content.groupBox = QGroupBox()
+        self.content.layout.addWidget(self.content.groupBox)
+
+        self.content.innerHbox = None
+
+        self.content.innerHbox = QHBoxLayout() 
+        self.content.groupBox.setLayout(self.content.innerHbox)
+
+        self.content.innerHbox.addWidget(self.content.addBtn)
+        self.content.innerHbox.addWidget(self.content.subBtn)
+        self.content.innerHbox.addWidget(self.content.elseLbl)
+
+        self.content.layout.setStretch(self.TotalIfs - 1, 1)
+        self.content.layout.setStretch(self.TotalIfs, 1)
         
         self.TotalOutputs.insert(-2, 1)
         self.newSockets([1], self.TotalOutputs, True)
@@ -194,15 +217,18 @@ class IfNode(VplNode):
     def decreaseWidgetSize(self):
 
         if (self.TotalIfs > 1):
-            self.content.layout.removeWidget(self.content.subBtn)
+            self.content.innerHbox.removeWidget(self.content.subBtn)
             self.content.subBtn.deleteLater()
             self.content.subBtn = None
-            self.content.layout.removeWidget(self.content.elseLbl)
+            self.content.innerHbox.removeWidget(self.content.elseLbl)
             self.content.elseLbl.deleteLater()
             self.content.elseLbl = None
-            self.content.layout.removeWidget(self.content.addBtn)
+            self.content.innerHbox.removeWidget(self.content.addBtn)
             self.content.addBtn.deleteLater()
-            self.content.addBtn = None   
+            self.content.addBtn = None
+            self.content.layout.removeWidget(self.content.groupBox)
+            self.content.groupBox.deleteLater()
+            self.content.groupBox = None
             
             self.content.layout.removeWidget(self.content.comboBox[self.TotalIfs - 1])
             self.content.comboBox[self.TotalIfs - 1].setParent(None) 
@@ -215,13 +241,19 @@ class IfNode(VplNode):
             self.content.addBtn = QPushButton('+', self.content)
             self.content.elseLbl = QLabel('Else', self.content)
             self.content.elseLbl.setAlignment(Qt.AlignCenter)
+
+            self.content.groupBox = QGroupBox()
+            self.content.layout.addWidget(self.content.groupBox)
+
+            self.content.innerHbox = QHBoxLayout() 
+            self.content.groupBox.setLayout(self.content.innerHbox)
             
-            self.content.layout.addWidget(self.content.subBtn, self.TotalIfs + 1, 2)
-            self.content.layout.addWidget(self.content.elseLbl, self.TotalIfs + 1, 3)
-            self.content.layout.addWidget(self.content.addBtn, self.TotalIfs + 1, 1)
+            self.content.innerHbox.addWidget(self.content.addBtn)
+            self.content.innerHbox.addWidget(self.content.subBtn)
+            self.content.innerHbox.addWidget(self.content.elseLbl)
             
             self.TotalOutputs.pop(-2)
-            self.newSockets([1], self.TotalOutputs, False)
+            self.newSockets([1], self.TotalOutputs, True)
 
             self.grNode.height -= 43
 
