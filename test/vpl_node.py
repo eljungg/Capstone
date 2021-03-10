@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 from nodeeditor.node_node import Node
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
-from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
+from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER, RIGHT_BOTTOM
 from nodeeditor.utils import dumpException
 from model.node_data import NodeData
 
@@ -75,6 +75,59 @@ class VplNode(Node):
             if(parent.id == pid):
                 return i #returns the socket's postition in the list
             i = i + 1
+
+    def newSockets(self, inputs: list, outputs: list, AddOrSub):
+        
+        if(len(inputs) != len(self.inputs)):
+            counter = 0
+            for item in inputs:
+                socket = self.__class__.Socket_class(
+                    node=self, index=counter, position=self.input_socket_position,
+                    socket_type=item, multi_edges=self.input_multi_edged,
+                    count_on_this_node_side=len(inputs), is_input=True
+                )
+                counter += 1
+                self.inputs.append(socket)
+
+        if(len(outputs) != len(self.outputs)):
+            if(AddOrSub):
+                counter = 0
+                for item in outputs:
+                    socket = self.__class__.Socket_class(
+                        node=self, index=counter, position=self.output_socket_position,
+                        socket_type=item, multi_edges=self.output_multi_edged,
+                        count_on_this_node_side=len(outputs), is_input=False
+                    )
+                    if(counter == len(outputs) - 2):
+                        self.outputs.insert(counter, socket)
+                    elif(counter == len(outputs) - 1):
+                        self.outputs[counter].index=counter
+                        self.outputs[counter].setSocketPosition=RIGHT_BOTTOM
+
+                        if(self.outputs[counter].hasAnyEdge()):
+                            self.outputs[counter].removeAllEdges()
+                        
+                    counter += 1
+            else:
+                for socket in self.outputs:
+                    if(socket.index == len(self.outputs) - 2):
+                        socket.delete()
+                        self.outputs.pop(-2)
+
+        '''
+        if(AddOrSub):
+            print("Made it")
+            socket = self.__class__.Socket_class(
+                node=self, index=outputs.index(outputs[-2]), position=self.output_socket_position,
+                socket_type=outputs[-2], multi_edges=self.output_multi_edged,
+                count_on_this_node_side=len(outputs), is_input=False)
+
+            self.outputs.append(socket)
+        else:
+            self.outputs.pop(-2)
+        '''
+
+        ##self.initSockets(inputs, outputs, reset)
 
     def serialize(self):
         res = super().serialize()

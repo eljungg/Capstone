@@ -266,8 +266,8 @@
         {
             "id": 145651288,
             "title": "Data Node",
-            "pos_x": 118.0,
-            "pos_y": 43.0,
+            "pos_x": 130.0,
+            "pos_y": 249.0,
             "inputs": [
                 {
                     "id": 145651408,
@@ -308,6 +308,60 @@
             "outputs": [
                 {
                     "id": 145651000,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 4,
+                    "socket_type": 1
+                }
+            ],
+            "content": {},
+            "op_code": 50
+        },
+        {
+            "id": 147347992,
+            "title": "Data Node",
+            "pos_x": 169.0,
+            "pos_y": 19.0,
+            "inputs": [
+                {
+                    "id": 147348160,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 3,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 147348184,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 4,
+                    "socket_type": 3
+                }
+            ],
+            "content": {
+                "value": "What is this?"
+            },
+            "op_code": 9
+        },
+        {
+            "id": 147348688,
+            "title": "Print Line",
+            "pos_x": 528.0,
+            "pos_y": -33.0,
+            "inputs": [
+                {
+                    "id": 147348832,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 3,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 147348856,
                     "index": 0,
                     "multi_edges": true,
                     "position": 4,
@@ -378,6 +432,18 @@
             "edge_type": 2,
             "start": 73260504,
             "end": 145650520
+        },
+        {
+            "id": 147348592,
+            "edge_type": 2,
+            "start": 145650544,
+            "end": 147348160
+        },
+        {
+            "id": 147348928,
+            "edge_type": 2,
+            "start": 147348184,
+            "end": 147348832
         }
     ]
 }
