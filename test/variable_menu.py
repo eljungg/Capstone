@@ -91,9 +91,7 @@ class VariableMenu(QDialog):
     def _connectView(self , parent):
         #wire up buttons
         self.addBtn.clicked.connect(self._addVar) # add variable to varList
-        self.addBtn.clicked.connect(parent.reDrawVariablesDropDown) # refresh current nodes dropdown when item added
         self.deleteBtn.clicked.connect(self._deleteVar) # Delete selected variables
-        self.deleteBtn.clicked.connect(parent.reDrawVariablesDropDown) # refresh current nodes dropdown when item deleted
         self.variableListBox.itemClicked.connect(self._updateVariableTypeDropdown) # potential weakness, only responds to mouse clicks not tabs or arrows?
         s.focusInVarInp.connect(self._lockTypeBox) # lock typeDropDownwhen adding new vars
         s.focusOutVarInp.connect(self._unlockTypeBox) # unclock typeDropDown
@@ -146,7 +144,7 @@ class VariableMenu(QDialog):
         self.variablesListRef._addVariable(newVar) # add Variable object to "global" variables list
         self._drawListBoxEntry(varName) # add item to listbox
         self._determineTypeDropDownLockStatus()
-        self.s1.varListChanged.emit()
+        self.s1.varAdded.emit(varName)
 
     def showDuplicateErrorDialog(self): #simple popup for warning user attempting to add duplicate variable
         self.errorString = "ERROR: Variable already exists.\n Cannot add duplicate."
@@ -162,6 +160,8 @@ class VariableMenu(QDialog):
 
     def _deleteVar(self):
         selectedVarList = self.variableListBox.selectedItems() # returns list of selected items
+        if(len(selectedVarList )== 0): # nothing to delete, ignore user click
+            return
         for selected in selectedVarList: # plan on only deleting one at a time, but its set to handle multiple selected it needed
             varName = selected.text()
             variable = self.variablesListRef._findVarByName(varName);
@@ -172,7 +172,7 @@ class VariableMenu(QDialog):
         self._reDrawListBoxEntries()
         self.currentlySelectedVariable = None # reset this because if selected was deleted it breaks
         self._determineTypeDropDownLockStatus()
-        self.s1.varListChanged.emit()
+        self.s1.varDeleted.emit(varName)
 
     def _drawVarLineEdit(self , variable): #where variable == string of varName
         le = QLineEdit(variable) #We need something selectable, Im not sure this is proper widget....
