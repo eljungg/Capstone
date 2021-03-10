@@ -42,11 +42,12 @@ class QDMGraphicsScene(QGraphicsScene):
         self.gridSquares = 5
 
         self.initAssets()
-        self.setBackgroundBrush(self._color_background)
+        #self.setBackgroundBrush(self._color_background)
 
     def initAssets(self):
         """Initialize ``QObjects`` like ``QColor``, ``QPen`` and ``QBrush``"""
         self._color_background = QColor("#F5F5F5")
+        '''
         self._color_light = QColor("#C0C0C0")
         self._color_dark = QColor("#8C8C8C")
 
@@ -54,6 +55,7 @@ class QDMGraphicsScene(QGraphicsScene):
         self._pen_light.setWidth(1)
         self._pen_dark = QPen(self._color_dark)
         self._pen_dark.setWidth(2)
+        '''
 
 
     # the drag events won't be allowed until dragMoveEvent is overriden
@@ -68,6 +70,7 @@ class QDMGraphicsScene(QGraphicsScene):
     def drawBackground(self, painter:QPainter, rect:QRect):
         """Draw background scene grid"""
         super().drawBackground(painter, rect)
+        '''
 
         # here we create our grid
         left = int(math.floor(rect.left()))
@@ -95,3 +98,4 @@ class QDMGraphicsScene(QGraphicsScene):
 
         painter.setPen(self._pen_dark)
         painter.drawLines(*lines_dark)
+        '''
