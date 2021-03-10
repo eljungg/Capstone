@@ -127,8 +127,7 @@ class VariableNode(VplNode):
             errTypeMsg = "Error for variable "+selectedVariable.name +": "+pTypeStr+ " was not\n recognized as a valid "+vTypeStr+"."
             print(errTypeMsg)
             self.data.val = "null" # how viple does it
-            self.data
-            #note, above does not prevent passing of value, just complains
+            self.data.messages.append(errTypeMsg) # print error on execution window
         else: # types agree case
             self.data.val = parentData.val # value from parent node# NOT HOW VIPLE WORKS
     
