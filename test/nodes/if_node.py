@@ -124,7 +124,7 @@ class IfNode(VplNode):
                     statement = statement.replace('value', str(self.inp))
 
                 for var in self.content.vars.variables:
-                    statement = re.sub(fr'\b{var.name}\b', str(var.val), statement)
+                    statement = re.sub(fr'\bstate.{var.name}\b', str(var.val), statement)
                 
                 # issue with multiple variables sharing parts of the same name
 
