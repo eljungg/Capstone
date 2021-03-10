@@ -34,14 +34,14 @@ class PrintLineNode(VplNode):
         self.data.nodeType = self.op_code
         self.data.id = self.id
 
-    def nodeDataValtoString(self, input=None):
+    def nodeDataValtoString(self, input):
         rString = ""
         if(input == None):
             rString = "ERROR: Null value passed to PrintLine node."
         else:
-            if(isinstance(input, list)):
-                for s in input:
-                    rString = rString + str(s) + '\n'
+            if(isinstance(input, dict)):
+                for j, k in input.items():
+                    rString = rString + j + ': ' + k + '\n'
             else:
                 rString = str(input)
         return rString
