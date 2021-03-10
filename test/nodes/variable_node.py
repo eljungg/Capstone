@@ -7,7 +7,13 @@ from conf import *
 from model.variables import VariablesData
 from variable_menu import *
 from nodeeditor.node_graphics_node import QDMGraphicsNode
+from util import valTypeToString
+from util import stringToValType
 
+class customSignals(QObject): #custom signals
+    typeChange = pyqtSignal()
+    varListChanged = pyqtSignal()
+s1 = customSignals() # need a "global" ref to pass custom signal into our variable menu
 class VariableContent(QDMNodeContentWidget):
     
     def __init__(self, parent, variablesRef):
@@ -17,18 +23,18 @@ class VariableContent(QDMNodeContentWidget):
 
     def initUI(self):
         self.layout = QVBoxLayout()
-        
+        self.innerHbox = QHBoxLayout() # for holding side by side typeLabel and variableMenuBtn
+        self.typeLabel = QLabel("No Value") # label for holding type info of selected variable
         ###We are going to need some globla (subWindow) level variable holder
         self.variablesDropDown = QComboBox(self)
-        for var in self.vars.variables:
-            self.variablesDropDown.addItem(var)
+        #for var in self.vars.variables:
+        #    self.variablesDropDown.addItem(var)
         
         self.variableMenuBtn = QPushButton("more")
-
-        #self.layout.addWidget(self.edit) #hiding the O.G. edit line, not needed
         self.layout.addWidget(self.variablesDropDown)
-        self.layout.addWidget(self.variableMenuBtn)
-
+        self.innerHbox.addWidget(self.typeLabel)
+        self.innerHbox.addWidget(self.variableMenuBtn)
+        self.layout.addLayout(self.innerHbox)
         self.setLayout(self.layout)
         self.reDrawVariablesDropDown() # on node creation, show current variables in dropdown
         
@@ -55,7 +61,7 @@ class VariableContent(QDMNodeContentWidget):
             dumpException(e)
         return res
     def showVariableMenu(self): #maybe better in content class?
-        menuDialog = VariableMenu(self, self.vars)
+        menuDialog = VariableMenu(self, self.vars ,s1)
         menuDialog.exec_()
 
 class VariableNode(VplNode):
@@ -64,20 +70,32 @@ class VariableNode(VplNode):
         self.variablesRef = VariablesData() # set on construction in sub_window.py # reference to out subWindow level variables
         super().__init__(scene, inputs=[1], outputs=[3]) #added single input
         
-
     def initInnerClasses(self):
         self.content = VariableContent(self , self.variablesRef)
         self.grNode = VplGraphicsNode(self)
-        self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
+        self.data.id = self.id
 
-        self.grNode.height = 120
+        self.grNode.height = 98
         self.grNode.width = 160
+        self._connectView() # set the controllers
+
+    def _connectView(self): #wire up controllers
         self.content.variableMenuBtn.clicked.connect(self.content.showVariableMenu) # do modal popup
+        self.content.variablesDropDown.currentIndexChanged.connect(self._setTypeLbl)
+        s1.typeChange.connect(self._setTypeLbl)
+        s1.varListChanged.connect(self.content.reDrawVariablesDropDown) # redraw variables dropdown on every node when varlist changes
+
+    def _setTypeLbl(self):
+        varType = self._getSelectedVariableType() # get the variable type
+        varTypeStr = valTypeToString(varType) # convert from TYPE to string
+        self.content.typeLabel.setText(varTypeStr)
+
     def doEval(self, parentData=None):
         selectedVariable = self._getSelectedVariable()#we need a handle on selected variable
         if(selectedVariable == None): # case we have no variables yet, but data comes into variable node
-            print("This is an error message! You can have data coming in with no defined variables!") # TODO build some type of popup alert like in VIPLE for this
+            print("This is an error message! You cant have data coming in with no defined variables!") # TODO build some type of popup alert like in VIPLE for this
             self.__clearNodeData()
             return
         if(parentData == None): #case its the first node in thread 
@@ -87,16 +105,29 @@ class VariableNode(VplNode):
             return
 
         self.__setVariableVal(selectedVariable , parentData.val) # set that variable with the new data
-        self.__setVariableType(selectedVariable , parentData.valType)
         #now we need to set this nodes NodeData() to have its val, and type. So that we pass these one to children
-        self.data.val = parentData.val
-        self.data.valType = parentData.valType
+        self.data.valType = selectedVariable.valType # TYPE DETERMINED BY VARIABLE MENU
+        if(parentData.valType != selectedVariable.valType): # need to throw error, print to exection window
+            pTypeStr = valTypeToString(parentData.valType)
+            vTypeStr = valTypeToString(selectedVariable.valType)
+            errTypeMsg = "Error for variable "+selectedVariable.name +": "+pTypeStr+ " was not\n recognized as a valid "+vTypeStr+"."
+            print(errTypeMsg)
+            self.data.val = "null" # how viple does it
+            self.data
+            #note, above does not prevent passing of value, just complains
+        else: # types agree case
+            self.data.val = parentData.val # value from parent node# NOT HOW VIPLE WORKS
     
     def _getSelectedVariable(self): # get variable object which is selected on node-face
         varName = self.content.variablesDropDown.currentText() # get varname as string
         variable = self.variablesRef._findVarByName(varName)
         return variable;
-    
+    def _getSelectedVariableType(self):
+        varName = self.content.variablesDropDown.currentText() # get varname as string
+        variable = self.variablesRef._findVarByName(varName)
+        if(variable != None):
+            return variable.valType;
+            #this call fails sometimes (and this catches it), I think its because we redraw the variableMenu and it calls on changeIndex of text == ""
     def __setVariableVal(self , variable , inpVal):
         variable.val = inpVal;
 

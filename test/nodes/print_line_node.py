@@ -30,6 +30,23 @@ class PrintLineNode(VplNode):
     def initInnerClasses(self):
         self.content = PrintLineNodeContent(self)
         self.grNode = VplGraphicsNode(self)
-        self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
+        self.data.id = self.id
+
+    def nodeDataValtoString(self, input=None):
+        rString = ""
+        if(input == None):
+            rString = "ERROR: Null value passed to PrintLine node."
+        else:
+            if(isinstance(input, list)):
+                for s in input:
+                    rString = rString + str(s) + '\n'
+            else:
+                rString = str(input)
+        return rString
     
+    def doEval(self, parentData=None):
+        msg = self.nodeDataValtoString(parentData.val)
+        self.data.messages.append(msg)
+

@@ -56,8 +56,6 @@ class _DialogWindow(QWidget):
         self.windowString += string
         self.textArea.setText(self.windowString)
 
-
-
 class VplExecution():
 
     def __init__(self, nodes: list=[], edges: list=[]):
@@ -70,11 +68,13 @@ class VplExecution():
         self.dialogOpen = False
         self.str = "Program started.\n"
         self._threads = list()
-
+    
     def _findStartNodes(self):
         for node in self._nodes:
             if(node.getInput() == None):
                 self._startNodes.append(node)
+            #if(node.op_code == OP_CODE_JOIN):
+                #self._registerJoinNode(node)
 
     def threadExecute(self, startNode, pData=None):
         parentData = pData
@@ -92,9 +92,6 @@ class VplExecution():
                 if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
                     self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
 
-                elif(currentNode.op_code == OP_CODE_PRINT_LINE):
-                    self._window.appendText(str(parentData.val) + '\n') #prints val from parents NodeData object
-
                 elif(currentNode.op_code == OP_CODE_IF):
                     ifValue = True
 
@@ -103,8 +100,10 @@ class VplExecution():
 
                 currentNode.doEval(parentData) #evaluate the current node, parentData is the data object from parent node if applicable
                 parentData = currentNode.data # save data object for passing to child node
+                self.printNodeMessages(parentData) # print any messages resulting from our doEval() function.
 
                 nextNodes = currentNode.getChildrenNodes()
+
                 if nextNodes != []:
                     if(ifValue):
                         currentNode = nextNodes[parentData.val]
@@ -112,6 +111,9 @@ class VplExecution():
                     elif(switchValue):
                         currentNode = nextNodes[parentData.val]
                         switchValue = False
+                    elif(currentNode.op_code == OP_CODE_JOIN and not parentData.val):
+                        moreChildren = False
+                        #join node returned empty list, not ready, let thread die. Non-empty list will pass through and execute normally.
                     else:
                         currentNode = nextNodes[0]
                         #print("continuing thread\n")
@@ -136,3 +138,10 @@ class VplExecution():
             #self._nodeQueue.append(node)
             #self._executeNodes()
             #print("end of thread.")
+    def printNodeMessages(self, dataObject): # prints all a nodes messages, and then clears them
+        for msg in dataObject.messages: # iterate any messages
+            if(type(msg) == str): #verify type
+                self._window.appendText(msg + '\n') # any given msg string to the print_line execution window
+            else:
+                print("printNodeMessages passed non-string type error") #Debug
+        dataObject.clearMessages() # clear all messages after printing

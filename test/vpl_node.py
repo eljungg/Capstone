@@ -46,19 +46,35 @@ class VplContent(QDMNodeContentWidget):
 class VplNode(Node):
     GraphicsNode_class = VplGraphicsNode
     NodeContent_class = VplContent
-    data = NodeData() # hold our data model for this node
+    #data = NodeData() # hold our data model for this node
     op_code = 0
 
     content_label = ""
     content_label_objname = "calc_node_bg"
     def __init__(self, scene:'Scene', title:str="Undefined Node", inputs:list=[], outputs:list=[]):
+        self.data = NodeData()
         super().__init__(scene , title , inputs, outputs)
+        
         print("Over-rided node class goes!")
+
+    def onDeserialized(self, data=None):
+        self.data.id = self.id
 
     #eval statment for our execution engine
     def doEval(self, input=None):
         """Evaluation statement for our execution engine. May replace later with normal eval provided by `nodeeditor`."""
         return None
+
+    def findParentFromSocket(self, pid):
+        """Allows a node to determine which socket the parent is connected to based on id in NodeData. id of parent node as argument. Used for join"""
+        i = 0
+        for socket in self.inputs: #loop through inputs of the node
+            e = socket.edges[0] #only merge should take multiple inputs on a socket, get the only edge connected to the input
+            parent = e.getOtherSocket(socket).node
+
+            if(parent.id == pid):
+                return i #returns the socket's postition in the list
+            i = i + 1
 
     def serialize(self):
         res = super().serialize()

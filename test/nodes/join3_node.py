@@ -6,7 +6,7 @@ from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from collections import deque
 
-class JoinNodeContent(VplContent):
+class Join3NodeContent(VplContent):
     def initUI(self):
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0,0,0,0)
@@ -44,7 +44,7 @@ class JoinNodeContent(VplContent):
         return res
 
 
-class JoinNode(VplNode):
+class Join3Node(VplNode):
     icons = "icons/in.png"
     op_code = OP_CODE_JOIN
     op_title = "Join"
@@ -52,18 +52,18 @@ class JoinNode(VplNode):
     content_label_objname2 = "VplNodeJoin"
 
     def __init__(self, scene, title:str="Join"):
-        super().__init__(scene, title, inputs = [1, 1], outputs = [1])
+        super().__init__(scene, title, inputs = [1, 1, 1], outputs = [1])
         self.eval()
 
     def initInnerClasses(self):
-        self.content = JoinNodeContent(self)
+        self.content = Join3NodeContent(self)
         self.grNode = VplGraphicsNode(self)
         self.content.conditional1.textChanged.connect(self.onInputChanged)
         self.content.conditional2.textChanged.connect(self.onInputChanged)
         #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
         self.data.id = self.id
-        self.size = 2
+        self.size = 3
         self.queueList = []
         #will need to be change on size update
         for i in range(self.size):
@@ -98,30 +98,3 @@ class JoinNode(VplNode):
         else:
             print("ERROR, join recieved a null input")
             
-    #def evalImplementation():
-    #May use in the future for syntax checking. Not needed for compilation
-    """
-    class _joinData():
-    def __init__(self, nodeId, size):
-        self.nodeId = nodeId
-        self.size = size
-        self.queueList = []
-
-        for i in range(size):
-            self.queueList.append(deque())
-
-    def addEntry(self, position, entry):
-        returnList = []
-        if(position < 0 or position >= self.size):
-            print("Error: position is out of range")
-        else:
-            self.queueList[position].append(entry)
-            full = True
-            for i in self.queueList:
-                if not self.queueList[i]:
-                    full = False
-            if full:
-                for i in self.queueList:
-                    returnList.append(self.queueList[i].popleft())
-        return returnList
-    """

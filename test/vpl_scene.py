@@ -1,4 +1,9 @@
 from nodeeditor.node_scene import Scene
+from nodeeditor.utils import *
+from nodeeditor.node_scene import InvalidFile
+from vpl_graphics_scene import QDMGraphicsScene
+
+import os
 import json
 
 class VplScene(Scene):
@@ -23,3 +28,8 @@ class VplScene(Scene):
                 raise InvalidFile("%s is not a valid JSON file" % os.path.basename(filename))
             except Exception as e:
                 dumpException(e)
+
+    def initUI(self):
+        
+        self.grScene = QDMGraphicsScene(self)
+        self.grScene.setGrScene(self.scene_width, self.scene_height)

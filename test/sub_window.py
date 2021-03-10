@@ -1,4 +1,6 @@
 from nodeeditor.node_editor_widget import NodeEditorWidget
+from nodeeditor.node_graphics_scene import QDMGraphicsScene
+from nodeeditor.node_graphics_view import QDMGraphicsView
 from PyQt5.QtCore import *
 from conf import *
 from PyQt5.QtGui import *
@@ -8,6 +10,7 @@ from vpl_node import VplNode # get over-ridedd node
 from nodes.variable_node import VariableNode # get our node sub classes
 from nodes.if_node import IfNode
 from nodes.join_node import JoinNode
+from nodes.join3_node import Join3Node
 from nodes.data_node import DataNode
 from nodes.calculate_node import CalculateNode
 from nodes.merge_node import MergeNode
@@ -22,6 +25,7 @@ from nodes.timer_node import timerNode
 
 class SubWindow(NodeEditorWidget):
     Scene_class = VplScene
+    GraphicsView_class = QDMGraphicsView
     """This is a sub-window, the grey plot for placing nodes on """
     def __init__(self):
         
@@ -38,6 +42,8 @@ class SubWindow(NodeEditorWidget):
 
         self._close_event_listeners = []
         self.variables = VariablesData() # each "scene" or "subwindow" has a "global" Variables data list
+
+        
 
     def getNodeClass(self, data):
         #scan through op codes
@@ -171,6 +177,10 @@ class SubWindow(NodeEditorWidget):
         elif (op_code == OP_CODE_timer):
             print("adding timer node.")
             node = timerNode(self.scene)
+        elif(op_code == OP_CODE_JOIN3):
+            print("adding join node.")
+            node = Join3Node(self.scene)
+            node.title = "Join Node"
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 
