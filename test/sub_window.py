@@ -137,10 +137,13 @@ class SubWindow(NodeEditorWidget):
         elif op_code == OP_CODE_MERGE:
             node = MergeNode(self.scene)
             node.title = "Merge Node"
+
         elif(op_code == OP_CODE_IF):
-            print("adding if node.")
             node = IfNode(self.scene)
+            node.setVariableData(self.variables)
+            node.content.redrawComboBox()
             node.title = "If Node"
+
         elif(op_code == OP_CODE_JOIN):
             print("adding join node.")
             node = JoinNode(self.scene)
@@ -156,9 +159,12 @@ class SubWindow(NodeEditorWidget):
         elif(op_code == OP_CODE_TERMINAL_PRINT):
             print("adding terminal print node.")
             node = TerminalPrintNode(self.scene)
+            
         elif(op_code == OP_CODE_SWITCH):
-            print("adding switch node")
             node = SwitchNode(self.scene)
+            node.setVariableData(self.variables)
+            node.content.redrawComboBox()
+
         elif (op_code == OP_CODE_COMMENT):
             print("adding comment node.")
             node = CommentNode(self.scene)

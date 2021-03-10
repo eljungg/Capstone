@@ -1,8 +1,8 @@
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from nodeeditor.utils import dumpException
-from vpl_node import * # get our custom node base
-from Capstone.test.conf import * 
+from vpl_node import *
+from conf import * 
 from model.variables import VariablesData
 from model.node_data import NodeData
 from nodeeditor.node_node import *
@@ -23,6 +23,7 @@ class CalculateContent(QDMNodeContentWidget):
 
         for var in self.vars.variables:
             self.initialList.append(var)
+            
         self.initialList.append('value')
         self.comboBox.addItems(self.initialList)
 
