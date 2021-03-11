@@ -106,7 +106,15 @@ class VplExecution():
 
                 if nextNodes != []:
                     if(ifValue):
-                        currentNode = nextNodes[parentData.val]
+                        outputNodes = currentNode.getOutputs(parentData.val)
+                        if(len(outputNodes) > 0):
+                            currentNode = outputNodes[0]
+                            if len(outputNodes) > 1:
+                                for node in outputNodes[1:]:
+                                    #print("new thread from child\n")
+                                    t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
+                                    threads.append(t)
+                                    t.start()
                         ifValue = False
                     elif(switchValue):
                         currentNode = nextNodes[parentData.val]

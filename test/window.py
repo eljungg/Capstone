@@ -188,7 +188,7 @@ class MainWindow(NodeEditorWindow):
         self.nodesDock.setWidget(self.nodesListWidget)
         self.nodesDock.setFloating(False)
 
-        self.addDockWidget(Qt.RightDockWidgetArea, self.nodesDock)
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.nodesDock)
 
     def closeEvent(self, event):
 
