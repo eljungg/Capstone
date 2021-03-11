@@ -2,11 +2,16 @@ from nodeeditor.node_scene import Scene
 from nodeeditor.utils import *
 from nodeeditor.node_scene import InvalidFile
 from vpl_graphics_scene import QDMGraphicsScene
+#from window import MainWindow
 
 import os
 import json
 
 class VplScene(Scene):
+
+    def __init__(self):
+        super().__init__()
+        self.windowRef = None
 
     def loadFromFile(self, filename:str):
         """
@@ -33,3 +38,6 @@ class VplScene(Scene):
         
         self.grScene = QDMGraphicsScene(self)
         self.grScene.setGrScene(self.scene_width, self.scene_height)
+    
+    def setWindowRef(self, window=None):
+        self.windowRef = window

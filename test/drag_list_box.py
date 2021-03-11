@@ -34,6 +34,7 @@ class QDMDragListBox(QListWidget):
         self.addItem('Switch', 'icons/in.png', OP_CODE_SWITCH)
         self.addItem('Comment', 'icons/in.png', OP_CODE_COMMENT)
         self.addItem('timer', 'icons/in.png', OP_CODE_timer)
+        self.addItem('Custom Activity', 'icons/in.png', OP_CODE_CUSTOM_ACTIVITY)
         self.addItem('3Join', 'icons/in.png', OP_CODE_JOIN3)
 
 

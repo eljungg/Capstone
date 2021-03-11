@@ -39,11 +39,11 @@ class PrintLineNode(VplNode):
         if(input == None):
             rString = "ERROR: Null value passed to PrintLine node."
         else:
-            if(isinstance(input, dict)):
-                for j, k in input.items():
-                    rString = rString + j + ': ' + k + '\n'
-            else:
-                rString = str(input)
+            #if(isinstance(input, dict)):
+            #    for j, k in input.items():
+            #        rString = rString + j + ': ' + k + '\n'
+            #else:
+            rString = str(input)
         return rString
     
     def doEval(self, parentData=None):

@@ -86,7 +86,7 @@ class MainWindow(NodeEditorWindow):
                         self.mdiArea.setActiveSubWindow(existing)
                     else:
                         # we need to create new subWindow and open the file
-                        nodeeditor = SubWindow()
+                        nodeeditor = SubWindow(self)
                         if nodeeditor.fileLoad(fname):
                             self.statusBar().showMessage("File %s loaded" % fname, 5000)
                             nodeeditor.setTitle()
@@ -205,7 +205,7 @@ class MainWindow(NodeEditorWindow):
 
     def createMdiChild(self, child_widget=None):
         #this command executes on ctrl - n, when you make the actually window for adding nodes.
-        nodeeditor = child_widget if child_widget is not None else SubWindow() 
+        nodeeditor = child_widget if child_widget is not None else SubWindow(self) 
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         return subwnd
 

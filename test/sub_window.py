@@ -21,13 +21,14 @@ from nodes.switch_node import SwitchNode
 from model.variables import VariablesData
 from nodes.comment_node import CommentNode
 from nodes.timer_node import timerNode
+from nodes.custom_activity_node import CustomActivityNode
 
 
 class SubWindow(NodeEditorWidget):
     Scene_class = VplScene
     GraphicsView_class = QDMGraphicsView
     """This is a sub-window, the grey plot for placing nodes on """
-    def __init__(self):
+    def __init__(self, enclosingWindow):
         
         super().__init__()
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -42,8 +43,11 @@ class SubWindow(NodeEditorWidget):
 
         self._close_event_listeners = []
         self.variables = VariablesData() # each "scene" or "subwindow" has a "global" Variables data list
+        self.enclosingWindow = enclosingWindow
+        self.scene.setWindowRef(self.enclosingWindow)
 
-        
+    def getScene(self):
+        return self.scene
 
     def getNodeClass(self, data):
         #scan through op codes
@@ -62,6 +66,7 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 51: return SimpleDialogNode
         elif data['op_code'] == 14: return CommentNode
         elif data['op_code'] == 15: return timerNode
+        elif data['op_code'] == 16: return CustomActivityNode
         
         return VplNode
 
@@ -177,6 +182,9 @@ class SubWindow(NodeEditorWidget):
         elif (op_code == OP_CODE_timer):
             print("adding timer node.")
             node = timerNode(self.scene)
+        elif (op_code == OP_CODE_CUSTOM_ACTIVITY):
+            print("adding custom activity node.")
+            node = CustomActivityNode(self.scene)
         elif(op_code == OP_CODE_JOIN3):
             print("adding join node.")
             node = Join3Node(self.scene)
