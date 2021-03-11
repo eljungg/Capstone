@@ -35,6 +35,7 @@ class DataContent(QDMNodeContentWidget):
 
 class DataNode(VplNode):
     op_code = OP_CODE_DATA
+    TotalOutputs = [0,1]
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
 
@@ -59,6 +60,15 @@ class DataNode(VplNode):
             self.content.edit.resize(self.w, self.content.edit.height())
             self.grNode.width = self.w + 22
             self.content.setGeometry(self.content.geometry().x(), self.content.geometry().y(), self.w + 22, self.content.geometry().height())
+
+            
+            if len(self.TotalOutputs) == 0:
+                self.TotalOutputs.insert(-1,3)
+
+            self.newSockets([1], self.TotalOutputs, True)
+            
+            if self.TotalOutputs != []:
+                self.TotalOutputs.pop(-1)
 
 
     def determineDataType(self):

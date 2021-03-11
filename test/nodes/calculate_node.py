@@ -62,10 +62,11 @@ class CalculateContent(QDMNodeContentWidget):
 
 class CalculateNode(VplNode):
     op_code = OP_CODE_CALCULATE
+    TotalOutputs = [0,1]
 
     def __init__(self, scene):
         self.variablesRef = VariablesData()
-        super().__init__(scene, inputs=[1], outputs=[1])
+        super().__init__(scene, inputs=[1], outputs=[3])
 
     def initInnerClasses(self):
         self.content = CalculateContent(self, self.variablesRef)
@@ -73,6 +74,27 @@ class CalculateNode(VplNode):
         #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
         self.data.id = self.id
+        self.content.edit.textChanged.connect(self.onTextChange)
+
+    def onTextChange(self):
+        self.text = self.content.edit.text()
+        self.textLen = len(self.text)
+        self.metrics = self.content.edit.fontMetrics()
+        self.w = self.metrics.boundingRect(self.text).width()
+        if (self.w > 138) : 
+            self.content.edit.resize(self.w, self.content.edit.height())
+            self.grNode.width = self.w + 22
+            self.content.setGeometry(self.content.geometry().x(), self.content.geometry().y(), self.w + 22, self.content.geometry().height())
+
+            
+            if len(self.TotalOutputs) == 0:
+                self.TotalOutputs.insert(-1,3)
+
+            self.newSockets([1], self.TotalOutputs, True)
+            
+            if self.TotalOutputs != []:
+                self.TotalOutputs.pop(-1)
+            
 
     def setVariableData(self, variables): # wires up stuff, see subWindow.py
         self.variablesRef = variables
