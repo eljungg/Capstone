@@ -53,6 +53,7 @@ class IfNodeContent(QDMNodeContentWidget):
 
         self.layout.setStretch(0, 1)
         self.layout.setStretch(1, 1)
+        self.layout.setSizeConstraint(0)
         
         self.redrawComboBox()
         self.setLayout(self.layout)
@@ -210,6 +211,8 @@ class IfNode(VplNode):
         self.newSockets([1], self.TotalOutputs, True)
 
         self.grNode.height += 43
+
+        self.content.layout.setSizeConstraint(0)
         
         self.content.redrawComboBox()
         self.registerButtons()
@@ -242,6 +245,8 @@ class IfNode(VplNode):
             self.content.elseLbl = QLabel('Else', self.content)
             self.content.elseLbl.setAlignment(Qt.AlignCenter)
 
+            self.content.layout.setSizeConstraint(3)
+
             self.content.groupBox = QGroupBox()
             self.content.layout.addWidget(self.content.groupBox)
 
@@ -256,6 +261,8 @@ class IfNode(VplNode):
             self.newSockets([1], self.TotalOutputs, True)
 
             self.grNode.height -= 43
+
+            self.content.innerHbox.setSizeConstraint(3)
 
             self.registerButtons()
 
