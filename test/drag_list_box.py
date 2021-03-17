@@ -33,8 +33,9 @@ class QDMDragListBox(QListWidget):
         self.addItem('Terminal Print', 'icons/in.png', OP_CODE_TERMINAL_PRINT)
         self.addItem('Switch', 'icons/in.png', OP_CODE_SWITCH)
         self.addItem('Comment', 'icons/in.png', OP_CODE_COMMENT)
-        self.addItem('timer', 'icons/in.png', OP_CODE_timer)
+        self.addItem('timer', 'icons/in.png', OP_CODE_TIMER)
         self.addItem('3Join', 'icons/in.png', OP_CODE_JOIN3)
+        self.addItem('Text-To-Speech', None, OP_CODE_TTS)
 
 
 

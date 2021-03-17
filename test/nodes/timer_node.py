@@ -20,10 +20,8 @@ class timerNodeContent(VplContent):
         return res
 
 class timerNode(VplNode):
-    icon = 'icons\merge.png'
-    op_code = OP_CODE_timer
+    op_code = OP_CODE_TIMER
     op_title = 'timer'
-    content_label_objname = 'VplMergeNode'
 
     def initSettings(self):
         super().initSettings()

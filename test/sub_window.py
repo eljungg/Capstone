@@ -21,6 +21,7 @@ from nodes.switch_node import SwitchNode
 from model.variables import VariablesData
 from nodes.comment_node import CommentNode
 from nodes.timer_node import timerNode
+from nodes.tts_node import TtsNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -174,13 +175,18 @@ class SubWindow(NodeEditorWidget):
         elif (op_code == OP_CODE_COMMENT):
             print("adding comment node.")
             node = CommentNode(self.scene)
-        elif (op_code == OP_CODE_timer):
+        elif (op_code == OP_CODE_TIMER):
             print("adding timer node.")
             node = timerNode(self.scene)
         elif(op_code == OP_CODE_JOIN3):
             print("adding join node.")
             node = Join3Node(self.scene)
             node.title = "Join Node"
+
+        elif(op_code == OP_CODE_TTS):
+            print('TTS added!')
+            node = TtsNode(self.scene)
+            node.title = 'TTS Node'
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 
