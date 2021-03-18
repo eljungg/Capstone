@@ -22,6 +22,7 @@ from model.variables import VariablesData
 from nodes.comment_node import CommentNode
 from nodes.timer_node import timerNode
 from nodes.custom_activity_node import CustomActivityNode
+from nodes.noop_node import NoOPNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -67,6 +68,7 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 14: return CommentNode
         elif data['op_code'] == 15: return timerNode
         elif data['op_code'] == 16: return CustomActivityNode
+        elif data['op_code'] == 52: return NoOPNode
         
         return VplNode
 

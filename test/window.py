@@ -8,6 +8,8 @@ from drag_list_box import QDMDragListBox
 from sub_window import SubWindow
 from vpl_execution import VplExecution
 
+from c_a_window import CustomActivityWindow
+
 import qss.nodeeditor_dark_resources
 
 
@@ -133,6 +135,7 @@ class MainWindow(NodeEditorWindow):
         self.windowMenu.addAction(self.previousAct)
         self.windowMenu.addAction(self.separatorAct)
         self.windowMenu.addAction(self.actRun)
+        self.windowMenu.addAction(self.actShowCAWindow)
 
         windows = self.mdiArea.subWindowList()
         self.separatorAct.setVisible(len(windows) != 0)
@@ -168,6 +171,7 @@ class MainWindow(NodeEditorWindow):
         self.aboutAct = QAction("&About", self, statusTip="Show the application's About box", triggered=self.about)
         self.actRun = QAction('&Run', self, shortcut='Ctrl+R', statusTip="Run the program.", triggered=self.executeProgram)
 
+        self.actShowCAWindow = QAction('&CAWindow', self, statusTip="Show a custom activity window", triggered=self.createCAWindow)
 
     def onWindowNodesToolbar(self):
         if self.nodesDock.isVisible():
@@ -221,6 +225,10 @@ class MainWindow(NodeEditorWindow):
         execution.startExecution()
         #execution.setDialogWindow(window)
         #execution.executeProgram()
+
+    def createCAWindow(self):
+        subwnd = self.createMdiChild(CustomActivityWindow(self))
+        subwnd.show()
 
 
 
