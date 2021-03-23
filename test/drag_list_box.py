@@ -36,6 +36,8 @@ class QDMDragListBox(QListWidget):
         self.addItem('timer', 'icons/in.png', OP_CODE_TIMER)
         self.addItem('3Join', 'icons/in.png', OP_CODE_JOIN3)
         self.addItem('Text-To-Speech', None, OP_CODE_TTS)
+        self.addItem('RESTful Service', 'icons/in.png', OP_CODE_REST)
+        self.addItem('Code Activity Python', 'icons/in.png', OP_CODE_CODEPY)
 
 
 
