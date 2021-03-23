@@ -22,6 +22,8 @@ from model.variables import VariablesData
 from nodes.comment_node import CommentNode
 from nodes.timer_node import timerNode
 from nodes.tts_node import TtsNode
+from nodes.restful_node import RestfulServiceNode
+from nodes.code_activity_python_node import CodeActivityPythonNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -63,6 +65,8 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 51: return SimpleDialogNode
         elif data['op_code'] == 14: return CommentNode
         elif data['op_code'] == 15: return timerNode
+        elif data['op_code'] == OP_CODE_REST: return RestfulServiceNode
+        elif data['op_code'] == OP_CODE_CODEPY: return CodeActivityPythonNode
         
         return VplNode
 
@@ -187,6 +191,14 @@ class SubWindow(NodeEditorWidget):
             print('TTS added!')
             node = TtsNode(self.scene)
             node.title = 'TTS Node'
+        elif(op_code == OP_CODE_REST):
+            print("RESTful node added")
+            node = RestfulServiceNode(self.scene)
+            node.title = "RESTful Service"
+        elif(op_code == OP_CODE_CODEPY):
+            print("Code Activity Python node added")
+            node = CodeActivityPythonNode(self.scene)
+            node.title = "Code Activity (python)"
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 
