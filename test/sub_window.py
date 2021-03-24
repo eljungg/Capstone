@@ -194,6 +194,7 @@ class SubWindow(NodeEditorWidget):
         elif(op_code == OP_CODE_REST):
             print("RESTful node added")
             node = RestfulServiceNode(self.scene)
+            node.setVariableData(self.variables)
             node.title = "RESTful Service"
         elif(op_code == OP_CODE_CODEPY):
             print("Code Activity Python node added")

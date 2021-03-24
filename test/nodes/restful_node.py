@@ -4,6 +4,7 @@ from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from Capstone.test.conf import *
 from model.node_data import NodeData
+import requests
 
 class RestfulServiceContent(QDMNodeContentWidget):
     def initUI(self):
@@ -12,7 +13,8 @@ class RestfulServiceContent(QDMNodeContentWidget):
         self.layout.addWidget(self.propertiesBtn)
         self.setLayout(self.layout)
 
-        
+    def setContentVariables(self, variablesListRef):
+        self.variablesListRef = variablesListRef
     
     def serialize(self):
         res = super().serialize()
@@ -30,7 +32,7 @@ class RestfulServiceContent(QDMNodeContentWidget):
         return res
 
     def showPropertiesDialog(self):
-        self.propertiesDialog = RestfulDialog(self, "BADREF_TODO")
+        self.propertiesDialog = RestfulDialog(self, self.variablesListRef)
         self.propertiesDialog.exec_()
         print("showPropertiesDialog goes")    
 
@@ -39,6 +41,7 @@ class RestfulServiceNode(VplNode):
     TotalOutputs = [0,1]
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
+        self.restURL = ""
 
     def initInnerClasses(self):
         self.content = RestfulServiceContent(self)
@@ -55,20 +58,25 @@ class RestfulServiceNode(VplNode):
 
     def doEval(self, parentData=None): 
         #does literally nothing. 
+        self.data.messages.append(self.restURL)
+        print("WHAT IHAVE FOR restURL ==> " + self.restURL)
         #as of now, getting the type and data are handled in determineDataType() # saved to self.data
         return
+    def setVariableData(self, variables): # wires up stuff, see subWindow.py
+        self.variablesRef = variables
+        self.content.setContentVariables(self.variablesRef)
 
 
 class RestfulDialog(QDialog):
     def __init__(self, parent, variablesListRef):
         super().__init__(parent=parent)
+        self.parentNode = parent
         self.setWindowTitle("RESTful Service Settings")
         self.variablesListRef = variablesListRef
         self.dialogButtons = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
 
         self.buttonBox = QDialogButtonBox(self.dialogButtons)
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
+        
         #info
         infoTxt = "For uknown values, make a palcehodler. Expected format for placeholders is an integer (starting with 0) in curly braces, for example: {0}."
         #Widgets
@@ -126,19 +134,22 @@ class RestfulDialog(QDialog):
         self.layoutToDelete.itemAt(0).widget().deleteLater()
         self.layoutToDelete.itemAt(1).widget().deleteLater()
         self.dynamicVariablesVBox.removeItem(self.layoutToDelete)
-        # if(self.variableHboxCount == 0):
-        #     print("No variable HBOX?")
-        #     return
-        # else:
-        #     layToDelete = self.dynamicVariablesVBox.itemAt(self.variableHboxCount -1)
-        #     # we know its only two variables in each layout
-        #     layToDelete.itemAt(0).widget().deleteLater()
-        #     layToDelete.itemAt(1).widget().deleteLater()
 
     def _connectView(self):
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
         self.plusBtn.clicked.connect(self.createNextVariableHbox)
+        self.plusBtn.clicked.connect(self._debugVars)
         self.minusBtn.clicked.connect(self.removeLastVariableHbox)
-        
+        self.buttonBox.accepted.connect(self._reportEndPointToParent)
+        self.endPointInput.textChanged.connect(self._reportEndPointToParent)
+    def _debugVars(self):
+        for var in self.variablesListRef.variables:
+            var._printVar()
+    def _reportEndPointToParent(self):
+        urlTxt = self.endPointInput.text()
+        self.parentNode.restURL = urlTxt #TODO will need to format in variables here later
+        print("reportEndPointTOParent ==>" + urlTxt)
 
 
         
