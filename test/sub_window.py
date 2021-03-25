@@ -50,6 +50,9 @@ class SubWindow(NodeEditorWidget):
     def getScene(self):
         return self.scene
 
+    def setScene(self, scene):
+        self.scene = scene
+
     def getNodeClass(self, data):
         #scan through op codes
         #return a class based on op code

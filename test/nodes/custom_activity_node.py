@@ -12,21 +12,34 @@ class CustomActivityContent(VplContent):
         self.layout.setContentsMargins(0,0,0,0)
         self.setLayout(self.layout)
 
+        self.name = QLineEdit("", self)
         self.button = QPushButton("Edit", self)
 
+        self.layout.addWidget(self.name)
         self.layout.addWidget(self.button)
+
+        self.innerScene:VplScene = None
         #To imitate VIPLE we'll want to implement a way to add extra
         #fields. probably another function and graphics
     
     #I hope these are correct
     def serialize(self):
         res = super().serialize()
+        res['name'] = self.name.text()
+        if(self.innerScene == None):
+            res['scene'] = None
+        else:
+            res['scene'] = self.innerScene.serialize()
         #save internal scene
         return res
 
     def deserialize(self, data, hashmap={}):
         res = super().deserialize(data, hashmap)
         try:
+            name = data['name']
+            scene = data['scene']
+            self.name.setText(name)
+            self.innerScene.deserialize(scene)
             #restore internal scene
             return True & res
         except Exception as e:
@@ -51,13 +64,22 @@ class CustomActivityNode(VplNode):
         self.content.button.clicked.connect(self.buttonClicked)
         self.data.nodeType = self.op_code
         self.data.id = self.id
-        self.innerScene = None
         self.innerSubwindow = None
+        self.innerInput = None
 
     def buttonClicked(self):
         if(self.scene.windowRef != None):
-            self.innerSubwindow = self.scene.windowRef.createMdiChild().widget()
-            self.innerScene = self.innerSubwindow.getScene()
+            print("window ref found")
+            if self.content.innerScene == None:
+                self.innerSubwindow = self.scene.windowRef.createCAWindow(self).widget()
+                self.content.innerScene = self.innerSubwindow.getScene()
+                self.innerInput = self.innerSubwindow.getInputNode()
+            else:
+                if(self.innerSubwindow == None):
+                    self.innerSubwindow = self.scene.windowRef.createCAWindow(self).widget()
+                    self.innerSubwindow.setScene(self.content.innerScene)
+
+            self.innerSubwindow.show()
         else:
             print("failure")
         print("button pressed")

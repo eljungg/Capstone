@@ -226,9 +226,10 @@ class MainWindow(NodeEditorWindow):
         #execution.setDialogWindow(window)
         #execution.executeProgram()
 
-    def createCAWindow(self):
-        subwnd = self.createMdiChild(CustomActivityWindow(self))
+    def createCAWindow(self, CANode:'CANode'=None):
+        subwnd = self.createMdiChild(CustomActivityWindow(self, CANode))
         subwnd.show()
+        return subwnd
 
 
 

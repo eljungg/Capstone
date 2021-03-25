@@ -89,10 +89,10 @@ class VplExecution():
         else:
             while moreChildren:
 
-                if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
-                    self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
+                #if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
+                #    self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
 
-                elif(currentNode.op_code == OP_CODE_IF):
+                if(currentNode.op_code == OP_CODE_IF):
                     ifValue = True
 
                 elif(currentNode.op_code == OP_CODE_SWITCH):
@@ -102,7 +102,13 @@ class VplExecution():
                 parentData = currentNode.data # save data object for passing to child node
                 self.printNodeMessages(parentData) # print any messages resulting from our doEval() function.
 
-                nextNodes = currentNode.getChildrenNodes()
+                if(currentNode.op_code == OP_CODE_CUSTOM_ACTIVITY):
+                    nextNodes = [currentNode.innerInput]
+                elif(currentNode.op_code == OP_CODE_CAOUT):
+                    nextNodes = currentNode.CAParent.getChildrenNodes()
+                else:
+                    nextNodes = currentNode.getChildrenNodes()
+
 
                 if nextNodes != []:
                     if(ifValue):
@@ -134,6 +140,7 @@ class VplExecution():
 
                 else:
                     moreChildren = False
+                    return parentData
                     #print("Ending a thread\n")
 
     def startExecution(self):

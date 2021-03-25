@@ -24,13 +24,10 @@ class NoOPNode(VplNode):
     op_title = 'NoOP'
     content_label_objname = 'VplNoOPNode'
 
-    def initSettings(self):
-        super().initSettings()
-        self.input_multi_edged = True
-
-    def __init__(self, scene, title: str = "NoOP",inputs=[1], outputs=[1]):
+    def __init__(self, scene, title: str = "NoOP",inputs=[1], outputs=[1], CAParent:'VplNode'=None):
         super().__init__(scene, title, inputs, outputs)
         self.eval()
+        self.CAParent = CAParent
 
     def initInnerClasses(self):
         self.content = NoOPNodeContent(self)
@@ -42,3 +39,12 @@ class NoOPNode(VplNode):
     def doEval(self, input=None):
         self.data = input
         return self.data
+
+class CAOutNode(NoOPNode):
+    icon = 'icons\merge.png'
+    op_code = OP_CODE_CAOUT
+    op_title = 'NoOP'
+    content_label_objname = 'VplNoOPNode'
+
+    def __init__(self, scene, title: str = "NoOP",inputs=[1], outputs=[], CAParent:'VplNode'=None):
+        super().__init__(scene, title, inputs, outputs, CAParent)
