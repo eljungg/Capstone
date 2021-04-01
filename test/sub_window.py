@@ -25,6 +25,10 @@ from nodes.tts_node import TtsNode
 from nodes.restful_node import RestfulServiceNode
 from nodes.code_activity_python_node import CodeActivityPythonNode
 
+from nodes.key_press_node import KeypressNode
+
+from nodes.key_release_node import KeyReleaseNode
+
 
 class SubWindow(NodeEditorWidget):
     Scene_class = VplScene
@@ -67,6 +71,8 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 15: return timerNode
         elif data['op_code'] == OP_CODE_REST: return RestfulServiceNode
         elif data['op_code'] == OP_CODE_CODEPY: return CodeActivityPythonNode
+        elif data['op_code'] == 17: return KeypressNode
+        elif data['op_code'] == 18: return KeyReleaseNode
         
         return VplNode
 
@@ -200,6 +206,14 @@ class SubWindow(NodeEditorWidget):
             print("Code Activity Python node added")
             node = CodeActivityPythonNode(self.scene)
             node.title = "Code Activity (python)"
+        elif (op_code == OP_CODE_KEYRELEASE):
+            print("Key Release Python node added")
+            node = KeyReleaseNode(self.scene)
+            node.title = "Key Release"
+        elif (op_code == OP_CODE_KEYPRESS):
+            print("Key Press Python node added")
+            node = KeypressNode(self.scene)
+            node.title = "Key Press"
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 

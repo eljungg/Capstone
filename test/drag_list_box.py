@@ -38,6 +38,8 @@ class QDMDragListBox(QListWidget):
         self.addItem('Text-To-Speech', None, OP_CODE_TTS)
         self.addItem('RESTful Service', 'icons/in.png', OP_CODE_REST)
         self.addItem('Code Activity Python', 'icons/in.png', OP_CODE_CODEPY)
+        self.addItem('Key Press', 'icons/in.png', OP_CODE_KEYPRESS)
+        self.addItem('Key Release', 'icons/in.png', OP_CODE_KEYRELEASE)
 
 
 
