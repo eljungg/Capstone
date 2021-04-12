@@ -24,6 +24,9 @@ from nodes.timer_node import timerNode
 from nodes.tts_node import TtsNode
 from nodes.restful_node import RestfulServiceNode
 from nodes.code_activity_python_node import CodeActivityPythonNode
+from nodes.while_node import WhileNode
+from nodes.end_while_node import EndWhileNode
+from nodes.break_node import BreakNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -60,6 +63,9 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 10: return MergeNode
         elif data['op_code'] == 11: return IfNode
         elif data['op_code'] == 12: return JoinNode
+        elif data['op_code'] == 17: return WhileNode
+        elif data['op_code'] == 18: return EndWhileNode
+        elif data['op_code'] == 19: return BreakNode
         elif data['op_code'] == 49: return TerminalPrintNode
         elif data['op_code'] == 50: return PrintLineNode
         elif data['op_code'] == 51: return SimpleDialogNode
@@ -199,6 +205,20 @@ class SubWindow(NodeEditorWidget):
             print("Code Activity Python node added")
             node = CodeActivityPythonNode(self.scene)
             node.title = "Code Activity (python)"
+        elif(op_code == OP_CODE_WHILE):
+            print("While node added")
+            node = WhileNode(self.scene)
+            node.setVariableData(self.variables)
+            node.content.redrawComboBox()
+            node.title = "While"
+        elif(op_code == OP_CODE_END_WHILE):
+            print("End While node added")
+            node = EndWhileNode(self.scene)
+            node.title = "End While"
+        elif(op_code == OP_CODE_BREAK):
+            print("Breaknode added")
+            node = BreakNode(self.scene)
+            node.title = "Break"
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 

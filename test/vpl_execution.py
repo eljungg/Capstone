@@ -128,7 +128,9 @@ class VplExecution():
                                     t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
                                     threads.append(t)
                                     t.start()
-                        ifValue = False
+                        else:
+                            moreChildren = False
+                        ifValue = False                        
                     elif(switchValue):
                         currentNode = nextNodes[parentData.val]
                         switchValue = False
