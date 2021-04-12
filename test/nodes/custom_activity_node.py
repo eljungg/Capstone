@@ -70,6 +70,38 @@ class CustomActivityNode(VplNode):
     def buttonClicked(self):
         if(self.scene.windowRef != None):
             print("window ref found")
+            if self.innerSubwindow == None:
+                print("subwindow not found")
+                if(self.content.innerScene == None):
+                    print("innerScene not found. creating new scene")
+                    self.innerSubwindow = self.scene.windowRef.createCAWindow(self).widget()
+                    self.content.innerScene = self.innerSubwindow.getScene()
+                    self.innerInput = self.innerSubwindow.getInputNode()
+                else:
+                    print("innerscene found. attempting to show subwindow")
+                    try:
+                        self.innerSubwindow.show()
+                    except:
+                        print("subwindow failed to open. creating new window")
+                        self.innerSubwindow = self.scene.windowRef.createCAWindow(self, self.content.innerScene).widget()
+                        print("number of nodes in scene: " + str(len(self.content.innerScene.nodes)))
+                        #self.innerSubwindow.showScene()
+                        #self.innerSubwindow.setScene(self.content.innerScene)
+                        self.innerInput = self.innerSubwindow.getInputNode()
+                        self.innerSubwindow.show()
+            else:
+                print("subwindow found. attempting to show")
+                try:
+                    self.innerSubwindow.show()
+                except:
+                    print("subwindow could not be shown. creating new subwindow")
+                    self.innerSubwindow = self.scene.windowRef.createCAWindow(self, self.content.innerScene).widget()
+                    print("number of nodes in scene: " + str(len(self.content.innerScene.nodes)))
+                    #self.innerSubwindow.showScene()
+                    #self.innerSubwindow.setScene(self.content.innerScene)
+                    self.innerInput = self.innerSubwindow.getInputNode()
+                    self.innerSubwindow.show()
+            """
             if self.content.innerScene == None:
                 self.innerSubwindow = self.scene.windowRef.createCAWindow(self).widget()
                 self.content.innerScene = self.innerSubwindow.getScene()
@@ -78,8 +110,8 @@ class CustomActivityNode(VplNode):
                 if(self.innerSubwindow == None):
                     self.innerSubwindow = self.scene.windowRef.createCAWindow(self).widget()
                     self.innerSubwindow.setScene(self.content.innerScene)
+            """
 
-            self.innerSubwindow.show()
         else:
             print("failure")
         print("button pressed")
