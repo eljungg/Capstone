@@ -94,7 +94,16 @@ class JoinNode(VplNode):
         if (input != None):
             inputpos = self.findParentFromSocket(input.id)
             #print(inputpos)
-            self.data.val = self.addEntry(inputpos, input.val)
+            temp = []
+            temp = self.addEntry(inputpos, input.val)
+            returndict = {}
+            #for i in range(size): #need to create iterable list of textboxes based on size of join node
+            if(temp):
+                returndict[str(self.content.conditional1.text())] = temp[0]
+                returndict[str(self.content.conditional2.text())] = temp[1]
+            self.data.val = returndict
+            return returndict
+
         else:
             print("ERROR, join recieved a null input")
             
