@@ -22,10 +22,15 @@ from PyQt5.QtCore import *
 # If you recieve errors such as No module named win32com.client, No module named win32, or No module named win32api, you will need to additionally install pypiwin32.
 
 import pyttsx3
+import keyboard
+from pynput import keyboard
+from pynput.keyboard import Key, Controller, Listener
 
 start_threads = []
 threads = []
 windowContent = []
+myDict = []
+key_press_Merge = False
 
 class _DialogWindow(QWidget):
     def __init__(self, simpleDialog=True):
@@ -96,6 +101,63 @@ class VplExecution():
 
         if (startNode.op_code == OP_CODE_MERGE or startNode.op_code == OP_CODE_JOIN):
             self._window.appendText("Error, you cannot have a Merge or Join activity as Start-Node!" + '\n')
+
+        elif (startNode.op_code == OP_CODE_KEYPRESS):
+            keyEle = currentNode.getKey()
+            def on_press(key):
+                global myDict
+                if isinstance(keyEle, str):
+                    if key == keyboard.Key.esc:
+                        print("Listener Closed!")
+                        return False
+                    elif key.char == keyEle:
+                        if not key.char in myDict:
+                            print("New key Pressed: " + key.char)
+                            if(startNode.getChildrenNodes()[0].op_code== OP_CODE_MERGE):
+                                self.key_press_Merge = True
+                            for node in startNode.getChildrenNodes():
+                                self.startnode(node)
+                            myDict.append(key.char)
+                            print("List: ", myDict)
+                else:
+                    COMBINATION = {keyEle[0], keyEle[1]}
+                    if key == keyboard.Key.esc:
+                        print("Listener Closed!")
+                        return False
+                    elif key.char in COMBINATION:
+                        if not key.char in myDict:
+                             print("New key Pressed: " + key.char)
+                             if (startNode.getChildrenNodes()[0].op_code == OP_CODE_MERGE):
+                                 self.key_press_Merge = True
+                             for node in startNode.getChildrenNodes():
+                                 self.startnode(node)
+                             myDict.append(key.char)
+                             print("List: ", myDict)
+
+            def on_release(key):
+                print('{0} released'.format(key))
+                if key.char in myDict:
+                    myDict.remove(key.char)
+                print("List: ", myDict)
+
+            time.sleep(0.2)
+            with Listener(on_press=on_press, on_release=on_release) as listener:  # Create an instance of Listener
+                listener.join()
+            breakpoint()
+
+        elif (startNode.op_code == OP_CODE_KEYRELEASE):
+            def on_release(key):
+                print('{0} release'.format(key))
+                if (startNode.getChildrenNodes()[0].op_code == OP_CODE_MERGE):
+                    self.key_press_Merge = True
+                for node in startNode.getChildrenNodes():
+                    self.startnode(node)
+            time.sleep(1)
+            listener = keyboard.Listener(
+                on_release=on_release)
+            listener.start()
+            breakpoint()
+
         else:
             while moreChildren:
 
@@ -174,3 +236,8 @@ class VplExecution():
             else:
                 print("printNodeMessages passed non-string type error") #Debug
         dataObject.clearMessages() # clear all messages after printing
+
+    def startnode(self, node):
+        t = threading.Thread(target=self.threadExecute, args=(node,), daemon=True)
+        threads.append(t)
+        t.start()
