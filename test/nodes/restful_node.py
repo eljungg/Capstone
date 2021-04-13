@@ -6,19 +6,23 @@ from Capstone.test.conf import *
 from model.node_data import NodeData
 import requests
 import xml.etree.ElementTree as ET
+from data_connections_menu import DataConnectionsMenu
 
 class RestfulServiceContent(QDMNodeContentWidget):
     def initUI(self):
+        self.dataConnectionsDialog = DataConnectionsMenu(self)
         self.layout = QVBoxLayout()
-        self.propertiesBtn = QPushButton("Properties") # temporary / DEBUG
+        self.propertiesBtn = QPushButton("Properties") # VIPLE has on rightclick instead
+        self.dataConnectionsBtn = QPushButton("Data Connections") # VIPLE has on right click instead
         self.layout.addWidget(self.propertiesBtn)
+        self.layout.addWidget(self.dataConnectionsBtn)
         self.setLayout(self.layout)
         self.initModel()
 
     def initModel(self):
         self.model = RestModel()
         print("Rest Model Created")
-
+        
     def setContentVariables(self, variablesListRef):
         self.variablesListRef = variablesListRef
     
@@ -41,7 +45,8 @@ class RestfulServiceContent(QDMNodeContentWidget):
         self.propertiesDialog = RestfulDialog(self, self.variablesListRef)
         self.propertiesDialog.show()
         #self.propertiesDialog.exec_()  
-
+    def showDataConnectionsDialog(self):
+        self.dataConnectionsDialog.show()
 class RestfulServiceNode(VplNode):
     op_code = OP_CODE_DATA
     TotalOutputs = [0,1]
@@ -60,6 +65,7 @@ class RestfulServiceNode(VplNode):
 
     def _connectView(self):
         self.content.propertiesBtn.clicked.connect(self.content.showPropertiesDialog)
+        self.content.dataConnectionsBtn.clicked.connect(self.content.showDataConnectionsDialog)
 
     def doEval(self, parentData=None): 
         #self.data.messages.append(self.content.model.endPointURL)
@@ -170,9 +176,9 @@ class RestfulDialog(QDialog):
         self.plusMinusHBox.addStretch(1)
         self.plusMinusHBox.addWidget(self.plusBtn)
         self.outterVbox.addWidget(self.buttonBox)
-        self.DEBUGBTN = QPushButton("DEBUG") #DEBUG
-        self.outterVbox.addWidget(self.DEBUGBTN) # DEBUG
-        self.DEBUGBTN.clicked.connect(self.printPOS) # DEBUG
+        #self.DEBUGBTN = QPushButton("DEBUG") #DEBUG
+        #self.outterVbox.addWidget(self.DEBUGBTN) # DEBUG
+        #self.DEBUGBTN.clicked.connect(self.printPOS) # DEBUG
         self._connectView()
 
     def printPOS(self): #DEBUG of positional error
@@ -224,7 +230,7 @@ class RestfulDialog(QDialog):
         self.buttonBox.accepted.connect(self.accept)
         self.buttonBox.rejected.connect(self.reject)
         self.plusBtn.clicked.connect(lambda : self.createNewVariableHbox(newFlag=True , number=-1))
-        self.plusBtn.clicked.connect(self._debugVars)
+        #self.plusBtn.clicked.connect(self._debugVars)
         self.minusBtn.clicked.connect(self.removeLastVariableHbox)
         self.buttonBox.accepted.connect(self._reportEndPointToParent)
         #self.endPointInput.textChanged.connect(self._reportEndPointToParent)

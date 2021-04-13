@@ -161,10 +161,10 @@ class VplExecution():
         else:
             while moreChildren:
 
-                if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
-                    self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
+                # if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG): // just gonna handle in doEval()
+                #     self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
 
-                elif(currentNode.op_code == OP_CODE_IF):
+                if(currentNode.op_code == OP_CODE_IF):
                     ifValue = True
 
                 elif(currentNode.op_code == OP_CODE_SWITCH):
