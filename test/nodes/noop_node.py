@@ -48,3 +48,7 @@ class CAOutNode(NoOPNode):
 
     def __init__(self, scene, title: str = "NoOP",inputs=[1], outputs=[], CAParent:'VplNode'=None):
         super().__init__(scene, title, inputs, outputs, CAParent)
+
+    def doEval(self, input=None):
+        self.data = input
+        return self.data

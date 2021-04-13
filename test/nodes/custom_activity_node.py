@@ -27,8 +27,10 @@ class CustomActivityContent(VplContent):
         res = super().serialize()
         res['name'] = self.name.text()
         if(self.innerScene == None):
+            print("scene to save not found")
             res['scene'] = None
         else:
+            print("saving scene")
             res['scene'] = self.innerScene.serialize()
         #save internal scene
         return res
@@ -39,7 +41,10 @@ class CustomActivityContent(VplContent):
             name = data['name']
             scene = data['scene']
             self.name.setText(name)
-            self.innerScene.deserialize(scene)
+            tempScene = VplScene()
+            tempScene.deserialize(scene)
+            #self.innerScene.deserialize(scene)
+            self.innerScene = tempScene
             #restore internal scene
             return True & res
         except Exception as e:
