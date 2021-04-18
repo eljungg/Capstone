@@ -47,7 +47,8 @@ class MainWindow(NodeEditorWindow):
 
         self.readSettings()
 
-        self.setWindowTitle("VPL")    
+        self.setWindowTitle("VPL")
+        self.createMdiChild()    
 
     def updateMenus(self):
         pass   
