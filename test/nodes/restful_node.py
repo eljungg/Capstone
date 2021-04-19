@@ -169,20 +169,16 @@ class RestfulDialog(QDialog): #Properties btn dialog
         self.outterVbox.addWidget(self.varLbl)
         self.outterVbox.addLayout(self.dynamicVariablesVBox)
         variableCount = 0
-        # while( variableCount < self.model.numVars ):
         while(variableCount < self.connectionsModel.valueCount):
             self.createNewVariableHbox(newFlag=False , number=variableCount)
             variableCount +=1
-            print("Going again because varCount =>" +str(variableCount) +" is < self.model.numVars ==>" +str(self.model.numVars))
-        ## add dynamic variable HBOXES into self.dynamicVariablesVBox
+
         self.outterVbox.addLayout(self.plusMinusHBox)
         self.plusMinusHBox.addWidget(self.minusBtn)
         self.plusMinusHBox.addStretch(1)
         self.plusMinusHBox.addWidget(self.plusBtn)
         self.outterVbox.addWidget(self.buttonBox)
-        #self.DEBUGBTN = QPushButton("DEBUG") #DEBUG
-        #self.outterVbox.addWidget(self.DEBUGBTN) # DEBUG
-        #self.DEBUGBTN.clicked.connect(self.printPOS) # DEBUG
+
         self._connectView()
 
     def printPOS(self): #DEBUG of positional error
@@ -198,28 +194,34 @@ class RestfulDialog(QDialog): #Properties btn dialog
         #self.printPOS()
         QDialog.resizeEvent(self, event)
         #self.printPOS()
-    def createNewVariableHbox(self, newFlag=True , number=-1):
-        print("createNext goes with newFlag ==>" + str(newFlag))
+
+    def createNewVariableHbox(self, newFlag=True , number=-1): # creates GUI for each variable.
+        #also responsible for updating the target names and count in self.connectionsModel
         if(number == -1):
             count = self.connectionsModel.valueCount # get amount of current things
         else:
             count = number
         #when plus btn pressed, create a new hbox.
         self.newHbox = QHBoxLayout()
-        self.varInput = QLineEdit("Variable "+str(count)) #TODO NEED TO GET VARIABLE NAME FROM MODEL HERE
+        if(newFlag == True):
+            varInput = QLineEdit("Variable "+str(count)) # if new, show default name
+        else:
+            varInput = QLineEdit(self.connectionsModel.valList[count].target) # display saved name from model if not new
         self.typeDropDown = QComboBox()
         self.typeDropDown.addItem("Int")
         self.typeDropDown.addItem("Double")
         self.typeDropDown.addItem("Boolean")
         self.typeDropDown.addItem("Char")
         self.typeDropDown.addItem("String")
-        self.newHbox.addWidget(self.varInput)
+        self.newHbox.addWidget(varInput)
         self.newHbox.addWidget(self.typeDropDown)
         self.dynamicVariablesVBox.addLayout(self.newHbox)
         if(newFlag == True):
-            # self.model.numVars += 1
             self.connectionsModel.valueCount+=1
-
+            valTarPair = ValueTargetPair(tar=varInput.text())
+            self.connectionsModel._addValueTargetPair(valTarPair) # create new object in connection data structure
+        varInput.textChanged.connect(lambda : self.connectionsModel.valList[count]._setTarget(varInput.text()))
+    
     def removeLastVariableHbox(self):
         self.variableHboxCount = self.dynamicVariablesVBox.count() # get total number of
         print("variableHboxCount ==>" +str(self.variableHboxCount))
@@ -229,7 +231,6 @@ class RestfulDialog(QDialog): #Properties btn dialog
         self.layoutToDelete.itemAt(0).widget().deleteLater()
         self.layoutToDelete.itemAt(1).widget().deleteLater()
         self.dynamicVariablesVBox.removeItem(self.layoutToDelete)
-        # self.model.numVars -= 1
         self.connectionsModel.valueCount-=1
 
     def _connectView(self):

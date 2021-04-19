@@ -14,11 +14,13 @@ class DataConnections:
             return True
         return False
 
-    def _addValueTargetPair(self, valTargetPair):
+    def _addValueTargetPair(self, valTargetPair=""):
+        if(valTargetPair == ""):
+            valTargetPair = ValueTargetPair()
         if(self._valListContains(valTargetPair)): # if element already in list
             print("Duplicates not allowed") # warning message?
             return
-        self.valList.append(valueTargetPair)
+        self.valList.append(valTargetPair)
     
     def _removeValueTargetPair(self):
         if(len(self.valList) > 0): # if list not empty
@@ -31,15 +33,9 @@ class DataConnections:
             print("target ==> "+str(x.target))
 
 class ValueTargetPair: # simple data struct for our objects for use with dataConnectionsMenu
-    def __init__(self , tar):
-        self.value = ""
+    def __init__(self , val="" , tar=""):
+        self.value = val
         self.target = tar
-    def __init__(self , val , tar):
-        self.value = val;
-        self.target = tar;
-    def __init__(self):
-        self.value = ""
-        self.target = ""
     def _setValue(self , val):
         self.value = val
     def _setTarget(self , tar):
