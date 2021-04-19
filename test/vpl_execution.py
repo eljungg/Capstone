@@ -97,7 +97,7 @@ class VplExecution():
         switchValue = False
         speak = False
 
-        engine = pyttsx3.init()
+
 
         if (startNode.op_code == OP_CODE_MERGE or startNode.op_code == OP_CODE_JOIN):
             self._window.appendText("Error, you cannot have a Merge or Join activity as Start-Node!" + '\n')
@@ -175,7 +175,7 @@ class VplExecution():
 
                 currentNode.doEval(parentData) #evaluate the current node, parentData is the data object from parent node if applicable
                 parentData = currentNode.data # save data object for passing to child node
-                self.printNodeMessages(parentData, speak, engine) # print any messages resulting from our doEval() function.
+                self.printNodeMessages(parentData, speak) # print any messages resulting from our doEval() function.
 
                 nextNodes = currentNode.getChildrenNodes()
 
@@ -213,7 +213,7 @@ class VplExecution():
                     moreChildren = False
                     #print("Ending a thread\n")
 
-            engine.stop()
+            
 
     def startExecution(self):
         self._window.show()
@@ -226,13 +226,15 @@ class VplExecution():
             #self._executeNodes()
             #print("end of thread.")
 
-    def printNodeMessages(self, dataObject, speak, engine): # prints all a nodes messages, and then clears them
+    def printNodeMessages(self, dataObject, speak): # prints all a nodes messages, and then clears them
         for msg in dataObject.messages: # iterate any messages
             if(type(msg) == str): #verify type
                 self._window.appendText(msg + '\n') # any given msg string to the print_line execution window
                 if speak:
+                    engine = pyttsx3.init()
                     engine.say(msg)
                     engine.runAndWait()
+                    engine.stop()
             else:
                 print("printNodeMessages passed non-string type error") #Debug
         dataObject.clearMessages() # clear all messages after printing
