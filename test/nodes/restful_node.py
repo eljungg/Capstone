@@ -7,20 +7,23 @@ from model.node_data import NodeData
 import requests
 import xml.etree.ElementTree as ET
 from data_connections_menu import DataConnectionsMenu
+from model.data_connections import *
 
 class RestfulServiceContent(QDMNodeContentWidget):
     def initUI(self):
-        self.dataConnectionsDialog = DataConnectionsMenu(self)
+        self.initModel()
+        self.dataConnectionsDialog = DataConnectionsMenu(self , self.dataConnectionsModel) # pass model to menu
         self.layout = QVBoxLayout()
         self.propertiesBtn = QPushButton("Properties") # VIPLE has on rightclick instead
         self.dataConnectionsBtn = QPushButton("Data Connections") # VIPLE has on right click instead
         self.layout.addWidget(self.propertiesBtn)
         self.layout.addWidget(self.dataConnectionsBtn)
         self.setLayout(self.layout)
-        self.initModel()
+        
 
     def initModel(self):
-        self.model = RestModel()
+        self.dataConnectionsModel = DataConnections() # model for holding our value/target pairs for input / params
+        self.model = RestModel() # holds URL
         print("Rest Model Created")
         
     def setContentVariables(self, variablesListRef):
@@ -42,9 +45,9 @@ class RestfulServiceContent(QDMNodeContentWidget):
         return res
 
     def showPropertiesDialog(self):
-        self.propertiesDialog = RestfulDialog(self, self.variablesListRef)
+        self.propertiesDialog = RestfulDialog(self, self.variablesListRef , self.dataConnectionsModel)
         self.propertiesDialog.show()
-        #self.propertiesDialog.exec_()  
+ 
     def showDataConnectionsDialog(self):
         self.dataConnectionsDialog.show()
 class RestfulServiceNode(VplNode):
@@ -71,7 +74,7 @@ class RestfulServiceNode(VplNode):
         #self.data.messages.append(self.content.model.endPointURL)
         output = ""
         try: #do webRequest
-            r = requests.get(self.content.model.endPointURL)
+            r = requests.get(self.content.model.endPointURL) #TODO add variable/dataconnections processing
             output = r.text
         except: # webRequest failed
             output = "RESTful service failed"
@@ -129,10 +132,11 @@ class RestfulServiceNode(VplNode):
         self.content.setContentVariables(self.variablesRef)
 
 
-class RestfulDialog(QDialog):
-    def __init__(self, parent, variablesListRef):
+class RestfulDialog(QDialog): #Properties btn dialog
+    def __init__(self, parent, variablesListRef , dataConnectionsModel):
         super().__init__(parent=parent)
         self.parentNode = parent
+        self.connectionsModel = dataConnectionsModel
         self.model = self.parentNode.model
 
         self.setWindowTitle("RESTful Service Settings")
@@ -155,7 +159,6 @@ class RestfulDialog(QDialog):
         self.endPointHbox = QHBoxLayout()
         self.dynamicVariablesVBox = QVBoxLayout()
         self.plusMinusHBox = QHBoxLayout()
-        #DYNAMICALLY NEED TO CREATE HBOX WITH Variable LineEdit and QComboBox TODO
 
         #add widgets to boxes
         self.setLayout(self.outterVbox)
@@ -166,7 +169,8 @@ class RestfulDialog(QDialog):
         self.outterVbox.addWidget(self.varLbl)
         self.outterVbox.addLayout(self.dynamicVariablesVBox)
         variableCount = 0
-        while( variableCount < self.model.numVars ):
+        # while( variableCount < self.model.numVars ):
+        while(variableCount < self.connectionsModel.valueCount):
             self.createNewVariableHbox(newFlag=False , number=variableCount)
             variableCount +=1
             print("Going again because varCount =>" +str(variableCount) +" is < self.model.numVars ==>" +str(self.model.numVars))
@@ -197,7 +201,7 @@ class RestfulDialog(QDialog):
     def createNewVariableHbox(self, newFlag=True , number=-1):
         print("createNext goes with newFlag ==>" + str(newFlag))
         if(number == -1):
-            count = self.model.numVars # get amount of current things
+            count = self.connectionsModel.valueCount # get amount of current things
         else:
             count = number
         #when plus btn pressed, create a new hbox.
@@ -213,7 +217,8 @@ class RestfulDialog(QDialog):
         self.newHbox.addWidget(self.typeDropDown)
         self.dynamicVariablesVBox.addLayout(self.newHbox)
         if(newFlag == True):
-            self.model.numVars += 1
+            # self.model.numVars += 1
+            self.connectionsModel.valueCount+=1
 
     def removeLastVariableHbox(self):
         self.variableHboxCount = self.dynamicVariablesVBox.count() # get total number of
@@ -224,7 +229,8 @@ class RestfulDialog(QDialog):
         self.layoutToDelete.itemAt(0).widget().deleteLater()
         self.layoutToDelete.itemAt(1).widget().deleteLater()
         self.dynamicVariablesVBox.removeItem(self.layoutToDelete)
-        self.model.numVars -= 1
+        # self.model.numVars -= 1
+        self.connectionsModel.valueCount-=1
 
     def _connectView(self):
         self.buttonBox.accepted.connect(self.accept)
@@ -243,11 +249,9 @@ class RestfulDialog(QDialog):
         self.model.endPointURL = urlTxt
         print("reportEndPointTOParent ==>" + urlTxt)
 
-class RestModel():
+class RestModel(): # this only is used for the endPoint. Kind of unnecessary
     def __init__(self):
         self.endPointURL = ""
-        self.numVars = 0
-        #TODO more variable stuff i imagine
 
 
 

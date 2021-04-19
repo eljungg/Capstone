@@ -1,13 +1,15 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-# from model.variables import Variable
+from model.variables import Variable
 from conf import *
-# from util import valTypeToString
-# from util import stringToValType
+
+#This file contains the QDialog popup menu for data connections,
+#TODO we will need a ref to variablesList here
 
 class DataConnectionsMenu(QDialog): #general popup window for managing data connections on RESTful node and others
-    def __init__(self, parent): # should probably take in desired size from parent ? TODO
+    def __init__(self, parent , dataConnectionsModel): # should probably take in desired size from parent ? TODO
         super().__init__(parent=parent)
+        self.model = dataConnectionsModel # get access to our model.
         self.setWindowTitle("Data Connections")
 
         self.dialogButtons = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
