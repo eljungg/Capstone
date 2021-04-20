@@ -3,7 +3,7 @@ from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from conf import *
 
-from model.node_data import *
+from node_data import *
 
 
 class MergeNodeContent(VplContent):

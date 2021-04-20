@@ -17,7 +17,7 @@ from nodes.print_line_node import PrintLineNode
 from nodes.simple_dialog_node import SimpleDialogNode
 from nodes.terminal_print_node import TerminalPrintNode
 from nodes.switch_node import SwitchNode
-from model.variables import VariablesData
+from variables import VariablesData
 from nodes.comment_node import CommentNode
 from nodes.timer_node import timerNode
 from nodes.tts_node import TtsNode

@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import *
 from nodeeditor.utils import dumpException
 from vpl_node import *
 from conf import *
-from model.variables import VariablesData
-from model.node_data import NodeData
+from variables import VariablesData
+from node_data import NodeData
 from nodeeditor.node_node import *
 
 import re

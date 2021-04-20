@@ -1,7 +1,7 @@
 from PyQt5.QtCore import *
 from nodeeditor.utils import dumpException
 from vpl_node import *  # get our custom node base
-from Capstone.test.conf import *
+from conf import *
 
 class CommentGraphics(QDMGraphicsNode):
 

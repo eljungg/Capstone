@@ -4,9 +4,8 @@ from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from conf import *
 from pynput.keyboard import Key, Listener
-from model.node_data import *
+from node_data import *
 from vpl_execution import *
-from conf import *
 
 class keyReleaseNodeContent(VplContent):
     def initUI(self):

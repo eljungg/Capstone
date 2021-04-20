@@ -2,8 +2,8 @@ from PyQt5.QtCore import *
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.utils import dumpException
 from vpl_node import *  # get our custom node base
-from Capstone.test.conf import *
-from model.node_data import NodeData
+from conf import *
+from node_data import NodeData
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QComboBox, QPushButton, QWidget
 from PyQt5.QtCore import Qt
 

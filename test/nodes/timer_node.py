@@ -4,7 +4,7 @@ from vpl_node import * # get our custom node base
 from conf import *
 import time
 
-from model.node_data import *
+from node_data import *
 
 
 class timerNodeContent(VplContent):

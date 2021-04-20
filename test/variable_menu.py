@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
-from model.variables import Variable
+from variables import Variable
 from conf import *
 from util import valTypeToString
 from util import stringToValType

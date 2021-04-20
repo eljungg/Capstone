@@ -2,8 +2,8 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
-from Capstone.test.conf import *
-from model.node_data import NodeData
+from conf import *
+from node_data import NodeData
 
 class CodeActivityPythonContent(QDMNodeContentWidget):
     def initUI(self):

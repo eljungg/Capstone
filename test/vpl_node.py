@@ -8,7 +8,7 @@ from nodeeditor.node_socket import *
 from nodeeditor.node_edge import *
 from vpl_socket import *
 from nodeeditor.utils import dumpException
-from model.node_data import NodeData
+from node_data import NodeData
 
 #test
 #Over-ride the Graphics of our Node
