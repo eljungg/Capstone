@@ -28,8 +28,9 @@ class DataConnectionsMenu(QDialog): #general popup window for managing data conn
         self.rightGroupVbox = QVBoxLayout()
         self.rightGroupBox.setLayout(self.rightGroupVbox)
 
-        self.createNewRow() # PROOF OF CONCEPT
-        self.createNewRow()
+        for i in range(0,self.model.valueCount): # make a row and set value for each of our stuffs
+            # print("DEBUG FROM data_con_menu self.model.valueCount ==>" + str(self.model.valueCount))
+            self.createNewRow(leftVal = self.model.valList[i].value , rightVal = self.model.valList[i].target , index=i)
 
         self.outtestVbox.addLayout(self.outterHbox)
         self.outtestVbox.addWidget(self.buttonBox)
@@ -38,22 +39,21 @@ class DataConnectionsMenu(QDialog): #general popup window for managing data conn
 
         self.setLayout(self.outtestVbox)
 
-        #TODO determine amount of lineEdits from the node itself.
-        #TODO data structure to share with nodes
-
-    def createNewRow(self, leftVal="leftTODO" , rightVal="rightTODO"): # might need an index or soemthing im not sure
-        #create two line edits, add them to appropriate boxes
+    def createNewRow(self, leftVal="leftTODO" , rightVal="rightTODO" , index=-1): # might need an index or soemthing im not sure
+        #Leftval is the val
+        #rightVal is the target
+        #rightVal is non editable 
         leftLineEdit = QLineEdit(leftVal)
-        rightLineEdit = QLineEdit(rightVal)
-
-        initialList = ['value' , 'true', 'false']
-        
+        rightLbl = QLabel(rightVal)
+        initialList = ['value' , 'true', 'false'] #taken from calculate node, give user hints for possible options
+        #TODO user hints for variables as well?
         comboLeft = QComboBox(self)
-        comboRight = QComboBox(self)
+        comboLeft.addItem(leftVal)
         comboLeft.addItems(initialList)
-        comboRight.addItems(initialList)
         comboLeft.setLineEdit(leftLineEdit)
-        comboRight.setLineEdit(rightLineEdit)
         self.leftGroupVbox.addWidget(comboLeft)
-        self.rightGroupVbox.addWidget(comboRight)
+        self.rightGroupVbox.addWidget(rightLbl)
+
+        self.buttonBox.accepted.connect(lambda : self.model.valList[index]._setValue(leftLineEdit.text()))
+     
 

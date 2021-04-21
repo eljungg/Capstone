@@ -12,7 +12,7 @@ from model.data_connections import *
 class RestfulServiceContent(QDMNodeContentWidget):
     def initUI(self):
         self.initModel()
-        self.dataConnectionsDialog = DataConnectionsMenu(self , self.dataConnectionsModel) # pass model to menu
+        #self.dataConnectionsDialog = DataConnectionsMenu(self , self.dataConnectionsModel) # pass model to menu
         self.layout = QVBoxLayout()
         self.propertiesBtn = QPushButton("Properties") # VIPLE has on rightclick instead
         self.dataConnectionsBtn = QPushButton("Data Connections") # VIPLE has on right click instead
@@ -24,7 +24,6 @@ class RestfulServiceContent(QDMNodeContentWidget):
     def initModel(self):
         self.dataConnectionsModel = DataConnections() # model for holding our value/target pairs for input / params
         self.model = RestModel() # holds URL
-        print("Rest Model Created")
         
     def setContentVariables(self, variablesListRef):
         self.variablesListRef = variablesListRef
@@ -49,6 +48,7 @@ class RestfulServiceContent(QDMNodeContentWidget):
         self.propertiesDialog.show()
  
     def showDataConnectionsDialog(self):
+        self.dataConnectionsDialog = DataConnectionsMenu(self , self.dataConnectionsModel) # pass model to menu
         self.dataConnectionsDialog.show()
 class RestfulServiceNode(VplNode):
     op_code = OP_CODE_DATA
@@ -71,10 +71,10 @@ class RestfulServiceNode(VplNode):
         self.content.dataConnectionsBtn.clicked.connect(self.content.showDataConnectionsDialog)
 
     def doEval(self, parentData=None): 
-        #self.data.messages.append(self.content.model.endPointURL)
         output = ""
         try: #do webRequest
             r = requests.get(self.content.model.endPointURL) #TODO add variable/dataconnections processing
+            
             output = r.text
         except: # webRequest failed
             output = "RESTful service failed"
@@ -90,6 +90,20 @@ class RestfulServiceNode(VplNode):
         self.__setDataType()
         print("data type of rest call == > " + str(self.data.valType))
         return
+    def processUrlString(urlString): # take the URL, process the dataConnection keyValue pairs for use
+        newUrlString = urlString
+        cm = self.content.dataConnectionsModel #shorter name connectionsModel
+        #Search string for instances of variable format {1} .. {3}... etc.
+        #we can have an upper bound for expected variables because we have the count from dataConnectionsModel
+        for x in range(0 , cm.valueCount): # loop all possible amount of variables
+            thisVariablesValue = cm.valList[x].value #gets the value of the variable by that index
+            #process string, regex any {x} => thisVariablesValue
+            searchedForString = "{"+str(x)+"}" #  == {0}
+            newUrlString = newUrlString.replace(searchedForString , thisVariablesValue)
+        #at the end of this loop, our string should have replaced all variables with their value NAMES
+        #TODO we need to go from valueNAME to actual value at some point..... ugh
+            
+
 
     def __setDataType(self):
         val = self.data.val
@@ -246,7 +260,6 @@ class RestfulDialog(QDialog): #Properties btn dialog
             var._printVar()
     def _reportEndPointToParent(self):
         urlTxt = self.endPointInput.text()
-        #self.parentNode.restURL = urlTxt #TODO will need to format in variables here later
         self.model.endPointURL = urlTxt
         print("reportEndPointTOParent ==>" + urlTxt)
 

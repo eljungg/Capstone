@@ -21,6 +21,7 @@ class DataConnections:
             print("Duplicates not allowed") # warning message?
             return
         self.valList.append(valTargetPair)
+        self.print() # DEBUG printing
     
     def _removeValueTargetPair(self):
         if(len(self.valList) > 0): # if list not empty
@@ -28,6 +29,8 @@ class DataConnections:
         print("DataConncetion: cant remove element, empty list") # warning message?
 
     def print(self): # Debug utility # print the list
+        print("Debug Printing dataConnections model , size of list is "+str(len(self.valList)))
+        print("valCount ==> " +str(self.valueCount))
         for x in self.valList:
             print("Value ==> "+ str(x.value))
             print("target ==> "+str(x.target))
