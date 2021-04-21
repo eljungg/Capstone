@@ -41,8 +41,11 @@ class SimpleDialogNode(VplNode):
 
     def doEval(self, input=None):
         usrMsg = input.val
-        dialog = AlertDialog(None , usrMsg)
-        dialog.exec_() # current implementation locks the thread until user OK's
+        self.dialog = AlertDialog(None ,  usrMsg)
+        ##WARNING# This BREAKS on macOS. It doesnt like trying to create a new GUI element on the thread which is running from execution_engine.
+        #Im not sure how to fix but this node is BROKEN #TODO
+        #Possible fix, spawn a new thread here and have it run the QDialog?
+        self.dialog.exec_() # current implementation locks the thread until user OK's
 
 class AlertDialog(QDialog):
     def __init__(self, parent , userMessage):
