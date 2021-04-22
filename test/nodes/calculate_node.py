@@ -6,6 +6,7 @@ from conf import *
 from model.variables import VariablesData
 from model.node_data import NodeData
 from nodeeditor.node_node import *
+from util import determineDataType
 
 import re
 
@@ -103,9 +104,8 @@ class CalculateNode(VplNode):
         self.content.setContentVariables(self.variablesRef)
 
     def doEval(self, input=None):
-
+        #Warn, this fails if Value == string variable. not sure what VIPLE does
         statement = self.content.edit.text()
-        print(statement)
 
         if statement == 'true':
             self.data.val = True
@@ -128,9 +128,5 @@ class CalculateNode(VplNode):
 
         self.final = eval(statement)
         self.data.val = self.final
-        if type(self.final) is int:
-            self.data.valType = TYPE_INT
-        elif type(self.final) is float:
-            self.data.valType = TYPE_DOUBLE
-        
-        self.data.valType = type(self.final)
+        valType = determineDataType(self.data.val) # get VPL type of output
+        self.data.valType = valType

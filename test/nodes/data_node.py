@@ -4,6 +4,7 @@ from nodeeditor.utils import dumpException
 from vpl_node import * # get our custom node base
 from Capstone.test.conf import *
 from model.node_data import NodeData
+from util import *
 
 class DataContent(QDMNodeContentWidget):
     def initUI(self):
@@ -46,7 +47,7 @@ class DataNode(VplNode):
         self.grNode.height = 90
         #below is onTextChanged event for simple self.edit Label
         self.content.edit.textChanged.connect(self.onInputChanged)
-        self.content.edit.textChanged.connect(self.determineDataType)
+        self.content.edit.textChanged.connect(self.doDataType)
         self.content.edit.textChanged.connect(self.onTextChange)
         #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
@@ -64,55 +65,18 @@ class DataNode(VplNode):
 
             self.newSockets([1], [2], True)
 
-
-    def determineDataType(self):
+    
+    def doDataType(self):
         ### Determine the type of data given in Text Box by user ###
         self.data.val = (self.content.edit.text())
-        val = self.data.val
-        if self.__isInt(val) == True:
-            self.data.valType = TYPE_INT
-            self.content.typeLabel.setText("Int")
-        elif self.__isFloat(val) == True:
-            self.data.valType = TYPE_DOUBLE
-            self.content.typeLabel.setText("Double")
-        elif self.__isBool(val) == True:
-            self.data.valType = TYPE_BOOL
-            self.content.typeLabel.setText("Boolean")
-        elif self.__isChar(val) == True:
-            self.data.valType = TYPE_CHAR
-            self.content.typeLabel.setText("Char")
-        else:
-            self.data.valType = TYPE_STRING
-            self.content.typeLabel.setText("String")
-
+        valType = determineDataType(self.data.val) # get the VPL_TYPE
+        self.data.valType = valType
+        typeStr = valTypeToString(valType)
+        self.content.typeLabel.setText(typeStr)
+ 
+        
     def doEval(self, parentData=None): 
         #does literally nothing. 
         #as of now, getting the type and data are handled in determineDataType() # saved to self.data
         self.data.val = (self.content.edit.text())
         return
-
-    def __isInt(self , val): #helper function for determineType
-        try:
-            int(val)
-            return True
-        except ValueError:
-            return False
-    def __isFloat(self, val):
-        try:
-            float(val)
-            return True
-        except ValueError:
-            return False
-    def __isBool(self, val):
-        lcVal = val.lower()
-        if lcVal == "false" or lcVal == "true":
-            return True
-        else:
-            return False
-    def __isChar(self, val): #Python doesnt do Char, but VIPLE does so we just emulate?
-        if len(val) == 1:
-            return True
-        else:
-            return False
-
-
