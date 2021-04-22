@@ -136,7 +136,7 @@ class MainWindow(NodeEditorWindow):
         self.windowMenu.addAction(self.previousAct)
         self.windowMenu.addAction(self.separatorAct)
         self.windowMenu.addAction(self.actRun)
-        self.windowMenu.addAction(self.actShowCAWindow)
+        #self.windowMenu.addAction(self.actShowCAWindow)
 
         windows = self.mdiArea.subWindowList()
         self.separatorAct.setVisible(len(windows) != 0)
