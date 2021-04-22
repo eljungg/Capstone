@@ -150,14 +150,19 @@ class VplExecution():
                 elif(currentNode.op_code == OP_CODE_TTS):
                     speak = True
 
+                elif (currentNode.op_code == OP_CODE_CODEPY):
+                    result = currentNode.getOutValue(parentData)
+                    self._window.appendText(result.val + '\n')
+
                 # Checks to see if the node is an End While node and the corresponding While node has a 'true' condition
                 if(currentNode.op_code == OP_CODE_END_WHILE and whileValue):
                     currentNode = whileNodes[-1][0]
                     parentData = whileNodes[-1][1]
-
+                
+                # General execution for nodes
                 currentNode.doEval(parentData) #evaluate the current node, parentData is the data object from parent node if applicable
                 parentData = currentNode.data # save data object for passing to child node
-                self.printNodeMessages(parentData, speak, engine) # print any messages resulting from our doEval() function.
+                self.printNodeMessages(parentData, speak) # print any messages resulting from our doEval() function.
                 
                 #determine which nodes will be executed next
                 if(currentNode.op_code == OP_CODE_CUSTOM_ACTIVITY):
