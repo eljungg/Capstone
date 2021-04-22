@@ -6,6 +6,8 @@ from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from collections import deque
 
+# TODO: Add resizability to join node, like if and switch.
+
 class JoinNodeContent(VplContent):
     def initUI(self):
         self.layout = QVBoxLayout()
@@ -24,7 +26,6 @@ class JoinNodeContent(VplContent):
         #To imitate VIPLE we'll want to implement a way to add extra
         #fields. probably another function and graphics
     
-    #I hope these are correct
     def serialize(self):
         res = super().serialize()
         res['value1'] = self.conditional1.text()
@@ -60,11 +61,10 @@ class JoinNode(VplNode):
         self.grNode = VplGraphicsNode(self)
         self.content.conditional1.textChanged.connect(self.onInputChanged)
         self.content.conditional2.textChanged.connect(self.onInputChanged)
-        #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
         self.data.id = self.id
-        self.size = 2
-        self.queueList = []
+        self.size = 2 #default value
+        self.queueList = [] #queues for each input of the join node
         #will need to be change on size update
         for i in range(self.size):
             self.queueList.append(deque())
@@ -76,29 +76,26 @@ class JoinNode(VplNode):
         elif(position < 0 or position >= self.size):
             print("Error: position is out of range")
         else:
-            self.queueList[position].append(entry)
+            self.queueList[position].append(entry) # append entry to the proper queue
             full = True
-            for i in self.queueList:
-                if not (i):
+            for i in self.queueList: # i is one of the queues in the list
+                if not (i): #if i is empty... returnList will remain empty and be returned
                     full = False
-            if full:
+            if full: # if no queues are empty...
                 for i in self.queueList:
                     returnList.append(i.popleft())
-                #print("returning a full join node")
                 returnList.reverse() #nodeeditor has the bottom socket as 0 so the entries are backwards from what one would expect.
-            #else:
-                #print("join is not full")
+
         return returnList
 
     def doEval(self, input=None):
         if (input != None):
             inputpos = self.findParentFromSocket(input.id)
-            #print(inputpos)
             temp = []
-            temp = self.addEntry(inputpos, input.val)
-            returndict = {}
-            #for i in range(size): #need to create iterable list of textboxes based on size of join node
-            if(temp):
+            temp = self.addEntry(inputpos, input.val) #add entry returns a list
+            returndict = {} #dictionary formed by text fields and list returned by addEntry
+            if(temp): #if addEntry didn't return an empty list.
+                #will need to be altered for resizable nodes
                 returndict[str(self.content.conditional1.text())] = temp[0]
                 returndict[str(self.content.conditional2.text())] = temp[1]
             self.data.val = returndict
@@ -107,30 +104,3 @@ class JoinNode(VplNode):
         else:
             print("ERROR, join recieved a null input")
             
-    #def evalImplementation():
-    #May use in the future for syntax checking. Not needed for compilation
-    """
-    class _joinData():
-    def __init__(self, nodeId, size):
-        self.nodeId = nodeId
-        self.size = size
-        self.queueList = []
-
-        for i in range(size):
-            self.queueList.append(deque())
-
-    def addEntry(self, position, entry):
-        returnList = []
-        if(position < 0 or position >= self.size):
-            print("Error: position is out of range")
-        else:
-            self.queueList[position].append(entry)
-            full = True
-            for i in self.queueList:
-                if not self.queueList[i]:
-                    full = False
-            if full:
-                for i in self.queueList:
-                    returnList.append(self.queueList[i].popleft())
-        return returnList
-    """
