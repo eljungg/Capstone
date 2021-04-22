@@ -52,7 +52,7 @@ class Join3Node(VplNode):
     content_label_objname2 = "VplNodeJoin"
 
     def __init__(self, scene, title:str="Join"):
-        super().__init__(scene, title, inputs = [1, 1, 1], outputs = [1])
+        super().__init__(scene, title, inputs = [0, 0, 0], outputs = [0])
         self.eval()
 
     def initInnerClasses(self):

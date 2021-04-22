@@ -31,7 +31,7 @@ class KeyReleaseNode(VplNode):
         self.input_multi_edged = True
 
     def __init__(self, scene, title: str = "Key Release"):
-        super().__init__(scene, title, inputs=[], outputs=[1])
+        super().__init__(scene, title, inputs=[], outputs=[2])
         self.eval()
 
     def initInnerClasses(self):

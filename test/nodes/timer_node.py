@@ -28,7 +28,7 @@ class timerNode(VplNode):
         self.input_multi_edged = True
 
     def __init__(self, scene, title: str = "timer"):
-        super().__init__(scene, title, inputs=[1], outputs=[1])
+        super().__init__(scene, title, inputs=[0], outputs=[0])
         self.eval()
 
     def initInnerClasses(self):

@@ -3,10 +3,12 @@ from vpl_node import *
 from conf import *
 from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
+from model.node_data import NodeData
+from random import *
 
-class TerminalPrintContent(VplContent):
+class RandomNodeContent(VplContent):
     def initUI(self):
-        self.label = QLabel("Print Line", self)
+        self.label = QLabel("Random", self)
     
     #I hope these are correct
     def serialize(self):
@@ -18,27 +20,24 @@ class TerminalPrintContent(VplContent):
         return res
 
 
-class TerminalPrintNode(VplNode):
-    op_code = OP_CODE_TERMINAL_PRINT
-    op_title = "Terminal Print"
-    content_label_objname = "VplNodePrint"
+class RandomNode(VplNode):
+    op_code = OP_CODE_RANDOM
+    op_title = "Random"
+    content_label_objname = "VplNodeRandom"
 
-    def __init__(self, scene, title:str="Terminal Print"):
+    def __init__(self, scene, title:str="Random"):
         super().__init__(scene, title, inputs = [0], outputs = [0])
         self.eval()
 
     def initInnerClasses(self):
-        self.content = TerminalPrintContent(self)
+        self.content = RandomNodeContent(self)
         self.grNode = VplGraphicsNode(self)
-        #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
+        self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
         self.data.id = self.id
-
+    
     def doEval(self, input=None):
-        string = ""
-        if(input == None):
-            string = "ERROR, no value passed to node"
-            print(string)
-        else:
-            string = input.val
-            print(string)
+        self.data.val = randint(0, int(input.val) - 1)
+        self.data.valType = TYPE_INT
+        return
+

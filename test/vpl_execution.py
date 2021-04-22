@@ -2,35 +2,36 @@
 #scene passes list of nodes and edges into this class which handles the actual 
 #execution using node functions to find inputs to nodes
 
-import threading
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+
 from nodeeditor.node_node import Node
 from nodeeditor.node_edge import Edge
 from nodeeditor.node_socket import *
-from conf import *
-from execution_window import ExecutionWindow
 
-from collections import deque
+from execution_window import ExecutionWindow
+from conf import *
+
 import threading
 import time
-
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
+import pyttsx3
+import keyboard
+from collections import deque
+from pynput import keyboard
+from pynput.keyboard import Key, Controller, Listener
 
 # Library for Python tts library. 
 # Luke, on Linux you need to make sure that 'espeak' and 'ffmpeg' are installed
 # For everyone else, just pip install pyttsx3. 
 # If you recieve errors such as No module named win32com.client, No module named win32, or No module named win32api, you will need to additionally install pypiwin32.
 
-import pyttsx3
-import keyboard
-from pynput import keyboard
-from pynput.keyboard import Key, Controller, Listener
-
 start_threads = []
 threads = []
 windowContent = []
 myDict = []
 key_press_Merge = False
+whileNodes = []
+endWhileNodes = []
 
 class _DialogWindow(QWidget):
     def __init__(self, simpleDialog=True):
@@ -96,6 +97,7 @@ class VplExecution():
         ifValue = False
         switchValue = False
         speak = False
+        whileValue = False
 
         engine = pyttsx3.init()
 
@@ -169,24 +171,37 @@ class VplExecution():
 
                 elif(currentNode.op_code == OP_CODE_SWITCH):
                     switchValue = True
-                
+
+                elif(currentNode.op_code == OP_CODE_WHILE):
+                    whileNodes.append([currentNode, parentData])
+                    print(currentNode)
+                    whileValue = True
+
                 elif(currentNode.op_code == OP_CODE_TTS):
                     speak = True
+
+                # Checks to see if the node is an End While node and the corresponding While node has a 'true' condition
+                if(currentNode.op_code == OP_CODE_END_WHILE and whileValue):
+                    currentNode = whileNodes[-1][0]
+                    parentData = whileNodes[-1][1]
 
                 currentNode.doEval(parentData) #evaluate the current node, parentData is the data object from parent node if applicable
                 parentData = currentNode.data # save data object for passing to child node
                 self.printNodeMessages(parentData, speak, engine) # print any messages resulting from our doEval() function.
-
                 nextNodes = currentNode.getChildrenNodes()
 
                 if nextNodes != []:
                     if(ifValue):
+                        # If the node is an If node, choose the corresponding socket based on the correct statement
                         outputNodes = currentNode.getOutputs(parentData.val)
+
+                        # If the socket has connected edges
                         if(len(outputNodes) > 0):
                             currentNode = outputNodes[0]
+
+                            # Spawn a new thread if there are more than one edges connected to the socket
                             if len(outputNodes) > 1:
                                 for node in outputNodes[1:]:
-                                    #print("new thread from child\n")
                                     t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
                                     threads.append(t)
                                     t.start()
@@ -194,8 +209,51 @@ class VplExecution():
                             moreChildren = False
                         ifValue = False                        
                     elif(switchValue):
-                        currentNode = nextNodes[parentData.val]
+                        # If the node is an If node, choose the corresponding socket based on the correct statement
+                        outputNodes = currentNode.getOutputs(parentData.val)
+                        
+                        # If the socket has connected edges
+                        if(len(outputNodes) > 0):
+                            currentNode = outputNodes[0]
+
+                            # Spawn a new thread if there are more than one edges connected to the socket
+                            if len(outputNodes) > 1:
+                                for node in outputNodes[1:]:
+                                    t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
+                                    threads.append(t)
+                                    t.start()
+                        else:
+                            moreChildren = False
                         switchValue = False
+                    # If the node was a While node and it was a 'false' condition  
+                    elif(whileValue and parentData.val == False):
+                        noEndWhile = True
+                        
+                        # Search for the End While node
+                        for nodeThread in nextNodes:
+                            if(nodeThread.op_code == OP_CODE_END_WHILE):
+                                currentNode = nodeThread
+                                noEndWhile = False
+                                whileValue = False
+                                whileNodes.pop(-1)
+                                break
+                            else:
+                                nodeAfter = nodeThread.getChildrenNodes()
+                                while(nodeAfter != []):
+                                    if(nodeAfter[0].op_code == OP_CODE_END_WHILE):
+                                        currentNode = nodeAfter[0]
+                                        noEndWhile = False
+                                        whileValue = False
+                                        whileNodes.pop(-1)
+                                        break
+                                    else:
+                                        nodeAfter = nodeAfter[0].getChildrenNodes()
+                        
+                        # Check to see if there is an End While node connected the the sequence of nodes
+                        if(noEndWhile):
+                            self._window.appendText("Error, you cannot have a While node without an End While node!" + '\n')
+
+                        whileValue = False
                     elif(currentNode.op_code == OP_CODE_JOIN and not parentData.val):
                         moreChildren = False
                         #join node returned empty list, not ready, let thread die. Non-empty list will pass through and execute normally.

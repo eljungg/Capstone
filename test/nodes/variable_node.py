@@ -68,7 +68,7 @@ class VariableNode(VplNode):
     op_code = OP_CODE_VARIABLE
     def __init__(self, scene):
         self.variablesRef = VariablesData() # set on construction in sub_window.py # reference to out subWindow level variables
-        super().__init__(scene, inputs=[1], outputs=[3]) #added single input
+        super().__init__(scene, inputs=[0], outputs=[0]) #added single input
         self.currentVariableName = ""
         
     def initInnerClasses(self):
@@ -79,7 +79,7 @@ class VariableNode(VplNode):
         self.data.id = self.id
 
         self.grNode.height = 98
-        self.grNode.width = 160
+        self.grNode.width = 211
         self._connectView() # set the controllers
 
     def _connectView(self): #wire up controllers

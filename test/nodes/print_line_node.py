@@ -24,7 +24,7 @@ class PrintLineNode(VplNode):
     content_label_objname = "VplNodePrint"
 
     def __init__(self, scene, title:str="Print Line"):
-        super().__init__(scene, title, inputs = [1], outputs = [1])
+        super().__init__(scene, title, inputs = [0], outputs = [0])
         self.eval()
 
     def initInnerClasses(self):

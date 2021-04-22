@@ -10,8 +10,8 @@ class DataContent(QDMNodeContentWidget):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        self.edit = QLineEdit("Data Node Class" , self)
-        self.edit.setAlignment(Qt.AlignRight)
+        self.edit = QLineEdit("" , self)
+        self.edit.setAlignment(Qt.AlignLeft)
         self.typeLabel = QLabel("none" , self)
         self.typeLabel.setAlignment(Qt.AlignRight)
         self.layout.addWidget(self.edit)
@@ -37,7 +37,7 @@ class DataNode(VplNode):
     op_code = OP_CODE_DATA
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1], outputs=[3])
+        super().__init__(scene, inputs=[0], outputs=[0])
         self.title = "Data"
 
     def initInnerClasses(self):
@@ -62,8 +62,7 @@ class DataNode(VplNode):
             self.grNode.width = self.w + 22
             self.content.setGeometry(self.content.geometry().x(), self.content.geometry().y(), self.w + 22, self.content.geometry().height())
 
-            self.newSockets([1], [2], True)
-
+            self.newSockets([0], [0], True)
 
     def determineDataType(self):
         ### Determine the type of data given in Text Box by user ###

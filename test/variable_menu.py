@@ -27,9 +27,11 @@ class varLineEdit(QLineEdit): # we have to sub-class this to get event handlers 
 
 class VariableMenu(QDialog):
     def __init__(self, parent, variablesListRef , s1):
-        super().__init__(parent=parent) ## might need kwargs nonsense
+        #super().__init__(parent=parent) ## might need kwargs nonsense
+        QDialog.__init__(self) ## might need kwargs nonsense
         self.setWindowTitle("Variable Selection")
         self.s1 =s1
+        self.setModal(True)
         self.variablesListRef = variablesListRef
         dialogButtons = QDialogButtonBox.Ok
 

@@ -29,11 +29,7 @@ from nodes.end_while_node import EndWhileNode
 from nodes.break_node import BreakNode
 from nodes.key_press_node import KeypressNode
 from nodes.key_release_node import KeyReleaseNode
-
-from nodes.key_press_node import KeypressNode
-
-from nodes.key_release_node import KeyReleaseNode
-
+from nodes.random_node import RandomNode
 
 class SubWindow(NodeEditorWidget):
     Scene_class = VplScene
@@ -81,6 +77,7 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == OP_CODE_CODEPY: return CodeActivityPythonNode
         elif data['op_code'] == 20: return KeypressNode
         elif data['op_code'] == 21: return KeyReleaseNode
+        elif data['op_code'] == 22: return RandomNode
         
         return VplNode
 
@@ -225,7 +222,7 @@ class SubWindow(NodeEditorWidget):
             node = EndWhileNode(self.scene)
             node.title = "End While"
         elif(op_code == OP_CODE_BREAK):
-            print("Breaknode added")
+            print("Break node added")
             node = BreakNode(self.scene)
             node.title = "Break"
         elif (op_code == OP_CODE_KEYRELEASE):
@@ -236,6 +233,10 @@ class SubWindow(NodeEditorWidget):
             print("Key Press Python node added")
             node = KeypressNode(self.scene)
             node.title = "Key Press"
+        elif(op_code == OP_CODE_RANDOM):
+            print("Random node added")
+            node = RandomNode(self.scene)
+            node.title = "Random"
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 

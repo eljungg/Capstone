@@ -62,11 +62,10 @@ class CalculateContent(QDMNodeContentWidget):
 
 class CalculateNode(VplNode):
     op_code = OP_CODE_CALCULATE
-    TotalOutputs = [0,1]
 
     def __init__(self, scene):
         self.variablesRef = VariablesData()
-        super().__init__(scene, inputs=[1], outputs=[3])
+        super().__init__(scene, inputs=[0], outputs=[0])
 
     def initInnerClasses(self):
         self.content = CalculateContent(self, self.variablesRef)
@@ -86,14 +85,7 @@ class CalculateNode(VplNode):
             self.grNode.width = self.w + 22
             self.content.setGeometry(self.content.geometry().x(), self.content.geometry().y(), self.w + 22, self.content.geometry().height())
 
-            
-            if len(self.TotalOutputs) == 0:
-                self.TotalOutputs.insert(-1,3)
-
-            self.newSockets([1], self.TotalOutputs, True)
-            
-            if self.TotalOutputs != []:
-                self.TotalOutputs.pop(-1)
+            self.newSockets([0], [0], True)
             
 
     def setVariableData(self, variables): # wires up stuff, see subWindow.py
@@ -130,5 +122,3 @@ class CalculateNode(VplNode):
             self.data.valType = TYPE_INT
         elif type(self.final) is float:
             self.data.valType = TYPE_DOUBLE
-        
-        self.data.valType = type(self.final)

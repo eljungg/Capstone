@@ -46,7 +46,7 @@ class RestfulServiceNode(VplNode):
     op_code = OP_CODE_DATA
     TotalOutputs = [0,1]
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1], outputs=[3]) # was 3
+        super().__init__(scene, inputs=[0], outputs=[0]) # was 3
 
     def initInnerClasses(self):
         self.content = RestfulServiceContent(self)

@@ -19,25 +19,21 @@ class VplGraphicsNode(QDMGraphicsNode):
         self.height = 74
         self.edge_roundness = 6
         self.edge_padding = 0
+        self.title_height = 30
         self.title_horizontal_padding = 8
         self.title_vertical_padding = 32
 
     def initAssets(self):
         super().initAssets()
-        #self.icons = QImage("icons/status_icons.png")
 
+        # Set the color of the node outline
+        self._brush_title = QBrush(QColor("#FF000000"))
+        self._brush_background = QBrush(QColor("#FF000000"))
+
+    # Used to change the shape of the node - no changes needed but supplied just in case
     def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
         super().paint(painter, QStyleOptionGraphicsItem, widget)
 
-        offset = 24.0
-        if self.node.isDirty(): offset = 0.0
-        if self.node.isInvalid(): offset = 48.0
-
-        # painter.drawImage(
-        #     QRectF(-10, -10, 24.0, 24.0),
-        #     #self.icons,
-        #     QRectF(offset, 0, 24.0, 24.0)
-        # )
 #Over-Ride the content (gui) stuff of our node
 class VplContent(QDMNodeContentWidget):
     def initUI(self):
@@ -88,74 +84,109 @@ class VplNode(Node):
                 return i #returns the socket's postition in the list
             i = i + 1
 
+    # Changes the number of sockets to the supplied amount
     def newSockets(self, inputs: list, outputs: list, reset: bool=True):
-
         inputEdges = []
         outputEdges = []
 
+        # Reset the sockets if 'true'
         if reset:
-            # clear old sockets
+            # Clear old sockets
             if hasattr(self, 'inputs') and hasattr(self, 'outputs'):
-                # remove grSockets from scene
+                # Remove the input sockets from scene
                 for socket in (self.inputs):
                     inputSockets = []
 
+                    # Keep track of the connected edges
                     for edge in socket.edges:
                         inputSockets.append(edge.getOtherSocket(socket))
 
+                    # Add the edges based on the socket
                     inputEdges.append(inputSockets)
 
+                    # Remove the input sockets
                     self.scene.grScene.removeItem(socket.grSocket)
                     socket.removeAllEdges()
+
+                # Remove the output sockets from scene
                 for socket in (self.outputs):
                     outputSockets = []
 
+                    # Keep track of the connected edges
                     for edge in socket.edges:
                         outputSockets.append(edge.getOtherSocket(socket))
 
+                    # Add the edges based on the socket
                     outputEdges.append(outputSockets)
                     
+                    # Remove the output sockets
                     self.scene.grScene.removeItem(socket.grSocket)
                     socket.removeAllEdges()
                 self.inputs = []
                 self.outputs = []
 
-        # create new sockets
+        # Create new sockets
         counter = 0
         for item in inputs:
+            # Create a new socket
             socket = self.__class__.Socket_class(
                 node=self, index=counter, position=LEFT_CENTER,
                 socket_type=item, multi_edges=self.input_multi_edged,
                 count_on_this_node_side=len(inputs), is_input=True
             )
 
+            # Reconnect the edges
             if(counter < len(inputEdges)):       
                 for edge in inputEdges[counter]:
                     newEdge = Edge(self.scene, edge, socket, EDGE_TYPE_BEZIER)
 
             counter += 1
+
+            # Add the socket
             self.inputs.append(socket)
 
         counter = 0
         for item in outputs:
+            # Create a new socket
             socket = self.__class__.Socket_class(
                 node=self, index=counter, position=self.output_socket_position,
                 socket_type=item, multi_edges=self.output_multi_edged,
                 count_on_this_node_side=len(outputs), is_input=False
             )
 
-            if(counter < len(outputEdges) - 1):    
-                for edge in outputEdges[counter]:
-                    newEdge = Edge(self.scene, socket, edge, EDGE_TYPE_BEZIER)
+            # Reconnect the edges (used for the if/else if sockets of the If node)
+            if(counter < len(outputEdges) - 1):   
+                if(len(outputs) < len(outputEdges)):
+                    if(counter != len(outputEdges) - 2):
+                        for edge in outputEdges[counter]:
+                            newEdge = Edge(self.scene, socket, edge, EDGE_TYPE_BEZIER)
+                else:
+                    for edge in outputEdges[counter]:
+                        newEdge = Edge(self.scene, socket, edge, EDGE_TYPE_BEZIER)
 
+            # Reconnect the edges (used for the else socket of the If node)
             if(counter == len(outputs) - 1):
                 for edge in outputEdges[-1]:
                     newEdge = Edge(self.scene, socket, edge, EDGE_TYPE_BEZIER)
 
             counter += 1
+
+            # Add the socket
             self.outputs.append(socket)
         
         self.updateConnectedEdges()
+
+    # Used to calculate where sockets should be placed
+    def getSocketPosition(self, index, position, num_out_of=1):
+        # Get the position of the sockets
+        xy = super().getSocketPosition(index, position, num_out_of)
+
+        # Adjust the positions to fit the nodes better
+        x = -17 if (position in (LEFT_TOP, LEFT_CENTER, LEFT_BOTTOM)) else 10
+        xy[0] = xy[0] + x
+
+        return xy
+
 
     def serialize(self):
         res = super().serialize()

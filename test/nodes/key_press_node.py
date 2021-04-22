@@ -66,7 +66,7 @@ class KeypressNode(VplNode):
     additionalBox = False
 
     def __init__(self, scene, title: str = "Key Press Event"):
-        super().__init__(scene, title, inputs=[0], outputs=[1])
+        super().__init__(scene, title, inputs=[], outputs=[2])
 
     def initInnerClasses(self):
         self.content = KeypressContent(self)
