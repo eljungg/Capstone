@@ -8,6 +8,7 @@ import requests
 import xml.etree.ElementTree as ET
 from data_connections_menu import DataConnectionsMenu
 from model.data_connections import *
+from util import *
 
 class RestfulServiceContent(QDMNodeContentWidget):
     def initUI(self):
@@ -71,15 +72,16 @@ class RestfulServiceNode(VplNode):
         self.content.dataConnectionsBtn.clicked.connect(self.content.showDataConnectionsDialog)
 
     def doEval(self, parentData=None): 
+        parentVal = parentData.val #store input val for processing
+        endPointUrl = self.content.model.endPointURL #get raw url from user input
+        endPointUrl = self._processUrlString(endPointUrl , parentVal) # substitute any variables / input in raw url
         output = ""
         try: #do webRequest
-            r = requests.get(self.content.model.endPointURL) #TODO add variable/dataconnections processing
-            
+            r = requests.get(endPointUrl)
             output = r.text
         except: # webRequest failed
             output = "RESTful service failed"
         try: #strip xml trags
-            
             tree = ET.fromstring(output)
             notags = ET.tostring(tree, encoding='utf8', method='text')
             print(notags)
@@ -88,58 +90,41 @@ class RestfulServiceNode(VplNode):
             pass
         self.data.val = output #set result of service call as our data
         self.__setDataType()
-        print("data type of rest call == > " + str(self.data.valType))
         return
-    def processUrlString(urlString): # take the URL, process the dataConnection keyValue pairs for use
+
+    def _processUrlString(self, urlString , parentDataVal): # take the URL, process the dataConnection keyValue pairs for use
         newUrlString = urlString
         cm = self.content.dataConnectionsModel #shorter name connectionsModel
         #Search string for instances of variable format {1} .. {3}... etc.
         #we can have an upper bound for expected variables because we have the count from dataConnectionsModel
         for x in range(0 , cm.valueCount): # loop all possible amount of variables
             thisVariablesValue = cm.valList[x].value #gets the value of the variable by that index
+            thisVariablesValue = self.__checkForVariables(thisVariablesValue) #if variable, return value, else x -> x
+            if(thisVariablesValue == None):
+                self.data.messages.append("Variable " + str(cm.valList[x].value +" is undefined"))
+                return newUrlString # give back old string and cancel, has undefined variable
+            if(thisVariablesValue == "value"): #if value, get parents output as value
+                thisVariablesValue = parentDataVal
             #process string, regex any {x} => thisVariablesValue
             searchedForString = "{"+str(x)+"}" #  == {0}
             newUrlString = newUrlString.replace(searchedForString , thisVariablesValue)
         #at the end of this loop, our string should have replaced all variables with their value NAMES
-        #TODO we need to go from valueNAME to actual value at some point..... ugh
-            
 
+        return newUrlString
+            
+    def __checkForVariables(self, key):
+        #if this variable is found, return its value instead of its name
+        #else not a variable, return as is.
+        for var in self.content.variablesListRef.variables:
+            if(key == "state."+var.name):
+                return var.val
+        return key # not found
 
     def __setDataType(self):
         val = self.data.val
-        if self.__isInt(val) == True:
-            self.data.valType = TYPE_INT
-        elif self.__isFloat(val) == True:
-            self.data.valType = TYPE_DOUBLE
-        elif self.__isBool(val) == True:
-            self.data.valType = TYPE_BOOL
-        elif self.__isChar(val) == True:
-            self.data.valType = TYPE_CHAR
-        else:
-            self.data.valType = TYPE_STRING
-    def __isInt(self , val): #helper function for determineType
-        try:
-            int(val)
-            return True
-        except ValueError:
-            return False
-    def __isFloat(self, val):
-        try:
-            float(val)
-            return True
-        except ValueError:
-            return False
-    def __isBool(self, val):
-        lcVal = val.lower()
-        if lcVal == "false" or lcVal == "true":
-            return True
-        else:
-            return False
-    def __isChar(self, val): #Python doesnt do Char, but VIPLE does so we just emulate?
-        if len(val) == 1:
-            return True
-        else:
-            return False
+        valType = determineDataType(val)
+        self.data.valType = valType
+
 
     def setVariableData(self, variables): # wires up stuff, see subWindow.py
         self.variablesRef = variables
@@ -238,7 +223,6 @@ class RestfulDialog(QDialog): #Properties btn dialog
     
     def removeLastVariableHbox(self):
         self.variableHboxCount = self.dynamicVariablesVBox.count() # get total number of
-        print("variableHboxCount ==>" +str(self.variableHboxCount))
         if(self.variableHboxCount == 0):
             return #we done here bois
         self.layoutToDelete = self.dynamicVariablesVBox.itemAt(self.variableHboxCount-1)
@@ -261,7 +245,6 @@ class RestfulDialog(QDialog): #Properties btn dialog
     def _reportEndPointToParent(self):
         urlTxt = self.endPointInput.text()
         self.model.endPointURL = urlTxt
-        print("reportEndPointTOParent ==>" + urlTxt)
 
 class RestModel(): # this only is used for the endPoint. Kind of unnecessary
     def __init__(self):

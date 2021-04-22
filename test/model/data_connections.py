@@ -5,7 +5,6 @@ class DataConnections:
     #We can then reference this data in the content portion for display, and later for processing nodes
     # SEE test/conf.py for OPERATION and TYPE Constants
     def __init__(self): ##simple params for our object
-        print("Data Connection Created")
         self.valueCount = 0; # default as zero
         self.valList = []
 
@@ -21,7 +20,6 @@ class DataConnections:
             print("Duplicates not allowed") # warning message?
             return
         self.valList.append(valTargetPair)
-        self.print() # DEBUG printing
     
     def _removeValueTargetPair(self):
         if(len(self.valList) > 0): # if list not empty
@@ -36,6 +34,9 @@ class DataConnections:
             print("target ==> "+str(x.target))
 
 class ValueTargetPair: # simple data struct for our objects for use with dataConnectionsMenu
+    #NOTE that the value here may be for instance a variable, state.x
+    # the actual VALUE of state.x is unknown until runtime.
+    #your node must process these valueTargetPairs inside of its doEval function
     def __init__(self , val="" , tar=""):
         self.value = val
         self.target = tar
