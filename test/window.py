@@ -8,6 +8,8 @@ from drag_list_box import QDMDragListBox
 from sub_window import SubWindow
 from vpl_execution import VplExecution
 
+from c_a_window import CustomActivityWindow
+
 import qss.nodeeditor_dark_resources
 
 
@@ -47,7 +49,8 @@ class MainWindow(NodeEditorWindow):
 
         self.readSettings()
 
-        self.setWindowTitle("VPL")    
+        self.setWindowTitle("VPL")
+        self.createMdiChild()    
 
     def updateMenus(self):
         pass   
@@ -86,7 +89,7 @@ class MainWindow(NodeEditorWindow):
                         self.mdiArea.setActiveSubWindow(existing)
                     else:
                         # we need to create new subWindow and open the file
-                        nodeeditor = SubWindow()
+                        nodeeditor = SubWindow(self)
                         if nodeeditor.fileLoad(fname):
                             self.statusBar().showMessage("File %s loaded" % fname, 5000)
                             nodeeditor.setTitle()
@@ -133,6 +136,7 @@ class MainWindow(NodeEditorWindow):
         self.windowMenu.addAction(self.previousAct)
         self.windowMenu.addAction(self.separatorAct)
         self.windowMenu.addAction(self.actRun)
+        self.windowMenu.addAction(self.actShowCAWindow)
 
         windows = self.mdiArea.subWindowList()
         self.separatorAct.setVisible(len(windows) != 0)
@@ -168,6 +172,7 @@ class MainWindow(NodeEditorWindow):
         self.aboutAct = QAction("&About", self, statusTip="Show the application's About box", triggered=self.about)
         self.actRun = QAction('&Run', self, shortcut='Ctrl+R', statusTip="Run the program.", triggered=self.executeProgram)
 
+        self.actShowCAWindow = QAction('&CAWindow', self, statusTip="Show a custom activity window", triggered=self.createCAWindow)
 
     def onWindowNodesToolbar(self):
         if self.nodesDock.isVisible():
@@ -205,7 +210,7 @@ class MainWindow(NodeEditorWindow):
 
     def createMdiChild(self, child_widget=None):
         #this command executes on ctrl - n, when you make the actually window for adding nodes.
-        nodeeditor = child_widget if child_widget is not None else SubWindow() 
+        nodeeditor = child_widget if child_widget is not None else SubWindow(self) 
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         return subwnd
 
@@ -221,6 +226,11 @@ class MainWindow(NodeEditorWindow):
         execution.startExecution()
         #execution.setDialogWindow(window)
         #execution.executeProgram()
+
+    def createCAWindow(self, CANode:'CANode'=None, scene:'VplScene'=None):
+        subwnd = self.createMdiChild(CustomActivityWindow(self, CANode, scene))
+        subwnd.show()
+        return subwnd
 
 
 

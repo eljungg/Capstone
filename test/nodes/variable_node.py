@@ -124,6 +124,7 @@ class VariableNode(VplNode):
         if(parentData.valType != selectedVariable.valType) and selectedVariable.valType != TYPE_STRING: # need to throw error, print to exection window #Allow type mismatch if variable is marked string, anything can be string if you want (following VIPLE)
             pTypeStr = valTypeToString(parentData.valType)
             vTypeStr = valTypeToString(selectedVariable.valType)
+ 
             errTypeMsg = "Error for variable "+selectedVariable.name +": "+pTypeStr+ " was not\n recognized as a valid "+vTypeStr+"."
             print(errTypeMsg)
             self.data.val = "null" # how viple does it

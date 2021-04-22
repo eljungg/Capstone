@@ -10,7 +10,6 @@ from vpl_node import VplNode # get over-ridedd node
 from nodes.variable_node import VariableNode # get our node sub classes
 from nodes.if_node import IfNode
 from nodes.join_node import JoinNode
-from nodes.join3_node import Join3Node
 from nodes.data_node import DataNode
 from nodes.calculate_node import CalculateNode
 from nodes.merge_node import MergeNode
@@ -21,6 +20,8 @@ from nodes.switch_node import SwitchNode
 from model.variables import VariablesData
 from nodes.comment_node import CommentNode
 from nodes.timer_node import timerNode
+from nodes.custom_activity_node import CustomActivityNode
+from nodes.noop_node import NoOPNode
 from nodes.tts_node import TtsNode
 from nodes.restful_node import RestfulServiceNode
 from nodes.code_activity_python_node import CodeActivityPythonNode
@@ -35,7 +36,7 @@ class SubWindow(NodeEditorWidget):
     Scene_class = VplScene
     GraphicsView_class = QDMGraphicsView
     """This is a sub-window, the grey plot for placing nodes on """
-    def __init__(self):
+    def __init__(self, enclosingWindow):
         
         super().__init__()
         self.setAttribute(Qt.WA_DeleteOnClose)
@@ -50,34 +51,42 @@ class SubWindow(NodeEditorWidget):
 
         self._close_event_listeners = []
         self.variables = VariablesData() # each "scene" or "subwindow" has a "global" Variables data list
+        self.enclosingWindow = enclosingWindow
+        self.scene.setWindowRef(self.enclosingWindow)
 
-        
+    def getScene(self):
+        return self.scene
+
+    def setScene(self, scene):
+        self.scene = scene
 
     def getNodeClass(self, data):
         #scan through op codes
         #return a class based on op code
         if 'op_code' not in data: 
             return VplNode
-        elif data['op_code'] == 7:
+        elif data['op_code'] == OP_CODE_VARIABLE:
             return VariableNode
-        elif data['op_code'] == 8: return CalculateNode
-        elif data['op_code'] == 9: return DataNode
-        elif data['op_code'] == 10: return MergeNode
-        elif data['op_code'] == 11: return IfNode
-        elif data['op_code'] == 12: return JoinNode
-        elif data['op_code'] == 17: return WhileNode
-        elif data['op_code'] == 18: return EndWhileNode
-        elif data['op_code'] == 19: return BreakNode
-        elif data['op_code'] == 49: return TerminalPrintNode
-        elif data['op_code'] == 50: return PrintLineNode
-        elif data['op_code'] == 51: return SimpleDialogNode
-        elif data['op_code'] == 14: return CommentNode
-        elif data['op_code'] == 15: return timerNode
+        elif data['op_code'] == OP_CODE_CALCULATE: return CalculateNode
+        elif data['op_code'] == OP_CODE_DATA: return DataNode
+        elif data['op_code'] == OP_CODE_MERGE: return MergeNode
+        elif data['op_code'] == OP_CODE_IF: return IfNode
+        elif data['op_code'] == OP_CODE_JOIN: return JoinNode
+        elif data['op_code'] == OP_CODE_WHILE: return WhileNode
+        elif data['op_code'] == OP_CODE_END_WHILE: return EndWhileNode
+        elif data['op_code'] == OP_CODE_BREAK: return BreakNode
+        elif data['op_code'] == OP_CODE_TERMINAL_PRINT: return TerminalPrintNode
+        elif data['op_code'] == OP_CODE_PRINT_LINE: return PrintLineNode
+        elif data['op_code'] == OP_CODE_SIMPLE_DIALOG: return SimpleDialogNode
+        elif data['op_code'] == OP_CODE_COMMENT: return CommentNode
+        elif data['op_code'] == OP_CODE_TIMER: return timerNode
+        elif data['op_code'] == OP_CODE_CUSTOM_ACTIVITY: return CustomActivityNode
+        elif data['op_code'] == OP_CODE_NOOP: return NoOPNode
         elif data['op_code'] == OP_CODE_REST: return RestfulServiceNode
         elif data['op_code'] == OP_CODE_CODEPY: return CodeActivityPythonNode
-        elif data['op_code'] == 20: return KeypressNode
-        elif data['op_code'] == 21: return KeyReleaseNode
-        elif data['op_code'] == 22: return RandomNode
+        elif data['op_code'] == OP_CODE_KEYPRESS: return KeypressNode
+        elif data['op_code'] == OP_CODE_KEYRELEASE: return KeyReleaseNode
+        elif data['op_code'] == OP_CODE_RANDOM: return RandomNode
         
         return VplNode
 
@@ -193,11 +202,9 @@ class SubWindow(NodeEditorWidget):
         elif (op_code == OP_CODE_TIMER):
             print("adding timer node.")
             node = timerNode(self.scene)
-        elif(op_code == OP_CODE_JOIN3):
-            print("adding join node.")
-            node = Join3Node(self.scene)
-            node.title = "Join Node"
-
+        elif (op_code == OP_CODE_CUSTOM_ACTIVITY):
+            print("adding custom activity node.")
+            node = CustomActivityNode(self.scene)
         elif(op_code == OP_CODE_TTS):
             print('TTS added!')
             node = TtsNode(self.scene)

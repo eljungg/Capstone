@@ -25,86 +25,58 @@ from pynput.keyboard import Key, Controller, Listener
 # For everyone else, just pip install pyttsx3. 
 # If you recieve errors such as No module named win32com.client, No module named win32, or No module named win32api, you will need to additionally install pypiwin32.
 
-start_threads = []
+import pyttsx3
+import keyboard
+from pynput import keyboard
+from pynput.keyboard import Key, Controller, Listener
+
 threads = []
-windowContent = []
-myDict = []
+myDict = [] #Used for Key Press nodes
 key_press_Merge = False
 whileNodes = []
 endWhileNodes = []
 
-class _DialogWindow(QWidget):
-    def __init__(self, simpleDialog=True):
-        super().__init__()
-        self.windowString = ""
-        self.setFixedWidth(600)
-        self.setFixedHeight(600)
-        self.layout = QVBoxLayout()
-
-        self.textArea = QLabel()
-        self.textArea.setText(self.windowString)
-        self.textArea.setFixedWidth(580)
-        self.textArea.setFixedHeight(500)
-        self.layout.addWidget(self.textArea)
-
-        self.button = QPushButton()
-        self.button.setFixedWidth(120)
-        self.button.setFixedHeight(50)
-        if simpleDialog:
-            self.button.setText("Ok")
-        else:
-            self.button.setText("Stop")
-        self.layout.addWidget(self.button)
-        #self.button.clicked.connect(self.buttonClicked())
-
-        self.setLayout(self.layout)
-
-        self.show()
-
-    def buttonClicked(self):
-        self.close()
-
-    
-    def appendLabel(self, string):
-        self.windowString += string
-        self.textArea.setText(self.windowString)
-
 class VplExecution():
-
+    """ Class handles execution of the program formed by the nodes """
     def __init__(self, nodes: list=[], edges: list=[]):
+        """
+        :Instance Attributes:
+
+            - **_nodes** - list of `Nodes` given to execution
+            - **_edges** - list of `Edges` given to execution
+
+        """
         self._nodes = nodes
         self._edges = edges
         self._startNodes = []
-        self._nodeQueue = deque()
         self._findStartNodes()
         self._window = ExecutionWindow(False)
         self.dialogOpen = False
         self.str = "Program started.\n"
-        self._threads = list()
     
     def _findStartNodes(self):
+        """Checks all nodes to see if they have a parent node. If not, add the node to the start list."""
         for node in self._nodes:
             if(node.getInput() == None):
                 self._startNodes.append(node)
-            #if(node.op_code == OP_CODE_JOIN):
-                #self._registerJoinNode(node)
 
     def threadExecute(self, startNode, pData=None):
-        parentData = pData
-        currentNode = startNode
+        """Executes program defined by nodes"""
+        parentData = pData #data from parent node to be passed to child/current node
+        currentNode = startNode #Node currently being processed
         moreChildren = True
-        nextNodes = []
+        nextNodes = [] #list of node(s) to be executed next
         ifValue = False
         switchValue = False
         speak = False
         whileValue = False
 
-        engine = pyttsx3.init()
 
         if (startNode.op_code == OP_CODE_MERGE or startNode.op_code == OP_CODE_JOIN):
+            #These nodes should not be at the start of a program
             self._window.appendText("Error, you cannot have a Merge or Join activity as Start-Node!" + '\n')
 
-        elif (startNode.op_code == OP_CODE_KEYPRESS):
+        elif (startNode.op_code == OP_CODE_KEYPRESS): #special handling for keypress node
             keyEle = currentNode.getKey()
             def on_press(key):
                 global myDict
@@ -147,7 +119,7 @@ class VplExecution():
                 listener.join()
             breakpoint()
 
-        elif (startNode.op_code == OP_CODE_KEYRELEASE):
+        elif (startNode.op_code == OP_CODE_KEYRELEASE): #special handling for keyrelase node
             def on_release(key):
                 print('{0} release'.format(key))
                 if (startNode.getChildrenNodes()[0].op_code == OP_CODE_MERGE):
@@ -160,13 +132,11 @@ class VplExecution():
             listener.start()
             breakpoint()
 
-        else:
+        else: #normal handling for nodes
             while moreChildren:
 
-                if(currentNode.op_code == OP_CODE_SIMPLE_DIALOG):
-                    self._simpleDialogEx(parentData) #broken? -luke     Very broken -Ceres
-
-                elif(currentNode.op_code == OP_CODE_IF):
+                #set flags as needed for certain nodes.
+                if(currentNode.op_code == OP_CODE_IF):
                     ifValue = True
 
                 elif(currentNode.op_code == OP_CODE_SWITCH):
@@ -188,9 +158,16 @@ class VplExecution():
                 currentNode.doEval(parentData) #evaluate the current node, parentData is the data object from parent node if applicable
                 parentData = currentNode.data # save data object for passing to child node
                 self.printNodeMessages(parentData, speak, engine) # print any messages resulting from our doEval() function.
-                nextNodes = currentNode.getChildrenNodes()
+                
+                #determine which nodes will be executed next
+                if(currentNode.op_code == OP_CODE_CUSTOM_ACTIVITY):
+                    nextNodes = [currentNode.innerInput]
+                elif(currentNode.op_code == OP_CODE_CAOUT):
+                    nextNodes = currentNode.CAParent.getChildrenNodes()
+                else:
+                    nextNodes = currentNode.getChildrenNodes()
 
-                if nextNodes != []:
+                if nextNodes != []: #If there are more nodes after current...
                     if(ifValue):
                         # If the node is an If node, choose the corresponding socket based on the correct statement
                         outputNodes = currentNode.getOutputs(parentData.val)
@@ -209,7 +186,7 @@ class VplExecution():
                             moreChildren = False
                         ifValue = False                        
                     elif(switchValue):
-                        # If the node is an If node, choose the corresponding socket based on the correct statement
+                        # If the node is an Switch node, choose the corresponding socket based on the correct statement
                         outputNodes = currentNode.getOutputs(parentData.val)
                         
                         # If the socket has connected edges
@@ -257,40 +234,38 @@ class VplExecution():
                     elif(currentNode.op_code == OP_CODE_JOIN and not parentData.val):
                         moreChildren = False
                         #join node returned empty list, not ready, let thread die. Non-empty list will pass through and execute normally.
-                    else:
-                        currentNode = nextNodes[0]
-                        #print("continuing thread\n")
+                    else: # normal handling for nodes
+                        currentNode = nextNodes[0] #continue thread with first available node in next
                         if len(nextNodes) > 1:
-                            for node in nextNodes[1:]:
-                                #print("new thread from child\n")
+                            for node in nextNodes[1:]: #if there are more nodes, create threads for remaining children
                                 t = threading.Thread(target=self.threadExecute, args=(node, parentData), daemon=True)
                                 threads.append(t)
                                 t.start()
 
-                else:
-                    moreChildren = False
+                else: 
+                    moreChildren = False #no more children, while loop will ends, thread will die.
+                    return parentData
                     #print("Ending a thread\n")
 
-            engine.stop()
+            
 
     def startExecution(self):
+        """Spawns a thread for each node in the `_startNodes` list."""
         self._window.show()
         for node in self._startNodes:
             t = threading.Thread(target=self.threadExecute, args=(node,), daemon=True)
             threads.append(t)
-            #print("Starting a thread\n")
             t.start()
-            #self._nodeQueue.append(node)
-            #self._executeNodes()
-            #print("end of thread.")
 
-    def printNodeMessages(self, dataObject, speak, engine): # prints all a nodes messages, and then clears them
+    def printNodeMessages(self, dataObject, speak): # prints all a nodes messages, and then clears them
         for msg in dataObject.messages: # iterate any messages
             if(type(msg) == str): #verify type
                 self._window.appendText(msg + '\n') # any given msg string to the print_line execution window
                 if speak:
+                    engine = pyttsx3.init()
                     engine.say(msg)
                     engine.runAndWait()
+                    engine.stop()
             else:
                 print("printNodeMessages passed non-string type error") #Debug
         dataObject.clearMessages() # clear all messages after printing

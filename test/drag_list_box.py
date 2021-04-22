@@ -22,6 +22,7 @@ class QDMDragListBox(QListWidget):
 
 
     def addItems(self):
+        self.addItem('Custom Activity', None, OP_CODE_CUSTOM_ACTIVITY)
         self.addItem('Variable', None, OP_CODE_VARIABLE)
         self.addItem('Calculate', None, OP_CODE_CALCULATE)
         self.addItem('Data', None, OP_CODE_DATA)
