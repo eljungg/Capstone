@@ -69,27 +69,27 @@ class SubWindow(NodeEditorWidget):
         #return a class based on op code
         if 'op_code' not in data: 
             return VplNode
-        elif data['op_code'] == 7:
+        elif data['op_code'] == OP_CODE_VARIABLE:
             return VariableNode
-        elif data['op_code'] == 8: return CalculateNode
-        elif data['op_code'] == 9: return DataNode
-        elif data['op_code'] == 10: return MergeNode
-        elif data['op_code'] == 11: return IfNode
-        elif data['op_code'] == 12: return JoinNode
-        elif data['op_code'] == 17: return WhileNode
-        elif data['op_code'] == 18: return EndWhileNode
-        elif data['op_code'] == 19: return BreakNode
-        elif data['op_code'] == 49: return TerminalPrintNode
-        elif data['op_code'] == 50: return PrintLineNode
-        elif data['op_code'] == 51: return SimpleDialogNode
-        elif data['op_code'] == 14: return CommentNode
-        elif data['op_code'] == 15: return timerNode
+        elif data['op_code'] == OP_CODE_CALCULATE: return CalculateNode
+        elif data['op_code'] == OP_CODE_DATA: return DataNode
+        elif data['op_code'] == OP_CODE_MERGE: return MergeNode
+        elif data['op_code'] == OP_CODE_IF: return IfNode
+        elif data['op_code'] == OP_CODE_JOIN: return JoinNode
+        elif data['op_code'] == OP_CODE_WHILE: return WhileNode
+        elif data['op_code'] == OP_CODE_END_WHILE: return EndWhileNode
+        elif data['op_code'] == OP_CODE_BREAK: return BreakNode
+        elif data['op_code'] == OP_CODE_TERMINAL_PRINT: return TerminalPrintNode
+        elif data['op_code'] == OP_CODE_PRINT_LINE: return PrintLineNode
+        elif data['op_code'] == OP_CODE_SIMPLE_DIALOG: return SimpleDialogNode
+        elif data['op_code'] == OP_CODE_COMMENT: return CommentNode
+        elif data['op_code'] == OP_CODE_TIMER: return timerNode
         elif data['op_code'] == OP_CODE_CUSTOM_ACTIVITY: return CustomActivityNode
         elif data['op_code'] == OP_CODE_NOOP: return NoOPNode
         elif data['op_code'] == OP_CODE_REST: return RestfulServiceNode
         elif data['op_code'] == OP_CODE_CODEPY: return CodeActivityPythonNode
-        elif data['op_code'] == 20: return KeypressNode
-        elif data['op_code'] == 21: return KeyReleaseNode
+        elif data['op_code'] == OP_CODE_KEYPRESS: return KeypressNode
+        elif data['op_code'] == OP_CODE_KEYRELEASE: return KeyReleaseNode
         
         return VplNode
 
