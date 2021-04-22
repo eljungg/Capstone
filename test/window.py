@@ -172,7 +172,7 @@ class MainWindow(NodeEditorWindow):
         self.aboutAct = QAction("&About", self, statusTip="Show the application's About box", triggered=self.about)
         self.actRun = QAction('&Run', self, shortcut='Ctrl+R', statusTip="Run the program.", triggered=self.executeProgram)
 
-        self.actShowCAWindow = QAction('&CAWindow', self, statusTip="Show a custom activity window", triggered=self.createCAWindow)
+        #self.actShowCAWindow = QAction('&CAWindow', self, statusTip="Show a custom activity window", triggered=self.createCAWindow)
 
     def onWindowNodesToolbar(self):
         if self.nodesDock.isVisible():

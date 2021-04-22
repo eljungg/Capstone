@@ -40,5 +40,6 @@ class MergeNode(VplNode):
         self.data.id = self.id
 
     def doEval(self, input=None):
+        # Merge itself doesn't do anything other than pass info from the previous node.
         self.data = input
         return self.data

@@ -6,6 +6,12 @@ from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from vpl_scene import VplScene
 
+# TODO: Change node to look and function similar to variable node.
+# TODO: Fix deserialize to give the scene the getNodeClass() function from Subwindow/CustomActivityWindow
+# Currently the loaded scene in this node has no way to figure out the class of the node from opcode and tries to
+# create the default node and crashes. 
+# TODO: Addition of data connections.
+
 class CustomActivityContent(VplContent):
     def initUI(self):
         self.layout = QVBoxLayout()
@@ -73,6 +79,9 @@ class CustomActivityNode(VplNode):
         self.innerInput = None
 
     def buttonClicked(self):
+        # try catch blocks. The nodeeditor cannot tell if the custom activity window was closed.
+        # Trying to open it again will crash the program without these blocks. Feel free to 
+        # clean this section up if you can.
         if(self.scene.windowRef != None):
             print("window ref found")
             if self.innerSubwindow == None:
@@ -90,8 +99,6 @@ class CustomActivityNode(VplNode):
                         print("subwindow failed to open. creating new window")
                         self.innerSubwindow = self.scene.windowRef.createCAWindow(self, self.content.innerScene).widget()
                         print("number of nodes in scene: " + str(len(self.content.innerScene.nodes)))
-                        #self.innerSubwindow.showScene()
-                        #self.innerSubwindow.setScene(self.content.innerScene)
                         self.innerInput = self.innerSubwindow.getInputNode()
                         self.innerSubwindow.show()
             else:
@@ -102,20 +109,8 @@ class CustomActivityNode(VplNode):
                     print("subwindow could not be shown. creating new subwindow")
                     self.innerSubwindow = self.scene.windowRef.createCAWindow(self, self.content.innerScene).widget()
                     print("number of nodes in scene: " + str(len(self.content.innerScene.nodes)))
-                    #self.innerSubwindow.showScene()
-                    #self.innerSubwindow.setScene(self.content.innerScene)
                     self.innerInput = self.innerSubwindow.getInputNode()
                     self.innerSubwindow.show()
-            """
-            if self.content.innerScene == None:
-                self.innerSubwindow = self.scene.windowRef.createCAWindow(self).widget()
-                self.content.innerScene = self.innerSubwindow.getScene()
-                self.innerInput = self.innerSubwindow.getInputNode()
-            else:
-                if(self.innerSubwindow == None):
-                    self.innerSubwindow = self.scene.windowRef.createCAWindow(self).widget()
-                    self.innerSubwindow.setScene(self.content.innerScene)
-            """
 
         else:
             print("failure")
