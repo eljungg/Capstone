@@ -121,9 +121,10 @@ class VariableNode(VplNode):
         self.__setVariableVal(selectedVariable , parentData.val) # set that variable with the new data
         #now we need to set this nodes NodeData() to have its val, and type. So that we pass these one to children
         self.data.valType = selectedVariable.valType # TYPE DETERMINED BY VARIABLE MENU
-        if(parentData.valType != selectedVariable.valType): # need to throw error, print to exection window
+        if(parentData.valType != selectedVariable.valType) and selectedVariable.valType != TYPE_STRING: # need to throw error, print to exection window #Allow type mismatch if variable is marked string, anything can be string if you want (following VIPLE)
             pTypeStr = valTypeToString(parentData.valType)
             vTypeStr = valTypeToString(selectedVariable.valType)
+ 
             errTypeMsg = "Error for variable "+selectedVariable.name +": "+pTypeStr+ " was not\n recognized as a valid "+vTypeStr+"."
             print(errTypeMsg)
             self.data.val = "null" # how viple does it

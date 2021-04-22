@@ -6,11 +6,10 @@ from conf import *
 from model.variables import VariablesData
 from model.node_data import NodeData
 from nodeeditor.node_node import *
-from util import determineDataType
 
 import re
 
-class CalculateContent(QDMNodeContentWidget):
+class WhileContent(QDMNodeContentWidget):
 
     def __init__(self, parent, variablesRef):
         self.vars = variablesRef
@@ -23,8 +22,7 @@ class CalculateContent(QDMNodeContentWidget):
         self.initialList = ['true', 'false']
 
         for var in self.vars.variables:
-            prefixedName = 'state.' + var.name
-            self.initialList.append(prefixedName)
+            self.initialList.append(var)
             
         self.initialList.append('value')
         self.comboBox.addItems(self.initialList)
@@ -40,8 +38,7 @@ class CalculateContent(QDMNodeContentWidget):
         self.comboBox.clear()
         self.comboBox.addItems(['true', 'false'])
         for var in self.vars.variables:
-            prefixedName = 'state.' + var.name
-            self.comboBox.addItem(prefixedName)
+            self.comboBox.addItem(var.name)
         self.comboBox.addItem('value')
 
     def setContentVariables(self, variables):
@@ -63,8 +60,8 @@ class CalculateContent(QDMNodeContentWidget):
         return res
 
 
-class CalculateNode(VplNode):
-    op_code = OP_CODE_CALCULATE
+class WhileNode(VplNode):
+    op_code = OP_CODE_WHILE
     TotalOutputs = [0,1]
 
     def __init__(self, scene):
@@ -72,7 +69,7 @@ class CalculateNode(VplNode):
         super().__init__(scene, inputs=[1], outputs=[3])
 
     def initInnerClasses(self):
-        self.content = CalculateContent(self, self.variablesRef)
+        self.content = WhileContent(self, self.variablesRef)
         self.grNode = VplGraphicsNode(self)
         #self.data = NodeData() # THIS FIXES SCOPING ISSUE,
         self.data.nodeType = self.op_code
@@ -104,8 +101,9 @@ class CalculateNode(VplNode):
         self.content.setContentVariables(self.variablesRef)
 
     def doEval(self, input=None):
-        #Warn, this fails if Value == string variable. not sure what VIPLE does
+
         statement = self.content.edit.text()
+        print(statement)
 
         if statement == 'true':
             self.data.val = True
@@ -128,5 +126,9 @@ class CalculateNode(VplNode):
 
         self.final = eval(statement)
         self.data.val = self.final
-        valType = determineDataType(self.data.val) # get VPL type of output
-        self.data.valType = valType
+        if type(self.final) is int:
+            self.data.valType = TYPE_INT
+        elif type(self.final) is float:
+            self.data.valType = TYPE_DOUBLE
+        
+        self.data.valType = type(self.final)

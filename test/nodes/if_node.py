@@ -53,6 +53,7 @@ class IfNodeContent(QDMNodeContentWidget):
 
         self.layout.setStretch(0, 1)
         self.layout.setStretch(1, 1)
+        self.layout.setSizeConstraint(0)
         
         self.redrawComboBox()
         self.setLayout(self.layout)
@@ -87,10 +88,68 @@ class IfNodeContent(QDMNodeContentWidget):
             for i in range(len(value)):
                 self.edit[i].setText(value[i])
 
+                if i < len(value) - 1:
+                    self.increaseWidgetSize()
+
             return True & res
         except Exception as e:
             dumpException(e)
         return res
+
+    def registerButtons(self):
+        self.addBtn.clicked.connect(self.increaseWidgetSize)
+
+    def increaseWidgetSize(self):
+        
+        self.TotalIfs = self.TotalIfs + 1
+
+        self.innerHbox.removeWidget(self.subBtn)
+        self.subBtn.deleteLater()
+        self.subBtn = None
+        self.innerHbox.removeWidget(self.elseLbl)
+        self.elseLbl.deleteLater()
+        self.elseLbl = None
+        self.innerHbox.removeWidget(self.addBtn)
+        self.addBtn.deleteLater()
+        self.addBtn = None
+        self.layout.removeWidget(self.groupBox)
+        self.groupBox.deleteLater()
+        self.groupBox = None
+    
+        self.comboBox.append(QComboBox(self))
+        self.comboBox[self.TotalIfs - 1].addItems(self.initialList)
+
+        self.edit.append(QLineEdit('' , self))
+        self.comboBox[self.TotalIfs - 1].setLineEdit(self.edit[self.TotalIfs - 1])
+
+        self.edit[self.TotalIfs - 1].setAlignment(Qt.AlignCenter)
+        
+        self.subBtn = QPushButton('-', self)
+        self.addBtn = QPushButton('+', self)
+        self.elseLbl = QLabel('Else', self)
+        
+        self.layout.addWidget(self.comboBox[self.TotalIfs - 1])
+
+        self.groupBox = QGroupBox()
+        self.layout.addWidget(self.groupBox)
+
+        self.innerHbox = None
+
+        self.innerHbox = QHBoxLayout() 
+        self.groupBox.setLayout(self.innerHbox)
+
+        self.innerHbox.addWidget(self.addBtn)
+        self.innerHbox.addWidget(self.subBtn)
+        self.innerHbox.addWidget(self.elseLbl)
+
+        self.layout.setStretch(self.TotalIfs - 1, 1)
+        self.layout.setStretch(self.TotalIfs, 1)
+
+        self.layout.setSizeConstraint(0)
+        
+        self.redrawComboBox()
+
+        self.registerButtons()
 
 
 class IfNode(VplNode):
@@ -210,8 +269,9 @@ class IfNode(VplNode):
         self.newSockets([1], self.TotalOutputs, True)
 
         self.grNode.height += 43
+
+        self.content.layout.setSizeConstraint(0)
         
-        self.content.redrawComboBox()
         self.registerButtons()
 
     def decreaseWidgetSize(self):
@@ -242,6 +302,8 @@ class IfNode(VplNode):
             self.content.elseLbl = QLabel('Else', self.content)
             self.content.elseLbl.setAlignment(Qt.AlignCenter)
 
+            self.content.layout.setSizeConstraint(3)
+
             self.content.groupBox = QGroupBox()
             self.content.layout.addWidget(self.content.groupBox)
 
@@ -256,6 +318,8 @@ class IfNode(VplNode):
             self.newSockets([1], self.TotalOutputs, True)
 
             self.grNode.height -= 43
+
+            self.content.innerHbox.setSizeConstraint(3)
 
             self.registerButtons()
 

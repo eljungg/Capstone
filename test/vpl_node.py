@@ -5,6 +5,8 @@ from nodeeditor.node_node import Node
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_socket import *
+from nodeeditor.node_edge import *
+from vpl_socket import *
 from nodeeditor.utils import dumpException
 from model.node_data import NodeData
 
@@ -18,7 +20,7 @@ class VplGraphicsNode(QDMGraphicsNode):
         self.edge_roundness = 6
         self.edge_padding = 0
         self.title_horizontal_padding = 8
-        self.title_vertical_padding = 10
+        self.title_vertical_padding = 32
 
     def initAssets(self):
         super().initAssets()
@@ -46,6 +48,7 @@ class VplContent(QDMNodeContentWidget):
 class VplNode(Node):
     GraphicsNode_class = VplGraphicsNode
     NodeContent_class = VplContent
+    Socket_class = VplSocket
     #data = NodeData() # hold our data model for this node
     op_code = 0
 
@@ -53,11 +56,18 @@ class VplNode(Node):
     content_label_objname = "calc_node_bg"
     def __init__(self, scene:'Scene', title:str="Undefined Node", inputs:list=[], outputs:list=[]):
         self.data = NodeData()
-        super().__init__(scene , title , inputs, outputs)
+        super().__init__(scene, title, inputs, outputs)
+
+        print("Running: " + title)
 
         self.newSockets(inputs, outputs)
         
         print("Over-rided node class goes!")
+
+    def initSettings(self):
+        super().initSettings()
+
+        self.socket_spacing = 43
 
     def onDeserialized(self, data=None):
         self.data.id = self.id
@@ -80,11 +90,31 @@ class VplNode(Node):
 
     def newSockets(self, inputs: list, outputs: list, reset: bool=True):
 
+        inputEdges = []
+        outputEdges = []
+
         if reset:
             # clear old sockets
             if hasattr(self, 'inputs') and hasattr(self, 'outputs'):
                 # remove grSockets from scene
-                for socket in (self.inputs+self.outputs):
+                for socket in (self.inputs):
+                    inputSockets = []
+
+                    for edge in socket.edges:
+                        inputSockets.append(edge.getOtherSocket(socket))
+
+                    inputEdges.append(inputSockets)
+
+                    self.scene.grScene.removeItem(socket.grSocket)
+                    socket.removeAllEdges()
+                for socket in (self.outputs):
+                    outputSockets = []
+
+                    for edge in socket.edges:
+                        outputSockets.append(edge.getOtherSocket(socket))
+
+                    outputEdges.append(outputSockets)
+                    
                     self.scene.grScene.removeItem(socket.grSocket)
                     socket.removeAllEdges()
                 self.inputs = []
@@ -98,6 +128,11 @@ class VplNode(Node):
                 socket_type=item, multi_edges=self.input_multi_edged,
                 count_on_this_node_side=len(inputs), is_input=True
             )
+
+            if(counter < len(inputEdges)):       
+                for edge in inputEdges[counter]:
+                    newEdge = Edge(self.scene, edge, socket, EDGE_TYPE_BEZIER)
+
             counter += 1
             self.inputs.append(socket)
 
@@ -108,48 +143,19 @@ class VplNode(Node):
                 socket_type=item, multi_edges=self.output_multi_edged,
                 count_on_this_node_side=len(outputs), is_input=False
             )
-            
+
+            if(counter < len(outputEdges) - 1):    
+                for edge in outputEdges[counter]:
+                    newEdge = Edge(self.scene, socket, edge, EDGE_TYPE_BEZIER)
+
+            if(counter == len(outputs) - 1):
+                for edge in outputEdges[-1]:
+                    newEdge = Edge(self.scene, socket, edge, EDGE_TYPE_BEZIER)
+
             counter += 1
             self.outputs.append(socket)
-
         
-        '''
-        if(len(inputs) != len(self.inputs)):
-            counter = 0
-            for item in inputs:
-                socket = self.__class__.Socket_class(
-                    node=self, index=counter, position=self.input_socket_position,
-                    socket_type=item, multi_edges=self.input_multi_edged,
-                    count_on_this_node_side=len(inputs), is_input=True
-                )
-                counter += 1
-                self.inputs.append(socket)
-
-        if(len(outputs) != len(self.outputs)):
-            if(AddOrSub):
-                counter = 0
-                for item in outputs:
-                    socket = self.__class__.Socket_class(
-                        node=self, index=counter, position=self.output_socket_position,
-                        socket_type=item, multi_edges=self.output_multi_edged,
-                        count_on_this_node_side=len(outputs), is_input=False
-                    )
-                    if(counter == len(outputs) - 2):
-                        self.outputs.insert(counter, socket)
-                    elif(counter == len(outputs) - 1):
-                        self.outputs[counter].index=counter
-                        self.outputs[counter].setSocketPosition=RIGHT_BOTTOM
-
-                        if(self.outputs[counter].hasAnyEdge()):
-                            self.outputs[counter].removeAllEdges()
-                        
-                    counter += 1
-            else:
-                for socket in self.outputs:
-                    if(socket.index == len(self.outputs) - 2):
-                        socket.delete()
-                        self.outputs.pop(-2)
-        '''
+        self.updateConnectedEdges()
 
     def serialize(self):
         res = super().serialize()

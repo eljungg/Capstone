@@ -32,11 +32,17 @@ class QDMDragListBox(QListWidget):
         self.addItem('Simple Dialog', 'icons/in.png', OP_CODE_SIMPLE_DIALOG)
         self.addItem('Terminal Print', 'icons/in.png', OP_CODE_TERMINAL_PRINT)
         self.addItem('Switch', 'icons/in.png', OP_CODE_SWITCH)
+        self.addItem('While', 'icons/in.png', OP_CODE_WHILE)
+        self.addItem('End While', 'icons/in.png', OP_CODE_END_WHILE)
+        self.addItem('Break', 'icons/in.png', OP_CODE_BREAK)
         self.addItem('Comment', 'icons/in.png', OP_CODE_COMMENT)
-        self.addItem('timer', 'icons/in.png', OP_CODE_timer)
+        self.addItem('timer', 'icons/in.png', OP_CODE_TIMER)
+        self.addItem('Text-To-Speech', None, OP_CODE_TTS)
+        self.addItem('RESTful Service', 'icons/in.png', OP_CODE_REST)
+        self.addItem('Code Activity Python', 'icons/in.png', OP_CODE_CODEPY)
+        self.addItem('Key Press', 'icons/in.png', OP_CODE_KEYPRESS)
+        self.addItem('Key Release', 'icons/in.png', OP_CODE_KEYRELEASE)
         self.addItem('Custom Activity', 'icons/in.png', OP_CODE_CUSTOM_ACTIVITY)
-        self.addItem('3Join', 'icons/in.png', OP_CODE_JOIN3)
-
 
 
     def addItem(self, name, icon=None, op_code=0):

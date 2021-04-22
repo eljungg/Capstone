@@ -10,7 +10,6 @@ from vpl_node import VplNode # get over-ridedd node
 from nodes.variable_node import VariableNode # get our node sub classes
 from nodes.if_node import IfNode
 from nodes.join_node import JoinNode
-from nodes.join3_node import Join3Node
 from nodes.data_node import DataNode
 from nodes.calculate_node import CalculateNode
 from nodes.merge_node import MergeNode
@@ -23,6 +22,18 @@ from nodes.comment_node import CommentNode
 from nodes.timer_node import timerNode
 from nodes.custom_activity_node import CustomActivityNode
 from nodes.noop_node import NoOPNode
+from nodes.tts_node import TtsNode
+from nodes.restful_node import RestfulServiceNode
+from nodes.code_activity_python_node import CodeActivityPythonNode
+from nodes.while_node import WhileNode
+from nodes.end_while_node import EndWhileNode
+from nodes.break_node import BreakNode
+from nodes.key_press_node import KeypressNode
+from nodes.key_release_node import KeyReleaseNode
+
+from nodes.key_press_node import KeypressNode
+
+from nodes.key_release_node import KeyReleaseNode
 
 
 class SubWindow(NodeEditorWidget):
@@ -65,13 +76,20 @@ class SubWindow(NodeEditorWidget):
         elif data['op_code'] == 10: return MergeNode
         elif data['op_code'] == 11: return IfNode
         elif data['op_code'] == 12: return JoinNode
+        elif data['op_code'] == 17: return WhileNode
+        elif data['op_code'] == 18: return EndWhileNode
+        elif data['op_code'] == 19: return BreakNode
         elif data['op_code'] == 49: return TerminalPrintNode
         elif data['op_code'] == 50: return PrintLineNode
         elif data['op_code'] == 51: return SimpleDialogNode
         elif data['op_code'] == 14: return CommentNode
         elif data['op_code'] == 15: return timerNode
-        elif data['op_code'] == 16: return CustomActivityNode
-        elif data['op_code'] == 52: return NoOPNode
+        elif data['op_code'] == OP_CODE_CUSTOM_ACTIVITY: return CustomActivityNode
+        elif data['op_code'] == OP_CODE_NOOP: return NoOPNode
+        elif data['op_code'] == OP_CODE_REST: return RestfulServiceNode
+        elif data['op_code'] == OP_CODE_CODEPY: return CodeActivityPythonNode
+        elif data['op_code'] == 20: return KeypressNode
+        elif data['op_code'] == 21: return KeyReleaseNode
         
         return VplNode
 
@@ -184,16 +202,47 @@ class SubWindow(NodeEditorWidget):
         elif (op_code == OP_CODE_COMMENT):
             print("adding comment node.")
             node = CommentNode(self.scene)
-        elif (op_code == OP_CODE_timer):
+        elif (op_code == OP_CODE_TIMER):
             print("adding timer node.")
             node = timerNode(self.scene)
         elif (op_code == OP_CODE_CUSTOM_ACTIVITY):
             print("adding custom activity node.")
             node = CustomActivityNode(self.scene)
-        elif(op_code == OP_CODE_JOIN3):
-            print("adding join node.")
-            node = Join3Node(self.scene)
-            node.title = "Join Node"
+        elif(op_code == OP_CODE_TTS):
+            print('TTS added!')
+            node = TtsNode(self.scene)
+            node.title = 'TTS Node'
+        elif(op_code == OP_CODE_REST):
+            print("RESTful node added")
+            node = RestfulServiceNode(self.scene)
+            node.setVariableData(self.variables)
+            node.title = "RESTful Service"
+        elif(op_code == OP_CODE_CODEPY):
+            print("Code Activity Python node added")
+            node = CodeActivityPythonNode(self.scene)
+            node.title = "Code Activity (python)"
+        elif(op_code == OP_CODE_WHILE):
+            print("While node added")
+            node = WhileNode(self.scene)
+            node.setVariableData(self.variables)
+            node.content.redrawComboBox()
+            node.title = "While"
+        elif(op_code == OP_CODE_END_WHILE):
+            print("End While node added")
+            node = EndWhileNode(self.scene)
+            node.title = "End While"
+        elif(op_code == OP_CODE_BREAK):
+            print("Breaknode added")
+            node = BreakNode(self.scene)
+            node.title = "Break"
+        elif (op_code == OP_CODE_KEYRELEASE):
+            print("Key Release Python node added")
+            node = KeyReleaseNode(self.scene)
+            node.title = "Key Release"
+        elif (op_code == OP_CODE_KEYPRESS):
+            print("Key Press Python node added")
+            node = KeypressNode(self.scene)
+            node.title = "Key Press"
         else:
             node =  VplNode(self.scene,  text, inputs=[1,1], outputs=[2])
 
