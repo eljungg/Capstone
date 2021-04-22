@@ -138,6 +138,10 @@ class VplExecution():
                 elif(currentNode.op_code == OP_CODE_TTS):
                     speak = True
 
+                elif (currentNode.op_code == OP_CODE_CODEPY):
+                    result = currentNode.getOutValue(parentData)
+                    self._window.appendText(result.val + '\n')
+
                 #general execution for nodes
                 currentNode.doEval(parentData) #evaluate the current node, parentData is the data object from parent node if applicable
                 parentData = currentNode.data # save data object for passing to child node
